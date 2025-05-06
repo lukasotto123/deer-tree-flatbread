@@ -22,16 +22,19 @@ const Header = () => {
           </div>
         </div>
         
-        <Select value={currentClient} onValueChange={setCurrentClient} className="ml-4">
-          <SelectTrigger className="w-[220px] border-primary/20 bg-primary/5">
-            <SelectValue placeholder="Kunde auswählen" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="hauptkunde">Mustermann GmbH</SelectItem>
-            <SelectItem value="kunde2">Beispiel AG</SelectItem>
-            <SelectItem value="kunde3">Bau & Partner KG</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Fixed the Select component by removing the className prop from Select and moving styles to SelectTrigger */}
+        <div className="ml-4">
+          <Select value={currentClient} onValueChange={setCurrentClient}>
+            <SelectTrigger className="w-[220px] border-primary/20 bg-primary/5">
+              <SelectValue placeholder="Kunde auswählen" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="hauptkunde">Mustermann GmbH</SelectItem>
+              <SelectItem value="kunde2">Beispiel AG</SelectItem>
+              <SelectItem value="kunde3">Bau & Partner KG</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       
       <div className="flex items-center space-x-4">
