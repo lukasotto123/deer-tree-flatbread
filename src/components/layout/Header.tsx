@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [currentClient, setCurrentClient] = useState("hauptkunde");
@@ -35,6 +36,32 @@ const Header = () => {
             </SelectContent>
           </Select>
         </div>
+        
+        {/* Add Navigation Links */}
+        <nav className="ml-6 hidden md:block">
+          <ul className="flex items-center gap-6">
+            <li>
+              <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link to="/providers" className="text-muted-foreground hover:text-primary transition-colors">
+                Dienstleister
+              </Link>
+            </li>
+            <li>
+              <Link to="/documents" className="text-muted-foreground hover:text-primary transition-colors">
+                Dokumente
+              </Link>
+            </li>
+            <li>
+              <Link to="/ai-agent" className="text-muted-foreground hover:text-primary transition-colors">
+                KI-Assistent
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
       
       <div className="flex items-center space-x-4">

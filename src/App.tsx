@@ -8,6 +8,7 @@ import AppLayout from "./components/layout/AppLayout";
 import Index from "./pages/Index";
 import Providers from "./pages/Providers";
 import Documents from "./pages/Documents";
+import AIAgent from "./pages/AIAgent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/providers" element={<Providers />} />
             <Route path="/documents" element={<Documents />} />
+            <Route path="/ai-agent" element={<AIAgent />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
