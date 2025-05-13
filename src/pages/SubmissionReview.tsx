@@ -12,10 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { FileText } from "lucide-react";
 import { documents, providers, documentTypes, employees } from "@/data/dummy-data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
   comments: z.string().optional(),
@@ -132,27 +134,57 @@ const SubmissionReview = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          {/* Document preview placeholder - No actual document shown */}
+          {/* Document placeholder - No actual document loaded */}
           <Card>
             <CardHeader>
               <CardTitle>Dokumentvorschau</CardTitle>
               <CardDescription>
                 {isNewDocument 
-                  ? "Sie können ein neues Dokument hochladen" 
-                  : "Überprüfen Sie das eingereichte Dokument"}
+                  ? "Dokumentenupload-Bereich" 
+                  : "Vorschau des eingereichten Dokuments"}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center">
               <div className="w-full max-w-2xl border rounded-md overflow-hidden">
                 <AspectRatio ratio={1 / 1.414}>
-                  <div className="h-full w-full bg-muted flex items-center justify-center">
+                  <div className="h-full w-full bg-muted flex flex-col items-center justify-center p-6">
+                    <FileText className="h-16 w-16 text-muted-foreground mb-4" />
                     {isNewDocument ? (
-                      <div className="text-center p-4">
-                        <p className="text-muted-foreground mb-4">Ziehen Sie eine Datei hierher oder klicken Sie, um eine Datei auszuwählen</p>
-                        <Button>Datei auswählen</Button>
+                      <div className="text-center">
+                        <p className="text-muted-foreground mb-4">
+                          Hier können Sie Ihr Dokument hochladen.
+                        </p>
+                        <div className="border border-dashed border-gray-300 rounded-md p-8 mb-4">
+                          <p className="text-muted-foreground mb-2">
+                            Ziehen Sie eine Datei hierher oder klicken Sie, um eine Datei auszuwählen
+                          </p>
+                          <Button className="mt-2">Datei auswählen</Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Unterstützte Formate: PDF, JPG, PNG (max. 10MB)
+                        </p>
                       </div>
                     ) : (
-                      <p className="text-muted-foreground">Dokument wird geladen...</p>
+                      <div className="text-center w-full">
+                        <p className="text-lg font-medium mb-6">
+                          {documentType.name}
+                        </p>
+                        <div className="space-y-4 w-full">
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-3/4" />
+                          <div className="py-4"></div>
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-5/6" />
+                          <div className="py-4"></div>
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-2/3" />
+                        </div>
+                        <p className="text-muted-foreground mt-6">
+                          Das Dokument wird aus Sicherheitsgründen nicht angezeigt
+                        </p>
+                      </div>
                     )}
                   </div>
                 </AspectRatio>
