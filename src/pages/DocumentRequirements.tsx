@@ -75,7 +75,9 @@ const DocumentRequirements = () => {
                 <TableHead>Dokumentenname</TableHead>
                 <TableHead>Unternehmenstyp</TableHead>
                 <TableHead>Pro Mitarbeiter</TableHead>
-                <TableHead>Prüffrequenz</TableHead>
+                <TableHead>Klientenspezifisch</TableHead>
+                <TableHead>Prüffrequenz (Sicher)</TableHead>
+                <TableHead>Prüffrequenz (Basis)</TableHead>
                 <TableHead className="text-right">Aktionen</TableHead>
               </TableRow>
             </TableHeader>
@@ -89,7 +91,9 @@ const DocumentRequirements = () => {
                       : "Subunternehmer"}
                   </TableCell>
                   <TableCell>{doc.isPerEmployee ? "Ja" : "Nein"}</TableCell>
+                  <TableCell>{doc.isClientSpecific ? "Ja" : "Nein"}</TableCell>
                   <TableCell>{doc.checkFrequency.secure}</TableCell>
+                  <TableCell>{doc.checkFrequency.basic}</TableCell>
                   <TableCell className="text-right">
                     <Link to={`/document/${doc.id}`}>
                       <Button variant="outline" size="sm">Details</Button>

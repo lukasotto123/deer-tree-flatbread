@@ -2,7 +2,7 @@
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+import { Check, X, Sparkles } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { documents, providers } from "@/data/dummy-data";
 
@@ -22,7 +22,7 @@ const SubmissionReview = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Dokumentprüfung</h1>
+        <h1 className="text-3xl font-bold">Dokumentenprüfung</h1>
         <Link to={`/provider/${providerId}`}>
           <Button variant="outline">Zurück zum Dienstleister</Button>
         </Link>
@@ -50,22 +50,32 @@ const SubmissionReview = () => {
         {/* Extrahierte Inhalte */}
         <Card>
           <CardContent className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Extrahierte Inhalte</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Extrahierte Inhalte 
+              <span className="ml-2 text-primary text-sm font-normal">
+                <Sparkles className="h-4 w-4 inline mb-1" /> KI-unterstützt
+              </span>
+            </h2>
             <div className="space-y-4">
-              <div>
+              <div className="relative">
                 <p className="text-sm text-muted-foreground">Dokumenttyp</p>
                 <p className="font-medium">
                   {document ? document.name : "Neues Dokument"}
+                  <Sparkles className="h-4 w-4 inline text-primary ml-2" />
                 </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Unternehmen</p>
-                <p className="font-medium">{provider.name}</p>
+                <p className="font-medium">
+                  {provider.name}
+                  <Sparkles className="h-4 w-4 inline text-primary ml-2" />
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Ausstellungsdatum</p>
                 <p className="font-medium">
                   {document ? new Date(document.issuedDate).toLocaleDateString('de-DE') : "01.05.2025"}
+                  <Sparkles className="h-4 w-4 inline text-primary ml-2" />
                 </p>
               </div>
               <div>
@@ -74,6 +84,7 @@ const SubmissionReview = () => {
                   {document && document.expiryDate 
                     ? new Date(document.expiryDate).toLocaleDateString('de-DE') 
                     : "01.05.2026"}
+                  <Sparkles className="h-4 w-4 inline text-primary ml-2" />
                 </p>
               </div>
 

@@ -1,7 +1,6 @@
 
 import { FileText, AlertTriangle, Clock, CheckCircle, Building, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatCard from "@/components/dashboard/StatCard";
 import ExpiringDocumentsTable from "@/components/dashboard/ExpiringDocumentsTable";
@@ -25,14 +24,6 @@ const Index = () => {
           <p className="text-muted-foreground mt-1">
             Überblick über den aktuellen Status aller Dokumente und Dienstleister
           </p>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild>
-            <Link to="/documents">Alle Dokumente</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/ai-agent">KI-Assistent</Link>
-          </Button>
         </div>
       </div>
 
@@ -135,3 +126,5 @@ const Index = () => {
 };
 
 export default Index;
+
+import { Button } from "@/components/ui/button";

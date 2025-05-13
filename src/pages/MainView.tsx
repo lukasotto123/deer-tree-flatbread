@@ -44,13 +44,13 @@ const MainView = () => {
         
         <div className="flex gap-2">
           <Button asChild>
-            <Link to="/requests">Anfragen</Link>
+            <Link to="/document-requirements">Dokumentenanforderungen</Link>
           </Button>
-          <Button variant="outline" asChild>
-            <Link to="/document-requirements">
-              <Settings className="h-4 w-4 mr-2" />
-              Dokumentenanforderungen
-            </Link>
+          <Button asChild>
+            <Link to="/document-review/provider-3/new">Dokumentenprüfung</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/dashboard">Dashboard</Link>
           </Button>
         </div>
       </div>
@@ -194,6 +194,7 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>ANÜ</TableHead>
               <TableHead>Dokumente</TableHead>
               <TableHead>Letzte Aktualisierung</TableHead>
               <TableHead className="text-right">Aktion</TableHead>
@@ -202,9 +203,16 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
           <TableBody>
             {providers.map((provider) => (
               <TableRow key={provider.id}>
-                <TableCell className="font-medium">{provider.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Link to={`/provider/${provider.id}`} className="text-primary hover:underline">
+                    {provider.name}
+                  </Link>
+                </TableCell>
                 <TableCell>
                   <StatusBadgeGerman status={provider.status} />
+                </TableCell>
+                <TableCell className={provider.hasANUPermission ? 'text-success' : 'text-destructive'}>
+                  {provider.hasANUPermission ? 'Ja' : 'Nein'}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">

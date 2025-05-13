@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,7 +34,7 @@ const ProviderView = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">{provider.name}</h1>
         <div className="flex gap-2">
-          <Link to={`/submission-review/${id}/new`}>
+          <Link to={`/document-review/${id}/new`}>
             <Button>Dokument hochladen</Button>
           </Link>
           <Link to="/">
@@ -71,6 +70,12 @@ const ProviderView = () => {
               <StatusBadgeGerman status={provider.status} />
             </div>
             <div>
+              <p className="text-sm text-muted-foreground">ANÜ Erlaubnis</p>
+              <span className={`${provider.hasANUPermission ? 'text-success' : 'text-destructive'} font-medium`}>
+                {provider.hasANUPermission ? 'Ja' : 'Nein'}
+              </span>
+            </div>
+            <div>
               <p className="text-sm text-muted-foreground">Letzte Aktualisierung</p>
               <p>{new Date(provider.lastUpdated).toLocaleDateString('de-DE')}</p>
             </div>
@@ -91,6 +96,7 @@ const ProviderView = () => {
                 <TableHead>Status</TableHead>
                 <TableHead>Ausstellungsdatum</TableHead>
                 <TableHead>Ablaufdatum</TableHead>
+                <TableHead>Erinnerungen</TableHead>
                 <TableHead>Relevanz</TableHead>
                 <TableHead className="text-right">Aktionen</TableHead>
               </TableRow>
@@ -99,6 +105,7 @@ const ProviderView = () => {
               {relevantDocTypes.map((docType) => {
                 const doc = providerDocuments.find(d => d.type === docType.id);
                 const isRelevant = true; // Default to true, would come from API
+                const isMissing = !doc || doc.status === 'missing';
 
                 return (
                   <TableRow key={docType.id}>
@@ -117,6 +124,16 @@ const ProviderView = () => {
                       {doc && doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
                     </TableCell>
                     <TableCell>
+                      {isMissing && (
+                        <div className="text-sm">
+                          <div>{doc?.remindersSent || 0} gesendet</div>
+                          <div className="text-xs text-muted-foreground">
+                            Nächste: {doc?.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
+                          </div>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center space-x-2">
                         <Switch id={`relevance-${docType.id}`} checked={isRelevant} />
                         <Label htmlFor={`relevance-${docType.id}`}>
@@ -126,12 +143,12 @@ const ProviderView = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       {doc ? (
-                        <Link to={`/submission-review/${id}/${doc.id}`}>
+                        <Link to={`/document-review/${id}/${doc.id}`}>
                           <Button variant="outline" size="sm">Prüfen</Button>
                         </Link>
                       ) : (
-                        <Link to={`/submission-review/${id}/new?documentType=${docType.id}`}>
-                          <Button variant="outline" size="sm">Hochladen</Button>
+                        <Link to={`/document-review/${id}/new?documentType=${docType.id}`}>
+                          <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
                         </Link>
                       )}
                     </TableCell>

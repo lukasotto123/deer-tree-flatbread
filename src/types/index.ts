@@ -27,6 +27,8 @@ export interface Document {
   basicCheckFrequency: string; // Basisprüfung - Frequenz
   basicCheckRequirement: string; // Basisprüfung - Erfordernis
   issuanceType: 'pro Unternehmen' | 'pro Mitarbeiter'; // Ausstellung
+  remindersSent?: number; // Anzahl der gesendeten Erinnerungen
+  nextReminderDate?: string; // Datum der nächsten Erinnerung
 }
 
 export interface Provider {
@@ -45,6 +47,7 @@ export interface Provider {
     missing: number;
   };
   lastUpdated: string;
+  hasANUPermission?: boolean; // Arbeitnehmerüberlassungserlaubnis
 }
 
 export interface Employee {

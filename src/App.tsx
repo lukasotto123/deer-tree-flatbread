@@ -23,6 +23,7 @@ const App = () => (
           <Route element={<AppLayout />}>
             <Route path="/" element={<MainView />} />
             <Route path="/provider/:id" element={<ProviderView />} />
+            <Route path="/document-review/:providerId/:documentId" element={<SubmissionReview />} />
             <Route path="/submission-review/:providerId/:documentId" element={<SubmissionReview />} />
             <Route path="/document-requirements" element={<DocumentRequirements />} />
             <Route path="/document/:id" element={<SingleDocumentView />} />
