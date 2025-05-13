@@ -9,19 +9,15 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { FileText } from "lucide-react";
+import { FileText, Check, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-  comments: z.string().optional(),
-  isApproved: z.boolean().default(false)
+  comments: z.string().optional()
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -40,37 +36,39 @@ const SubmissionReview = () => {
   // Simplified approach - no document fetching
   const isNewDocument = documentId === 'new';
   
-  // Placeholder document type name
-  const documentTypeName = isNewDocument ? "Neues Dokument" : "Bestehendes Dokument";
-  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       comments: "",
-      isApproved: false,
     },
   });
   
-  // Handle form submission
-  const onSubmit = (data: FormValues) => {
+  // Handle approval
+  const handleApprove = () => {
     setIsSubmitting(true);
-    console.log("Submitting review:", data);
+    console.log("Document approved");
     
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      
-      // Navigate based on whether this is for an employee or just a provider
-      if (employeeIdParam) {
-        navigate(`/person/${providerId}/${employeeIdParam}`);
-      } else {
-        navigate(`/provider/${providerId}`);
-      }
+      navigateBack();
+    }, 1000);
+  };
+  
+  // Handle rejection
+  const handleReject = () => {
+    setIsSubmitting(true);
+    console.log("Document rejected", form.getValues());
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      navigateBack();
     }, 1000);
   };
 
   // Function to handle navigation back
-  const handleGoBack = () => {
+  const navigateBack = () => {
     if (employeeIdParam) {
       navigate(`/person/${providerId}/${employeeIdParam}`);
     } else {
@@ -78,32 +76,46 @@ const SubmissionReview = () => {
     }
   };
 
+  // Extracted document information (mock data)
+  const extractedData = {
+    documentType: "Arbeitnehmerüberlassungserlaubnis",
+    issuer: "Behörde für Arbeit und Soziales",
+    issuedDate: "01.03.2023",
+    expiryDate: "28.02.2025",
+    registrationNumber: "AÜG-2023-78291",
+    providerName: "Top Personal GmbH",
+    verificationStatus: "Prüfung ausstehend"
+  };
+
+  // Pending documents count (mock data)
+  const pendingDocumentsCount = 7;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">{isNewDocument ? `Neues Dokument` : "Dokumentprüfung"}</h1>
+          <h1 className="text-3xl font-bold">Dokumentprüfung</h1>
           <p className="text-muted-foreground mt-1">
-            Bitte überprüfen Sie die Details und geben Sie Ihre Bewertung ab
+            Bitte überprüfen Sie die extrahierten Informationen und bestätigen oder lehnen Sie das Dokument ab
           </p>
         </div>
         <Button 
           variant="outline"
-          onClick={handleGoBack}
+          onClick={navigateBack}
         >
           Zurück
         </Button>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Document placeholder - Left side */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Document placeholder - No actual document loaded */}
           <Card>
             <CardHeader>
               <CardTitle>Dokumentvorschau</CardTitle>
               <CardDescription>
                 {isNewDocument 
-                  ? "Dokumentenupload-Bereich" 
+                  ? "Neues Dokument" 
                   : "Vorschau des eingereichten Dokuments"}
               </CardDescription>
             </CardHeader>
@@ -111,44 +123,27 @@ const SubmissionReview = () => {
               <div className="w-full max-w-2xl border rounded-md overflow-hidden">
                 <AspectRatio ratio={1 / 1.414}>
                   <div className="h-full w-full bg-muted flex flex-col items-center justify-center p-6">
-                    <FileText className="h-16 w-16 text-muted-foreground mb-4" />
-                    {isNewDocument ? (
-                      <div className="text-center">
-                        <p className="text-muted-foreground mb-4">
-                          Hier können Sie Ihr Dokument hochladen.
-                        </p>
-                        <div className="border border-dashed border-gray-300 rounded-md p-8 mb-4">
-                          <p className="text-muted-foreground mb-2">
-                            Ziehen Sie eine Datei hierher oder klicken Sie, um eine Datei auszuwählen
-                          </p>
-                          <Button className="mt-2">Datei auswählen</Button>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          Unterstützte Formate: PDF, JPG, PNG (max. 10MB)
-                        </p>
+                    <FileText className="h-20 w-20 text-muted-foreground mb-4" />
+                    <div className="text-center w-full">
+                      <p className="text-lg font-medium mb-6">
+                        {extractedData.documentType}
+                      </p>
+                      <div className="space-y-4 w-full px-6">
+                        <div className="h-4 bg-gray-200 rounded-full w-full" />
+                        <div className="h-4 bg-gray-200 rounded-full w-5/6 mx-auto" />
+                        <div className="h-4 bg-gray-200 rounded-full w-full" />
+                        <div className="py-2"></div>
+                        <div className="h-4 bg-gray-200 rounded-full w-full" />
+                        <div className="h-4 bg-gray-200 rounded-full w-4/6 mx-auto" />
+                        <div className="py-2"></div>
+                        <div className="h-4 bg-gray-200 rounded-full w-full" />
+                        <div className="h-4 bg-gray-200 rounded-full w-3/4 mx-auto" />
+                        <div className="h-4 bg-gray-200 rounded-full w-full" />
                       </div>
-                    ) : (
-                      <div className="text-center w-full">
-                        <p className="text-lg font-medium mb-6">
-                          {documentTypeName}
-                        </p>
-                        <div className="space-y-4 w-full">
-                          <Skeleton className="h-8 w-full" />
-                          <Skeleton className="h-8 w-full" />
-                          <Skeleton className="h-8 w-3/4" />
-                          <div className="py-4"></div>
-                          <Skeleton className="h-8 w-full" />
-                          <Skeleton className="h-8 w-full" />
-                          <Skeleton className="h-8 w-5/6" />
-                          <div className="py-4"></div>
-                          <Skeleton className="h-8 w-full" />
-                          <Skeleton className="h-8 w-2/3" />
-                        </div>
-                        <p className="text-muted-foreground mt-6">
-                          Das Dokument wird aus Sicherheitsgründen nicht angezeigt
-                        </p>
-                      </div>
-                    )}
+                      <p className="text-muted-foreground mt-6">
+                        {isNewDocument ? "Neues Dokument" : "Dokument zur Überprüfung"}
+                      </p>
+                    </div>
                   </div>
                 </AspectRatio>
               </div>
@@ -156,69 +151,62 @@ const SubmissionReview = () => {
           </Card>
         </div>
         
+        {/* Extracted data display - Right side */}
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>{isNewDocument ? "Dokument hochladen" : "Dokument prüfen"}</CardTitle>
+              <CardTitle>Extrahierte Daten</CardTitle>
+              <CardDescription>
+                Automatisch erkannte Informationen
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="space-y-2">
-                    <div>
+                <form className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="grid gap-2">
                       <Label>Dokumenttyp</Label>
-                      <p className="text-sm mt-1">
-                        {isNewDocument ? "Bitte wählen Sie einen Dokumenttyp" : "Dokumenttyp"}
-                      </p>
+                      <div className="p-2 bg-gray-50 rounded border">
+                        {extractedData.documentType}
+                      </div>
                     </div>
                     
-                    <div>
-                      <Label>Beschreibung</Label>
-                      <p className="text-sm mt-1">
-                        {isNewDocument 
-                          ? "Beschreibung des ausgewählten Dokumenttyps" 
-                          : "Dieses Dokument enthält wichtige Informationen für die Compliance"}
-                      </p>
+                    <div className="grid gap-2">
+                      <Label>Aussteller</Label>
+                      <div className="p-2 bg-gray-50 rounded border">
+                        {extractedData.issuer}
+                      </div>
                     </div>
-
-                    {isNewDocument ? (
-                      <>
-                        <div className="pt-2">
-                          <Label htmlFor="issuedDate">Ausstellungsdatum</Label>
-                          <Input 
-                            type="date" 
-                            id="issuedDate"
-                            className="w-full"
-                          />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label>Ausstellungsdatum</Label>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {extractedData.issuedDate}
                         </div>
-                        
-                        <div>
-                          <Label htmlFor="expiryDate">Ablaufdatum (optional)</Label>
-                          <Input 
-                            type="date" 
-                            id="expiryDate"
-                            className="w-full"
-                          />
+                      </div>
+                      
+                      <div className="grid gap-2">
+                        <Label>Ablaufdatum</Label>
+                        <div className="p-2 bg-gray-50 rounded border text-amber-600 font-medium">
+                          {extractedData.expiryDate}
                         </div>
-                      </>
-                    ) : (
-                      <>
-                        <div>
-                          <Label>Status</Label>
-                          <p className="text-sm mt-1">Prüfung ausstehend</p>
-                        </div>
-                        
-                        <div>
-                          <Label>Ausstellungsdatum</Label>
-                          <p className="text-sm mt-1">01.01.2023</p>
-                        </div>
-                        
-                        <div>
-                          <Label>Ablaufdatum</Label>
-                          <p className="text-sm mt-1">31.12.2025</p>
-                        </div>
-                      </>
-                    )}
+                      </div>
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label>Registrierungsnummer</Label>
+                      <div className="p-2 bg-gray-50 rounded border">
+                        {extractedData.registrationNumber}
+                      </div>
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label>Dienstleister</Label>
+                      <div className="p-2 bg-gray-50 rounded border">
+                        {extractedData.providerName}
+                      </div>
+                    </div>
                     
                     <FormField
                       control={form.control}
@@ -237,53 +225,50 @@ const SubmissionReview = () => {
                         </FormItem>
                       )}
                     />
-                    
-                    <FormField
-                      control={form.control}
-                      name="isApproved"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 mt-4">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-base">
-                              {isNewDocument ? "Dokument bestätigen" : "Dokument genehmigen"}
-                            </FormLabel>
-                            <CardDescription>
-                              {isNewDocument 
-                                ? "Bestätigen Sie, dass das Dokument korrekt ist" 
-                                : "Genehmigen Sie das eingereichte Dokument"}
-                            </CardDescription>
-                          </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
                   </div>
                 </form>
               </Form>
             </CardContent>
-            <CardFooter className="flex justify-end">
+            <CardFooter className="flex justify-between">
               <Button 
-                variant="outline" 
-                className="mr-2"
-                onClick={handleGoBack}
+                variant="destructive" 
+                onClick={form.handleSubmit(handleReject)}
+                disabled={isSubmitting}
+                className="flex-1 mr-2"
               >
-                Abbrechen
+                <X className="mr-1" />
+                Ablehnen
               </Button>
               <Button 
-                onClick={form.handleSubmit(onSubmit)}
+                onClick={handleApprove}
                 disabled={isSubmitting}
+                className="flex-1"
               >
-                {isSubmitting ? "Wird gesendet..." : (isNewDocument ? "Hochladen" : "Bewerten")}
+                <Check className="mr-1" />
+                Akzeptieren
               </Button>
             </CardFooter>
           </Card>
         </div>
       </div>
+      
+      {/* Pending documents counter - Full width box */}
+      <Card className="bg-blue-50 border-blue-200">
+        <CardContent className="py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4">
+              {pendingDocumentsCount}
+            </div>
+            <div>
+              <p className="font-medium">Dokumente warten auf Prüfung</p>
+              <p className="text-sm text-muted-foreground">Es gibt noch weitere Dokumente, die geprüft werden müssen</p>
+            </div>
+          </div>
+          <Button variant="outline" onClick={() => console.log("Navigate to pending documents")}>
+            Alle anzeigen
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
