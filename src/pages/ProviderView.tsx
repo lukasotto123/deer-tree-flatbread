@@ -46,9 +46,6 @@ const ProviderView = () => {
           <StatusBadge status={worstStatus} />
         </div>
         <div className="flex gap-2">
-          <Link to={`/document-review/${id}/new`}>
-            <Button>Dokument hochladen</Button>
-          </Link>
           <Link to="/">
             <Button variant="outline">Zurück zur Übersicht</Button>
           </Link>
@@ -95,84 +92,7 @@ const ProviderView = () => {
         </CardContent>
       </Card>
 
-      {/* Dokumente des Unternehmens */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Unternehmensdokumente</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Dokument</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ausstellungsdatum</TableHead>
-                <TableHead>Ablaufdatum</TableHead>
-                <TableHead>Erinnerungen</TableHead>
-                <TableHead>Relevanz</TableHead>
-                <TableHead className="text-right">Aktionen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {relevantDocTypes.map((docType) => {
-                const doc = providerDocuments.find(d => d.type === docType.id);
-                const isRelevant = true; // Default to true, would come from API
-                const isMissing = !doc || doc.status === 'missing';
-
-                return (
-                  <TableRow key={docType.id}>
-                    <TableCell>{docType.name}</TableCell>
-                    <TableCell>
-                      {doc ? (
-                        <StatusBadge status={doc.status} />
-                      ) : (
-                        <StatusBadge status="missing" />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {doc && doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {isMissing && (
-                        <div className="text-sm">
-                          <div>{doc?.remindersSent || 0} gesendet</div>
-                          <div className="text-xs text-muted-foreground">
-                            Nächste: {doc?.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
-                          </div>
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Switch id={`relevance-${docType.id}`} checked={isRelevant} />
-                        <Label htmlFor={`relevance-${docType.id}`}>
-                          {isRelevant ? "Relevant" : "Nicht relevant"}
-                        </Label>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {doc ? (
-                        <Link to={`/document-review/${id}/${doc.id}`}>
-                          <Button variant="outline" size="sm">Prüfen</Button>
-                        </Link>
-                      ) : (
-                        <Link to={`/document-review/${id}/new?documentType=${docType.id}`}>
-                          <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
-                        </Link>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Mitarbeiter als Kärtchen */}
+      {/* Mitarbeiter als Kärtchen - Moved above company documents */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Mitarbeiter</CardTitle>
@@ -252,6 +172,85 @@ const ProviderView = () => {
               );
             })}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Dokumente des Unternehmens */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Unternehmensdokumente</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Dokument</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Ausstellungsdatum</TableHead>
+                <TableHead>Ablaufdatum</TableHead>
+                <TableHead>Erinnerungen</TableHead>
+                <TableHead>Relevanz</TableHead>
+                <TableHead className="text-right">Aktionen</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {relevantDocTypes.map((docType) => {
+                const doc = providerDocuments.find(d => d.type === docType.id);
+                const isRelevant = true; // Default to true, would come from API
+                const isMissing = !doc || doc.status === 'missing';
+                // Set "Werksverträge" to "Verpflichtend"
+                const isContractDoc = docType.name === "Werksverträge";
+
+                return (
+                  <TableRow key={docType.id}>
+                    <TableCell>{docType.name}</TableCell>
+                    <TableCell>
+                      {doc ? (
+                        <StatusBadge status={doc.status} />
+                      ) : (
+                        <StatusBadge status="missing" />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {doc && doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {isMissing && (
+                        <div className="text-sm">
+                          <div>{doc?.remindersSent || 0} gesendet</div>
+                          <div className="text-xs text-muted-foreground">
+                            Nächste: {doc?.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
+                          </div>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Switch id={`relevance-${docType.id}`} checked={isRelevant} />
+                        <Label htmlFor={`relevance-${docType.id}`}>
+                          {isContractDoc ? "Verpflichtend" : (isRelevant ? "Relevant" : "Nicht relevant")}
+                        </Label>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {doc ? (
+                        <Link to={`/document-review/${id}/${doc.id}`}>
+                          <Button variant="outline" size="sm">Prüfen</Button>
+                        </Link>
+                      ) : (
+                        <Link to={`/document-review/${id}/new?documentType=${docType.id}`}>
+                          <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
+                        </Link>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
