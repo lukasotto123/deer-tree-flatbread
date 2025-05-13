@@ -9,10 +9,12 @@ import { Label } from "@/components/ui/label";
 import { User } from "lucide-react";
 import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
+import DocumentHistory from "@/components/ui/DocumentHistory";
 
 const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
   const provider = providers.find(p => p.id === id);
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   
   if (!provider) {
     return <div>Dienstleister nicht gefunden</div>;
@@ -37,6 +39,11 @@ const ProviderView = () => {
   const hasMissing = providerDocuments.some(doc => doc.status === "missing");
   
   const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+  
+  // Handle document selection for showing history
+  const handleShowDocumentHistory = (docId: string) => {
+    setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
+  };
 
   return (
     <div className="space-y-6">
@@ -200,53 +207,76 @@ const ProviderView = () => {
                 const isMissing = !doc || doc.status === 'missing';
                 // Set "Werksverträge" to "Verpflichtend"
                 const isContractDoc = docType.name === "Werksverträge";
+                const hasHistory = doc && selectedDocumentId === doc.id;
 
                 return (
-                  <TableRow key={docType.id}>
-                    <TableCell>{docType.name}</TableCell>
-                    <TableCell>
-                      {doc ? (
-                        <StatusBadge status={doc.status} />
-                      ) : (
-                        <StatusBadge status="missing" />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {doc && doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {isMissing && (
-                        <div className="text-sm">
-                          <div>{doc?.remindersSent || 0} gesendet</div>
-                          <div className="text-xs text-muted-foreground">
-                            Nächste: {doc?.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
+                  <>
+                    <TableRow key={docType.id}>
+                      <TableCell>{docType.name}</TableCell>
+                      <TableCell>
+                        {doc ? (
+                          <StatusBadge status={doc.status} />
+                        ) : (
+                          <StatusBadge status="missing" />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {doc && doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {isMissing && (
+                          <div className="text-sm">
+                            <div>{doc?.remindersSent || 0} gesendet</div>
+                            <div className="text-xs text-muted-foreground">
+                              Nächste: {doc?.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
+                            </div>
                           </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Switch id={`relevance-${docType.id}`} checked={isRelevant} />
+                          <Label htmlFor={`relevance-${docType.id}`}>
+                            {isContractDoc ? "Verpflichtend" : (isRelevant ? "Relevant" : "Nicht relevant")}
+                          </Label>
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Switch id={`relevance-${docType.id}`} checked={isRelevant} />
-                        <Label htmlFor={`relevance-${docType.id}`}>
-                          {isContractDoc ? "Verpflichtend" : (isRelevant ? "Relevant" : "Nicht relevant")}
-                        </Label>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {doc ? (
-                        <Link to={`/document-review/${id}/${doc.id}`}>
-                          <Button variant="outline" size="sm">Prüfen</Button>
-                        </Link>
-                      ) : (
-                        <Link to={`/document-review/${id}/new?documentType=${docType.id}`}>
-                          <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
-                        </Link>
-                      )}
-                    </TableCell>
-                  </TableRow>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          {doc && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleShowDocumentHistory(doc.id)}
+                            >
+                              Historie
+                            </Button>
+                          )}
+                          {doc ? (
+                            <Link to={`/document-review/${id}/${doc.id}`}>
+                              <Button variant="outline" size="sm">Prüfen</Button>
+                            </Link>
+                          ) : (
+                            <Link to={`/document-review/${id}/new?documentType=${docType.id}`}>
+                              <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
+                            </Link>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                    {hasHistory && (
+                      <TableRow>
+                        <TableCell colSpan={7} className="p-0">
+                          <div className="py-3">
+                            <DocumentHistory documentId={doc.id} />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
                 );
               })}
             </TableBody>

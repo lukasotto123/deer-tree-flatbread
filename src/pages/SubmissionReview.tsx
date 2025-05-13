@@ -32,10 +32,10 @@ const SubmissionReview = () => {
   
   // Get document if it exists
   const document = documents.find(d => d.id === documentId);
-  // Get document type
-  const documentType = document 
-    ? documentTypes.find(dt => dt.id === document.type)
-    : documentTypes.find(dt => dt.id === new URLSearchParams(window.location.search).get("documentType"));
+  
+  // Get document type - fixed the logic to properly find the document type
+  const documentTypeId = document ? document.type : new URLSearchParams(window.location.search).get("documentType");
+  const documentType = documentTypes.find(dt => dt.id === documentTypeId);
   
   // Get provider
   const provider = providers.find(p => p.id === providerId);
@@ -65,7 +65,7 @@ const SubmissionReview = () => {
   }
   
   if (!documentType) {
-    return <div>Dokumenttyp nicht gefunden</div>;
+    return <div>Dokumenttyp nicht gefunden (ID: {documentTypeId})</div>;
   }
 
   const isNewDocument = documentId === 'new';
@@ -126,8 +126,8 @@ const SubmissionReview = () => {
           </Card>
           
           {/* Document history - Only show for existing documents */}
-          {!isNewDocument && (
-            <DocumentHistory documentId={documentId || ""} />
+          {!isNewDocument && documentId && (
+            <DocumentHistory documentId={documentId} />
           )}
         </div>
         

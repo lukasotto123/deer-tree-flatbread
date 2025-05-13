@@ -6,9 +6,12 @@ import { Button } from "@/components/ui/button";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { FileText } from "lucide-react";
+import { useState } from "react";
+import DocumentHistory from "@/components/ui/DocumentHistory";
 
 const PersonView = () => {
   const { providerId, employeeId } = useParams<{ providerId: string; employeeId: string }>();
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   
   const employee = employees.find(e => e.id === employeeId);
   const provider = providers.find(p => p.id === providerId);
@@ -82,6 +85,11 @@ const PersonView = () => {
     !employeeDocuments.some(doc => doc.type === dt.id)
   );
 
+  // Handle document selection for showing history
+  const handleShowDocumentHistory = (docId: string) => {
+    setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -143,26 +151,44 @@ const PersonView = () => {
                 const docTypeName = documentTypes.find(dt => dt.id === doc.type)?.name || doc.name;
                 
                 return (
-                  <TableRow key={doc.id}>
-                    <TableCell className="font-medium">{docTypeName}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={doc.status} />
-                    </TableCell>
-                    <TableCell>{new Date(doc.issuedDate).toLocaleDateString('de-DE')}</TableCell>
-                    <TableCell>
-                      {doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Link to={`/submission-review/${providerId}/${doc.id}`}>
-                          <Button variant="outline" size="sm">
+                  <React.Fragment key={doc.id}>
+                    <TableRow>
+                      <TableCell className="font-medium">{docTypeName}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={doc.status} />
+                      </TableCell>
+                      <TableCell>{new Date(doc.issuedDate).toLocaleDateString('de-DE')}</TableCell>
+                      <TableCell>
+                        {doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleShowDocumentHistory(doc.id)}
+                          >
                             <FileText className="h-4 w-4 mr-1" />
-                            Prüfen
+                            Historie
                           </Button>
-                        </Link>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                          <Link to={`/submission-review/${providerId}/${doc.id}`}>
+                            <Button variant="outline" size="sm">
+                              Prüfen
+                            </Button>
+                          </Link>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                    {selectedDocumentId === doc.id && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="p-0 border-b-0">
+                          <div className="py-3">
+                            <DocumentHistory documentId={doc.id} />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
                 );
               })}
             </TableBody>

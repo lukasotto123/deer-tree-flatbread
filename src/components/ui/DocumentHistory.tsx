@@ -61,7 +61,7 @@ const DocumentHistory = ({ documentId }: DocumentHistoryProps) => {
                   <TableCell>{entry.action}</TableCell>
                   <TableCell>
                     {entry.status && (
-                      <StatusBadgeGerman document={entry.status} />
+                      <StatusBadgeGerman status={entry.status} />
                     )}
                   </TableCell>
                   <TableCell>{entry.user}</TableCell>
@@ -111,7 +111,9 @@ const DocumentHistory = ({ documentId }: DocumentHistoryProps) => {
   );
 };
 
-const StatusBadgeGerman = ({ document }: { document: 'valid' | 'expiring' | 'expired' | 'missing' }) => {
+const StatusBadgeGerman = ({ status }: { status: 'valid' | 'expiring' | 'expired' | 'missing' | null }) => {
+  if (!status) return null;
+  
   const docStatusMap = {
     valid: { text: "Gültig", className: "bg-green-100 text-green-800" },
     expiring: { text: "Läuft bald ab", className: "bg-yellow-100 text-yellow-800" },
@@ -119,7 +121,7 @@ const StatusBadgeGerman = ({ document }: { document: 'valid' | 'expiring' | 'exp
     missing: { text: "Fehlt", className: "bg-gray-100 text-gray-800" },
   };
   
-  const { text, className } = docStatusMap[document];
+  const { text, className } = docStatusMap[status];
   
   return (
     <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>

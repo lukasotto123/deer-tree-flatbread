@@ -147,5 +147,95 @@ export const documentHistory: DocumentHistoryEntry[] = [
     status: "valid",
     user: "Lisa Meyer",
     comment: "Qualifikationsnachweis"
+  },
+  // Add histories for all documents in the dummy-data.ts file
+  {
+    documentId: "doc-101",
+    date: "2025-02-10T09:30:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Frank Müller",
+    comment: "A1-Bescheinigung hochgeladen"
+  },
+  {
+    documentId: "doc-102",
+    date: "2023-05-20T11:45:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Frank Müller",
+    comment: "Reisepass hochgeladen"
+  },
+  {
+    documentId: "doc-103",
+    date: "2024-03-01T14:20:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Anna Wagner",
+    comment: "Aufenthaltserlaubnis hochgeladen"
+  },
+  {
+    documentId: "doc-104",
+    date: "2025-04-10T10:15:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Finanzabteilung",
+    comment: "Aktuelle Unbedenklichkeitsbescheinigung"
+  },
+  {
+    documentId: "doc-104",
+    date: "2025-04-11T16:30:00",
+    action: "Status geändert",
+    status: "expiring",
+    user: "System",
+    comment: "Dokument läuft in 30 Tagen ab"
+  },
+  {
+    documentId: "doc-105",
+    date: "2024-08-15T09:45:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Versicherungsabteilung",
+    comment: "Jährliche Betriebshaftpflichtversicherung"
+  },
+  {
+    documentId: "doc-106",
+    date: "2024-01-20T13:20:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Rechtsabteilung",
+    comment: "Aktueller Handelsregisterauszug"
+  },
+  {
+    documentId: "doc-107",
+    date: "2025-03-01T11:10:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Martin Weber",
+    comment: "A1-Bescheinigung für Auslandseinsatz"
+  },
+  // Document histories for dummy documents 6-7
+  {
+    documentId: "doc-6",
+    date: "2025-01-05T09:30:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Finanzabteilung",
+    comment: "Unbedenklichkeitsbescheinigung Finanzamt"
+  },
+  {
+    documentId: "doc-6",
+    date: "2025-04-01T11:45:00",
+    action: "Status geändert",
+    status: "expired",
+    user: "System",
+    comment: "Dokument ist abgelaufen"
+  },
+  {
+    documentId: "doc-7",
+    date: "2020-08-15T14:20:00",
+    action: "Dokument hochgeladen",
+    status: "valid",
+    user: "Peter Zimmermann",
+    comment: "Reisepass hochgeladen"
   }
 ];
