@@ -13,11 +13,11 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { FileText } from "lucide-react";
-import { documents, providers, documentTypes, employees } from "@/data/dummy-data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
   comments: z.string().optional(),
@@ -37,48 +37,11 @@ const SubmissionReview = () => {
   const employeeIdParam = searchParams.get("employeeId");
   const documentTypeParam = searchParams.get("documentType");
   
-  // Get provider
-  const provider = providers.find(p => p.id === providerId);
-  if (!provider) {
-    return <div>Dienstleister nicht gefunden</div>;
-  }
+  // Simplified approach - no document fetching
+  const isNewDocument = documentId === 'new';
   
-  // Get document if it exists
-  const document = documentId !== 'new' ? documents.find(d => d.id === documentId) : null;
-  
-  // Get document type
-  let documentType;
-  if (document) {
-    documentType = documentTypes.find(dt => dt.id === document.type);
-  } else if (documentTypeParam) {
-    documentType = documentTypes.find(dt => dt.id === documentTypeParam);
-  }
-  
-  if (!documentType) {
-    // Handle missing document type explicitly
-    return <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Fehler beim Laden</h1>
-      <p className="text-muted-foreground">
-        Der angeforderte Dokumenttyp wurde nicht gefunden. 
-        Bitte kehren Sie zurück und versuchen Sie es erneut.
-      </p>
-      <Button 
-        className="mt-4"
-        onClick={() => {
-          if (employeeIdParam) {
-            navigate(`/person/${providerId}/${employeeIdParam}`);
-          } else {
-            navigate(`/provider/${providerId}`);
-          }
-        }}
-      >
-        Zurück
-      </Button>
-    </div>;
-  }
-
-  // Get employee if provided
-  const employee = employeeIdParam ? employees.find(e => e.id === employeeIdParam) : null;
+  // Placeholder document type name
+  const documentTypeName = isNewDocument ? "Neues Dokument" : "Bestehendes Dokument";
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -106,29 +69,29 @@ const SubmissionReview = () => {
     }, 1000);
   };
 
-  const isNewDocument = documentId === 'new';
+  // Function to handle navigation back
+  const handleGoBack = () => {
+    if (employeeIdParam) {
+      navigate(`/person/${providerId}/${employeeIdParam}`);
+    } else {
+      navigate(`/provider/${providerId}`);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">{isNewDocument ? `Neues Dokument: ${documentType.name}` : documentType.name}</h1>
+          <h1 className="text-3xl font-bold">{isNewDocument ? `Neues Dokument` : "Dokumentprüfung"}</h1>
           <p className="text-muted-foreground mt-1">
-            Dienstleister: {provider.name}
-            {employee && ` | Mitarbeiter: ${employee.name}`}
+            Bitte überprüfen Sie die Details und geben Sie Ihre Bewertung ab
           </p>
         </div>
         <Button 
           variant="outline"
-          onClick={() => {
-            if (employeeIdParam) {
-              navigate(`/person/${providerId}/${employeeIdParam}`);
-            } else {
-              navigate(`/provider/${providerId}`);
-            }
-          }}
+          onClick={handleGoBack}
         >
-          {employee ? "Zurück zum Mitarbeiter" : "Zurück zum Dienstleister"}
+          Zurück
         </Button>
       </div>
       
@@ -167,7 +130,7 @@ const SubmissionReview = () => {
                     ) : (
                       <div className="text-center w-full">
                         <p className="text-lg font-medium mb-6">
-                          {documentType.name}
+                          {documentTypeName}
                         </p>
                         <div className="space-y-4 w-full">
                           <Skeleton className="h-8 w-full" />
@@ -204,63 +167,55 @@ const SubmissionReview = () => {
                   <div className="space-y-2">
                     <div>
                       <Label>Dokumenttyp</Label>
-                      <p className="text-sm mt-1">{documentType.name}</p>
+                      <p className="text-sm mt-1">
+                        {isNewDocument ? "Bitte wählen Sie einen Dokumenttyp" : "Dokumenttyp"}
+                      </p>
                     </div>
                     
                     <div>
                       <Label>Beschreibung</Label>
-                      <p className="text-sm mt-1">{documentType.description}</p>
+                      <p className="text-sm mt-1">
+                        {isNewDocument 
+                          ? "Beschreibung des ausgewählten Dokumenttyps" 
+                          : "Dieses Dokument enthält wichtige Informationen für die Compliance"}
+                      </p>
                     </div>
 
-                    {document && (
-                      <>
-                        <div>
-                          <Label>Status</Label>
-                          <p className="text-sm mt-1">
-                            {document.status === "valid" ? "Gültig" : 
-                             document.status === "expiring" ? "Läuft bald ab" :
-                             document.status === "expired" ? "Abgelaufen" : "Fehlt"}
-                          </p>
-                        </div>
-                        
-                        {document.issuedDate && (
-                          <div>
-                            <Label>Ausstellungsdatum</Label>
-                            <p className="text-sm mt-1">
-                              {new Date(document.issuedDate).toLocaleDateString('de-DE')}
-                            </p>
-                          </div>
-                        )}
-                        
-                        {document.expiryDate && (
-                          <div>
-                            <Label>Ablaufdatum</Label>
-                            <p className="text-sm mt-1">
-                              {new Date(document.expiryDate).toLocaleDateString('de-DE')}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                    
-                    {isNewDocument && (
+                    {isNewDocument ? (
                       <>
                         <div className="pt-2">
                           <Label htmlFor="issuedDate">Ausstellungsdatum</Label>
-                          <input 
+                          <Input 
                             type="date" 
                             id="issuedDate"
-                            className="w-full px-3 py-2 border rounded-md mt-1"
+                            className="w-full"
                           />
                         </div>
                         
                         <div>
                           <Label htmlFor="expiryDate">Ablaufdatum (optional)</Label>
-                          <input 
+                          <Input 
                             type="date" 
                             id="expiryDate"
-                            className="w-full px-3 py-2 border rounded-md mt-1"
+                            className="w-full"
                           />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <Label>Status</Label>
+                          <p className="text-sm mt-1">Prüfung ausstehend</p>
+                        </div>
+                        
+                        <div>
+                          <Label>Ausstellungsdatum</Label>
+                          <p className="text-sm mt-1">01.01.2023</p>
+                        </div>
+                        
+                        <div>
+                          <Label>Ablaufdatum</Label>
+                          <p className="text-sm mt-1">31.12.2025</p>
                         </div>
                       </>
                     )}
@@ -315,13 +270,7 @@ const SubmissionReview = () => {
               <Button 
                 variant="outline" 
                 className="mr-2"
-                onClick={() => {
-                  if (employeeIdParam) {
-                    navigate(`/person/${providerId}/${employeeIdParam}`);
-                  } else {
-                    navigate(`/provider/${providerId}`);
-                  }
-                }}
+                onClick={handleGoBack}
               >
                 Abbrechen
               </Button>
