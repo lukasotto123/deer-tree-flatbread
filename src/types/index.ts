@@ -21,6 +21,12 @@ export interface Document {
   employeeId?: string;
   employeeName?: string;
   fileUrl?: string;
+  isClientSpecific: boolean; // Klientenspezfisch oder -unabhängig
+  secureCheckFrequency: string; // Sichere Prüfung - Frequenz
+  secureCheckRequirement: string; // Sichere Prüfung - Erfordernis
+  basicCheckFrequency: string; // Basisprüfung - Frequenz
+  basicCheckRequirement: string; // Basisprüfung - Erfordernis
+  issuanceType: 'pro Unternehmen' | 'pro Mitarbeiter'; // Ausstellung
 }
 
 export interface Provider {
@@ -55,6 +61,8 @@ export interface DocumentType {
   description: string;
   providerType: ProviderType;
   isPerEmployee: boolean;
+  isClientSpecific: boolean; // Klientenspezfisch oder -unabhängig
+  issuanceType: 'pro Unternehmen' | 'pro Mitarbeiter'; // Ausstellung
   checkFrequency: {
     secure: string;
     basic: string;

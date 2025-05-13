@@ -6,25 +6,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertCircle, Check, Clock, FileText, Hourglass, Settings } from "lucide-react";
-import { providers } from "@/data/dummy-data";
+import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-
-// Dummy historische Daten für den Chart
-const historicalData = [
-  { name: 'Jan', beitragsrückstände: 4, fehlend: 12, ablaufend: 5 },
-  { name: 'Feb', beitragsrückstände: 3, fehlend: 9, ablaufend: 7 },
-  { name: 'Mär', beitragsrückstände: 3, fehlend: 7, ablaufend: 6 },
-  { name: 'Apr', beitragsrückstände: 2, fehlend: 5, ablaufend: 5 },
-  { name: 'Mai', beitragsrückstände: 1, fehlend: 3, ablaufend: 4 },
-];
+import { historicalData } from "@/data/dummy-data";
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
 
   const filteredProviders = providers.filter(provider => 
     provider.type === 'subunternehmer' && (
-    activeTab === "niederlassung-a" ? ["provider-1", "provider-2", "provider-3"].includes(provider.id) : 
-    ["provider-4", "provider-5"].includes(provider.id))
+    activeTab === "niederlassung-a" ? ["provider-3", "provider-4", "provider-6"].includes(provider.id) : 
+    ["provider-5", "provider-7", "provider-8"].includes(provider.id))
+  );
+
+  // Calculate totals for the overview
+  const allDocuments = documents.filter(doc => 
+    filteredProviders.some(p => p.id === doc.providerId)
+  );
+  
+  const beitragsrückstände = allDocuments.filter(doc => 
+    doc.status === 'expired' && 
+    (doc.name.includes("Unbedenklichkeitsbescheinigung") || doc.name.includes("Beitrag"))
+  ).length;
+  
+  const fehlendeDokumente = filteredProviders.reduce(
+    (total, provider) => total + provider.documentsCount.missing, 0
+  );
+  
+  const ablaufendeDokumente = filteredProviders.reduce(
+    (total, provider) => total + provider.documentsCount.expiring, 0
   );
 
   return (
@@ -51,7 +61,7 @@ const MainView = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <h3 className="text-lg font-medium mb-2">Beitragsrückstände</h3>
-              <p className="text-4xl font-bold">0</p>
+              <p className="text-4xl font-bold">{beitragsrückstände}</p>
             </div>
           </CardContent>
         </Card>
@@ -60,7 +70,7 @@ const MainView = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <h3 className="text-lg font-medium mb-2">Fehlende Dokumente</h3>
-              <p className="text-4xl font-bold">0</p>
+              <p className="text-4xl font-bold">{fehlendeDokumente}</p>
             </div>
           </CardContent>
         </Card>
@@ -69,7 +79,7 @@ const MainView = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <h3 className="text-lg font-medium mb-2">Ablaufende Dokument</h3>
-              <p className="text-4xl font-bold">0</p>
+              <p className="text-4xl font-bold">{ablaufendeDokumente}</p>
               <p className="text-sm text-muted-foreground mt-1">in den nächsten 30 Tagen</p>
             </div>
           </CardContent>

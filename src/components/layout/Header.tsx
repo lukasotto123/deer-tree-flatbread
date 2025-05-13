@@ -2,6 +2,7 @@
 import { Bell, Search, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -12,6 +13,24 @@ const Header = () => {
             <span className="font-bold">CompliancePro</span>
             <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded">BETA</span>
           </div>
+        </div>
+      </div>
+      
+      {/* Main Navigation */}
+      <div className="flex items-center gap-4">
+        <div className="flex gap-2">
+          <Button variant="ghost" asChild>
+            <Link to="/">Dashboard</Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to="/document-requirements">Dokumentenanforderungen</Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to="/requests">Anfragen</Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to="/submission-review/provider-1/new">Einreichungsprüfung</Link>
+          </Button>
         </div>
       </div>
       
