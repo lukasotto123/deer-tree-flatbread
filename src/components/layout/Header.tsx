@@ -1,14 +1,8 @@
 
 const Header = () => {
   return (
-    <header className="h-12 flex items-center justify-between px-6 bg-white sticky top-0 z-10">
-      <div className="flex items-center gap-4">
-        {/* Empty div for layout balance */}
-      </div>
-      
-      <div className="flex items-center space-x-4">
-        {/* Navigation buttons will be added to AppLayout instead of here */}
-      </div>
+    <header className="h-2 bg-white sticky top-0 z-10">
+      {/* Empty header - reduced to 2px height */}
     </header>
   );
 };
