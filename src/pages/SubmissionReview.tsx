@@ -230,11 +230,11 @@ const SubmissionReview = () => {
                             <FormLabel className="text-base">
                               {isNewDocument ? "Dokument bestätigen" : "Dokument genehmigen"}
                             </FormLabel>
-                            <FormDescription>
+                            <CardDescription>
                               {isNewDocument 
                                 ? "Bestätigen Sie, dass das Dokument korrekt ist" 
                                 : "Genehmigen Sie das eingereichte Dokument"}
-                            </FormDescription>
+                            </CardDescription>
                           </div>
                           <FormControl>
                             <Switch

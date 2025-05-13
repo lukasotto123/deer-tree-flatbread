@@ -7,12 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { FileText } from "lucide-react";
 import { documentTypes, documents, providers, employees } from "@/data/dummy-data";
+import DocumentHistory from "@/components/ui/DocumentHistory";
 
 const SingleDocumentView = () => {
   const { id } = useParams<{ id: string }>();
   const docType = documentTypes.find(dt => dt.id === id);
   const [isEditing, setIsEditing] = useState(false);
+  const [showPdfDialog, setShowPdfDialog] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   
   if (!docType) {
     return <div>Dokument nicht gefunden</div>;
@@ -24,10 +30,20 @@ const SingleDocumentView = () => {
   // Alle Provider, die diesen Dokumenttyp verwenden sollten
   const relevantProviders = providers.filter(p => p.type === docType.providerType);
 
+  const handleViewDocument = (docId: string) => {
+    setSelectedDocId(docId);
+    setShowPdfDialog(true);
+  };
+
+  // Adjust the form values for Werksverträge - UI only, doesn't affect the actual data
+  const displayDocType = docType.name.includes("Werksvertrag") 
+    ? {...docType, requiredFor: {...docType.requiredFor, secure: "Verpflichtend", basic: "Verpflichtend"}} 
+    : docType;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">{docType.name}</h1>
+        <h1 className="text-3xl font-bold">{displayDocType.name}</h1>
         <div className="flex gap-2">
           <Button 
             variant={isEditing ? "default" : "outline"}
@@ -52,11 +68,11 @@ const SingleDocumentView = () => {
               {isEditing ? (
                 <Input 
                   id="description"
-                  defaultValue={docType.description} 
+                  defaultValue={displayDocType.description} 
                   className="mt-1"
                 />
               ) : (
-                <p>{docType.description}</p>
+                <p>{displayDocType.description}</p>
               )}
             </div>
             
@@ -65,20 +81,20 @@ const SingleDocumentView = () => {
               {isEditing ? (
                 <div className="flex gap-2 mt-1">
                   <Button 
-                    variant={docType.providerType === "personaldienstleister" ? "default" : "outline"}
+                    variant={displayDocType.providerType === "personaldienstleister" ? "default" : "outline"}
                     size="sm"
                   >
                     Personaldienstleister
                   </Button>
                   <Button 
-                    variant={docType.providerType === "subunternehmer" ? "default" : "outline"}
+                    variant={displayDocType.providerType === "subunternehmer" ? "default" : "outline"}
                     size="sm"
                   >
                     Subunternehmer
                   </Button>
                 </div>
               ) : (
-                <p>{docType.providerType === "personaldienstleister" 
+                <p>{displayDocType.providerType === "personaldienstleister" 
                     ? "Personaldienstleister" 
                     : "Subunternehmer"}
                 </p>
@@ -89,7 +105,7 @@ const SingleDocumentView = () => {
               <div className="flex items-center space-x-2">
                 <Switch 
                   id="isPerEmployee"
-                  defaultChecked={docType.isPerEmployee}
+                  defaultChecked={displayDocType.isPerEmployee}
                   disabled={!isEditing}
                 />
                 <Label htmlFor="isPerEmployee" className="text-sm text-muted-foreground">Pro Mitarbeiter</Label>
@@ -100,7 +116,7 @@ const SingleDocumentView = () => {
               <div className="flex items-center space-x-2">
                 <Switch 
                   id="isClientSpecific"
-                  defaultChecked={docType.isClientSpecific}
+                  defaultChecked={displayDocType.isClientSpecific}
                   disabled={!isEditing}
                 />
                 <Label htmlFor="isClientSpecific" className="text-sm text-muted-foreground">Klientenspezifisch</Label>
@@ -112,11 +128,11 @@ const SingleDocumentView = () => {
               {isEditing ? (
                 <Input 
                   id="secureFrequency"
-                  defaultValue={docType.checkFrequency.secure} 
+                  defaultValue={displayDocType.checkFrequency.secure} 
                   className="mt-1"
                 />
               ) : (
-                <p>{docType.checkFrequency.secure}</p>
+                <p>{displayDocType.checkFrequency.secure}</p>
               )}
             </div>
             
@@ -125,11 +141,11 @@ const SingleDocumentView = () => {
               {isEditing ? (
                 <Input 
                   id="secureReq"
-                  defaultValue={docType.requiredFor.secure} 
+                  defaultValue={displayDocType.requiredFor.secure} 
                   className="mt-1"
                 />
               ) : (
-                <p>{docType.requiredFor.secure}</p>
+                <p>{displayDocType.requiredFor.secure}</p>
               )}
             </div>
             
@@ -138,11 +154,11 @@ const SingleDocumentView = () => {
               {isEditing ? (
                 <Input 
                   id="basicFrequency"
-                  defaultValue={docType.checkFrequency.basic} 
+                  defaultValue={displayDocType.checkFrequency.basic} 
                   className="mt-1"
                 />
               ) : (
-                <p>{docType.checkFrequency.basic}</p>
+                <p>{displayDocType.checkFrequency.basic}</p>
               )}
             </div>
             
@@ -151,11 +167,11 @@ const SingleDocumentView = () => {
               {isEditing ? (
                 <Input 
                   id="basicReq"
-                  defaultValue={docType.requiredFor.basic} 
+                  defaultValue={displayDocType.requiredFor.basic} 
                   className="mt-1"
                 />
               ) : (
-                <p>{docType.requiredFor.basic}</p>
+                <p>{displayDocType.requiredFor.basic}</p>
               )}
             </div>
             
@@ -164,20 +180,20 @@ const SingleDocumentView = () => {
               {isEditing ? (
                 <div className="flex gap-2 mt-1">
                   <Button 
-                    variant={docType.issuanceType === "pro Unternehmen" ? "default" : "outline"}
+                    variant={displayDocType.issuanceType === "pro Unternehmen" ? "default" : "outline"}
                     size="sm"
                   >
                     Pro Unternehmen
                   </Button>
                   <Button 
-                    variant={docType.issuanceType === "pro Mitarbeiter" ? "default" : "outline"}
+                    variant={displayDocType.issuanceType === "pro Mitarbeiter" ? "default" : "outline"}
                     size="sm"
                   >
                     Pro Mitarbeiter
                   </Button>
                 </div>
               ) : (
-                <p>{docType.issuanceType}</p>
+                <p>{displayDocType.issuanceType}</p>
               )}
             </div>
           </div>
@@ -194,7 +210,7 @@ const SingleDocumentView = () => {
         )}
       </Card>
 
-      {docType.isPerEmployee && (
+      {displayDocType.isPerEmployee && (
         <Card>
           <CardHeader>
             <CardTitle>Mitarbeitermatrix</CardTitle>
@@ -208,12 +224,13 @@ const SingleDocumentView = () => {
                   <TableHead>Status</TableHead>
                   <TableHead>Ablaufdatum</TableHead>
                   <TableHead>Erinnerungen</TableHead>
+                  <TableHead className="text-right">Aktionen</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {employees.filter(e => {
                   const provider = providers.find(p => p.id === e.providerId);
-                  return provider && provider.type === docType.providerType;
+                  return provider && provider.type === displayDocType.providerType;
                 }).map((employee) => {
                   const doc = relatedDocuments.find(d => d.employeeId === employee.id);
                   const providerName = providers.find(p => p.id === employee.providerId)?.name || '';
@@ -241,6 +258,18 @@ const SingleDocumentView = () => {
                           </div>
                         )}
                       </TableCell>
+                      <TableCell className="text-right">
+                        {doc && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewDocument(doc.id)}
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Anzeigen
+                          </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -259,12 +288,13 @@ const SingleDocumentView = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Unternehmen</TableHead>
-                {docType.isPerEmployee && <TableHead>Mitarbeiter</TableHead>}
+                {displayDocType.isPerEmployee && <TableHead>Mitarbeiter</TableHead>}
                 <TableHead>Status</TableHead>
                 <TableHead>Ausstellungsdatum</TableHead>
                 <TableHead>Ablaufdatum</TableHead>
                 <TableHead>Nächste Prüfung</TableHead>
                 <TableHead>Erinnerungen</TableHead>
+                <TableHead className="text-right">Aktionen</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -278,7 +308,7 @@ const SingleDocumentView = () => {
                 return (
                   <TableRow key={doc.id}>
                     <TableCell className="font-medium">{providerName}</TableCell>
-                    {docType.isPerEmployee && <TableCell>{employeeName}</TableCell>}
+                    {displayDocType.isPerEmployee && <TableCell>{employeeName}</TableCell>}
                     <TableCell>
                       <StatusBadgeGerman document={doc.status} />
                     </TableCell>
@@ -301,6 +331,16 @@ const SingleDocumentView = () => {
                         </div>
                       )}
                     </TableCell>
+                    <TableCell className="text-right">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleViewDocument(doc.id)}
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Anzeigen
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -308,6 +348,34 @@ const SingleDocumentView = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {selectedDocId && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Dokumentenhistorie</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DocumentHistory documentId={selectedDocId} />
+          </CardContent>
+        </Card>
+      )}
+
+      <Dialog open={showPdfDialog} onOpenChange={setShowPdfDialog}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Dokumentvorschau</DialogTitle>
+          </DialogHeader>
+          <div className="border rounded-md overflow-hidden">
+            <AspectRatio ratio={1 / 1.414}>
+              <img 
+                src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" 
+                alt="Document Preview" 
+                className="object-contain w-full h-full"
+              />
+            </AspectRatio>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

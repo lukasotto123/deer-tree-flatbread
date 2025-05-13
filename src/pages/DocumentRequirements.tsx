@@ -11,7 +11,22 @@ const DocumentRequirements = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<"all" | "personaldienstleister" | "subunternehmer">("all");
 
-  const filteredDocuments = documentTypes.filter(doc => {
+  // Mark Werksverträge as "Verpflichtend" - update in UI only
+  const modifiedDocumentTypes = documentTypes.map(doc => {
+    if (doc.name.includes("Werksvertrag")) {
+      return {
+        ...doc,
+        requiredFor: {
+          ...doc.requiredFor,
+          secure: "Verpflichtend",
+          basic: "Verpflichtend"
+        }
+      };
+    }
+    return doc;
+  });
+
+  const filteredDocuments = modifiedDocumentTypes.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filter === "all" || doc.providerType === filter;
     return matchesSearch && matchesFilter;
