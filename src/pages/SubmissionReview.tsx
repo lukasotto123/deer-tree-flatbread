@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { 
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle 
 } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { documents, providers, documentTypes } from "@/data/dummy-data";
+import { documents, providers, documentTypes, employees } from "@/data/dummy-data";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,17 +28,30 @@ type FormValues = z.infer<typeof formSchema>;
 const SubmissionReview = () => {
   const { providerId, documentId } = useParams<{ providerId: string; documentId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Get URL query parameters
+  const searchParams = new URLSearchParams(location.search);
+  const employeeIdParam = searchParams.get("employeeId");
+  const documentTypeParam = searchParams.get("documentType");
   
   // Get document if it exists
   const document = documents.find(d => d.id === documentId);
   
-  // Get document type - fixed the logic to properly find the document type
-  const documentTypeId = document ? document.type : new URLSearchParams(window.location.search).get("documentType");
-  const documentType = documentTypes.find(dt => dt.id === documentTypeId);
+  // Get document type
+  let documentType;
+  if (document) {
+    documentType = documentTypes.find(dt => dt.id === document.type);
+  } else if (documentTypeParam) {
+    documentType = documentTypes.find(dt => dt.id === documentTypeParam);
+  }
   
   // Get provider
   const provider = providers.find(p => p.id === providerId);
+
+  // Get employee if provided
+  const employee = employeeIdParam ? employees.find(e => e.id === employeeIdParam) : null;
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -56,7 +69,13 @@ const SubmissionReview = () => {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      navigate(`/provider/${providerId}`);
+      
+      // Navigate based on whether this is for an employee or just a provider
+      if (employeeIdParam) {
+        navigate(`/person/${providerId}/${employeeIdParam}`);
+      } else {
+        navigate(`/provider/${providerId}`);
+      }
     }, 1000);
   };
 
@@ -65,7 +84,7 @@ const SubmissionReview = () => {
   }
   
   if (!documentType) {
-    return <div>Dokumenttyp nicht gefunden (ID: {documentTypeId})</div>;
+    return <div>Dokumenttyp nicht gefunden</div>;
   }
 
   const isNewDocument = documentId === 'new';
@@ -77,13 +96,20 @@ const SubmissionReview = () => {
           <h1 className="text-3xl font-bold">{isNewDocument ? `Neues Dokument: ${documentType.name}` : documentType.name}</h1>
           <p className="text-muted-foreground mt-1">
             Dienstleister: {provider.name}
+            {employee && ` | Mitarbeiter: ${employee.name}`}
           </p>
         </div>
         <Button 
           variant="outline"
-          onClick={() => navigate(`/provider/${providerId}`)}
+          onClick={() => {
+            if (employeeIdParam) {
+              navigate(`/person/${providerId}/${employeeIdParam}`);
+            } else {
+              navigate(`/provider/${providerId}`);
+            }
+          }}
         >
-          Zurück zum Dienstleister
+          {employee ? "Zurück zum Mitarbeiter" : "Zurück zum Dienstleister"}
         </Button>
       </div>
       
@@ -253,7 +279,13 @@ const SubmissionReview = () => {
               <Button 
                 variant="outline" 
                 className="mr-2"
-                onClick={() => navigate(`/provider/${providerId}`)}
+                onClick={() => {
+                  if (employeeIdParam) {
+                    navigate(`/person/${providerId}/${employeeIdParam}`);
+                  } else {
+                    navigate(`/provider/${providerId}`);
+                  }
+                }}
               >
                 Abbrechen
               </Button>

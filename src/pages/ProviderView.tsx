@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -205,13 +204,14 @@ const ProviderView = () => {
                 const doc = providerDocuments.find(d => d.type === docType.id);
                 const isRelevant = true; // Default to true, would come from API
                 const isMissing = !doc || doc.status === 'missing';
+                const isValid = doc?.status === 'valid';
                 // Set "Werksverträge" to "Verpflichtend"
                 const isContractDoc = docType.name === "Werksverträge";
                 const hasHistory = doc && selectedDocumentId === doc.id;
 
                 return (
-                  <>
-                    <TableRow key={docType.id}>
+                  <React.Fragment key={docType.id}>
+                    <TableRow>
                       <TableCell>{docType.name}</TableCell>
                       <TableCell>
                         {doc ? (
@@ -227,7 +227,7 @@ const ProviderView = () => {
                         {doc && doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
                       </TableCell>
                       <TableCell>
-                        {isMissing && (
+                        {(isMissing || doc?.status === 'expired') && (
                           <div className="text-sm">
                             <div>{doc?.remindersSent || 0} gesendet</div>
                             <div className="text-xs text-muted-foreground">
@@ -255,15 +255,15 @@ const ProviderView = () => {
                               Historie
                             </Button>
                           )}
-                          {doc ? (
+                          {doc && !isValid ? (
                             <Link to={`/document-review/${id}/${doc.id}`}>
                               <Button variant="outline" size="sm">Prüfen</Button>
                             </Link>
-                          ) : (
+                          ) : (!doc && (
                             <Link to={`/document-review/${id}/new?documentType=${docType.id}`}>
                               <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
                             </Link>
-                          )}
+                          ))}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -276,7 +276,7 @@ const ProviderView = () => {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </TableBody>

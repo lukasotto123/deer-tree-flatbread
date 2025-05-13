@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -142,12 +143,14 @@ const PersonView = () => {
                 <TableHead>Status</TableHead>
                 <TableHead>Ausstellungsdatum</TableHead>
                 <TableHead>Ablaufdatum</TableHead>
+                <TableHead>Erinnerungen</TableHead>
                 <TableHead className="text-right">Aktionen</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {employeeDocuments.map((doc) => {
                 const docTypeName = documentTypes.find(dt => dt.id === doc.type)?.name || doc.name;
+                const isValid = doc.status === "valid";
                 
                 return (
                   <React.Fragment key={doc.id}>
@@ -160,6 +163,16 @@ const PersonView = () => {
                       <TableCell>
                         {doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
                       </TableCell>
+                      <TableCell>
+                        {doc.status === "missing" || doc.status === "expired" ? (
+                          <div className="text-sm">
+                            <div>{doc.remindersSent || 0} gesendet</div>
+                            <div className="text-xs text-muted-foreground">
+                              Nächste: {doc.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
+                            </div>
+                          </div>
+                        ) : null}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button 
@@ -170,17 +183,19 @@ const PersonView = () => {
                             <FileText className="h-4 w-4 mr-1" />
                             Historie
                           </Button>
-                          <Link to={`/submission-review/${providerId}/${doc.id}`}>
-                            <Button variant="outline" size="sm">
-                              Prüfen
-                            </Button>
-                          </Link>
+                          {!isValid && (
+                            <Link to={`/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`}>
+                              <Button variant="outline" size="sm">
+                                Prüfen
+                              </Button>
+                            </Link>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
                     {selectedDocumentId === doc.id && (
                       <TableRow>
-                        <TableCell colSpan={5} className="p-0 border-b-0">
+                        <TableCell colSpan={6} className="p-0 border-b-0">
                           <div className="py-3">
                             <DocumentHistory documentId={doc.id} />
                           </div>
