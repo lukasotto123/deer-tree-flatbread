@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { FileText } from "lucide-react";
+import { FileText, AlertCircle, Clock, Hourglass, Check } from "lucide-react";
 
 const PersonView = () => {
   const { providerId, employeeId } = useParams<{ providerId: string; employeeId: string }>();
@@ -20,10 +20,38 @@ const PersonView = () => {
   // Tatsächliche Dokumente des Mitarbeiters
   const employeeDocuments = documents.filter(doc => doc.employeeId === employeeId);
   
-  // Alle Dokumenttypen, die für Mitarbeiter dieses Dienstleisters relevant sein könnten
-  const relevantDocTypes = documentTypes.filter(dt => 
-    dt.providerType === provider.type && dt.isPerEmployee
+  // Determine employee citizenship (for demo, assign randomly)
+  const citizenship = employee.id === "employee-8" ? "Österreich" : (
+    ["Deutschland", "Polen", "Frankreich", "Italien", "Spanien"][Math.floor(Math.random() * 5)]
   );
+
+  // Determine the worst document status for the employee
+  const hasExpired = employeeDocuments.some(doc => doc.status === "expired");
+  const hasExpiring = employeeDocuments.some(doc => doc.status === "expiring");
+  const hasMissing = employeeDocuments.some(doc => doc.status === "missing");
+  
+  const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+  
+  const StatusIcon = {
+    valid: <Check className="h-5 w-5 text-green-500" />,
+    expiring: <Hourglass className="h-5 w-5 text-yellow-500" />,
+    expired: <Clock className="h-5 w-5 text-red-500" />,
+    missing: <AlertCircle className="h-5 w-5 text-red-500" />
+  }[worstStatus];
+  
+  // Alle Dokumenttypen, die für Mitarbeiter dieses Dienstleisters relevant sein könnten
+  const relevantDocTypes = documentTypes.filter(dt => {
+    // Filter by provider type
+    if (dt.providerType !== provider.type) return false;
+    
+    // Filter by employee relevance
+    if (!dt.isPerEmployee) return false;
+    
+    // Filter based on citizenship
+    if (dt.id === "doc-type-11" && citizenship === "Deutschland") return false; // A1-Bescheinigung not needed for Germans
+    
+    return true;
+  });
   
   // Fehlende Dokumente identifizieren
   const missingDocuments = relevantDocTypes.filter(dt => 
@@ -33,7 +61,10 @@ const PersonView = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">{employee.name}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold">{employee.name}</h1>
+          {StatusIcon}
+        </div>
         <Link to={`/provider/${providerId}`}>
           <Button variant="outline">Zurück zum Unternehmen</Button>
         </Link>
@@ -48,6 +79,10 @@ const PersonView = () => {
             <div>
               <p className="text-sm text-muted-foreground">Position</p>
               <p>{employee.position}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Staatsbürgerschaft</p>
+              <p>{citizenship}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Unternehmen</p>
@@ -87,7 +122,7 @@ const PersonView = () => {
                   <TableRow key={doc.id}>
                     <TableCell className="font-medium">{docTypeName}</TableCell>
                     <TableCell>
-                      <StatusBadgeGerman document={doc.status} />
+                      <StatusBadge status={doc.status} />
                     </TableCell>
                     <TableCell>{new Date(doc.issuedDate).toLocaleDateString('de-DE')}</TableCell>
                     <TableCell>
@@ -127,41 +162,32 @@ const PersonView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {missingDocuments.map((docType) => (
-                  <TableRow key={docType.id}>
-                    <TableCell className="font-medium">{docType.name}</TableCell>
-                    <TableCell>{docType.description}</TableCell>
-                    <TableCell>{docType.requiredFor.secure}</TableCell>
-                    <TableCell className="text-right">
-                      <Link to={`/submission-review/${providerId}/new?documentType=${docType.id}&employeeId=${employeeId}`}>
-                        <Button variant="outline" size="sm">Anfordern</Button>
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {missingDocuments.map((docType) => {
+                  // Adjust requirement based on citizenship
+                  let requirement = docType.requiredFor.secure;
+                  if (docType.id === "doc-type-11" && citizenship !== "Deutschland") {
+                    requirement = "Verpflichtend (A1-Bescheinigung für nicht-deutsche Staatsangehörige)";
+                  }
+                  
+                  return (
+                    <TableRow key={docType.id}>
+                      <TableCell className="font-medium">{docType.name}</TableCell>
+                      <TableCell>{docType.description}</TableCell>
+                      <TableCell>{requirement}</TableCell>
+                      <TableCell className="text-right">
+                        <Link to={`/submission-review/${providerId}/new?documentType=${docType.id}&employeeId=${employeeId}`}>
+                          <Button variant="outline" size="sm">Anfordern</Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       )}
     </div>
-  );
-};
-
-const StatusBadgeGerman = ({ document }: { document: 'valid' | 'expiring' | 'expired' | 'missing' }) => {
-  const docStatusMap = {
-    valid: { text: "Gültig", className: "bg-green-100 text-green-800" },
-    expiring: { text: "Läuft bald ab", className: "bg-yellow-100 text-yellow-800" },
-    expired: { text: "Abgelaufen", className: "bg-red-100 text-red-800" },
-    missing: { text: "Fehlt", className: "bg-gray-100 text-gray-800" },
-  };
-  
-  const { text, className } = docStatusMap[document];
-  
-  return (
-    <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>
-      {text}
-    </span>
   );
 };
 
