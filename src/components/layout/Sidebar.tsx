@@ -1,22 +1,20 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { FileText, Home, User, Zap } from "lucide-react";
-import pactosFavicon from "/favicon.ico"; // Using the default favicon for now
+import { FileText, Zap } from "lucide-react";
 
 const Sidebar = () => {
   const location = useLocation();
   
   const navigationItems = [
     { name: "Bewerbungen", path: "/bewerbungen", icon: Zap },
-    { name: "Subunternehmer", path: "/", icon: FileText, active: true },
+    { name: "CompliancePro Beta", path: "/", icon: FileText, active: true },
   ];
   
   return (
     <div className="w-64 h-screen bg-[#002626] text-white flex flex-col fixed">
       <div className="p-6 border-b border-[#00414141]">
         <Link to="/" className="flex items-center gap-2">
-          <img src={pactosFavicon} alt="Pactos Logo" className="h-8 w-8" />
+          <img src="/lovable-uploads/6690430b-aa6f-4db0-b6fc-7116c43b37f2.png" alt="Pactos Logo" className="h-8 w-8" />
           <h1 className="text-xl font-bold">Pactos</h1>
         </Link>
       </div>
@@ -46,7 +44,7 @@ const Sidebar = () => {
             <User className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-medium">Lukas Otto</p>
+            <p className="text-sm font-medium">Max Mustermann</p>
           </div>
         </div>
       </div>

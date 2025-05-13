@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,11 @@ import { AlertCircle, Check, Clock, FileText, Hourglass, Settings } from "lucide
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { historicalData } from "@/data/dummy-data";
+import { cn } from "@/lib/utils";
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
+  const location = useLocation();
 
   const filteredProviders = providers.filter(provider => 
     provider.type === 'subunternehmer' && (
@@ -37,21 +39,33 @@ const MainView = () => {
     (total, provider) => total + provider.documentsCount.expiring, 0
   );
 
+  // Define navigation links
+  const navigationLinks = [
+    { name: "Dashboard", path: "/" },
+    { name: "Dokumentenanforderungen", path: "/document-requirements" },
+    { name: "Dokumentenprüfung", path: "/document-review/provider-3/new" }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Compliance-Dashboard</h1>
         
         <div className="flex gap-2">
-          <Button asChild>
-            <Link to="/document-requirements">Dokumentenanforderungen</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/document-review/provider-3/new">Dokumentenprüfung</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/dashboard">Dashboard</Link>
-          </Button>
+          {navigationLinks.map((link) => (
+            <Button 
+              key={link.path} 
+              asChild
+              variant={location.pathname === link.path ? "default" : "outline"}
+              className={cn(
+                location.pathname === link.path ? "bg-[#005B41] hover:bg-[#005B41]/90" : "bg-white hover:bg-slate-100"
+              )}
+            >
+              <Link to={link.path}>
+                {link.name}
+              </Link>
+            </Button>
+          ))}
         </div>
       </div>
 
