@@ -1,5 +1,5 @@
 
-import { Building, CheckCircle, Clock, AlertTriangle, Info } from "lucide-react";
+import { Building, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -59,19 +59,19 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
           <p className="font-medium mb-2">Dokumentenstatus</p>
           <div className="grid grid-cols-4 gap-2 text-sm">
             <div className="flex items-center">
-              <CheckCircle className="h-4 w-4 text-success mr-1" />
+              <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-4 w-4 mr-1" alt="Check" />
               <span>{provider.documentsCount.valid}</span>
             </div>
             <div className="flex items-center">
-              <Clock className="h-4 w-4 text-warning mr-1" />
+              <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-4 w-4 mr-1" alt="Clock" />
               <span>{provider.documentsCount.expiring}</span>
             </div>
             <div className="flex items-center">
-              <AlertTriangle className="h-4 w-4 text-destructive mr-1" />
+              <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-4 w-4 mr-1" alt="Alert" />
               <span>{provider.documentsCount.expired}</span>
             </div>
             <div className="flex items-center">
-              <Info className="h-4 w-4 text-muted-foreground mr-1" />
+              <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-4 w-4 mr-1" alt="Hourglass" />
               <span>{provider.documentsCount.missing}</span>
             </div>
           </div>

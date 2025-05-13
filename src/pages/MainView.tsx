@@ -5,11 +5,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertCircle, Check, Clock, FileText, Hourglass, Settings } from "lucide-react";
+import { Plus } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { historicalData } from "@/data/dummy-data";
 import { cn } from "@/lib/utils";
+
+// Modified historical data with more realistic trends and some hickups
+const modifiedHistoricalData = [
+  { name: "Jan", beitragsrückstände: 12, fehlend: 25, ablaufend: 13 },
+  { name: "Feb", beitragsrückstände: 13, fehlend: 22, ablaufend: 14 },
+  { name: "März", beitragsrückstände: 11, fehlend: 20, ablaufend: 12 },
+  { name: "Apr", beitragsrückstände: 14, fehlend: 19, ablaufend: 11 },
+  { name: "Mai", beitragsrückstände: 10, fehlend: 17, ablaufend: 13 },
+  { name: "Jun", beitragsrückstände: 8, fehlend: 19, ablaufend: 10 },
+  { name: "Jul", beitragsrückstände: 9, fehlend: 16, ablaufend: 9 },
+  { name: "Aug", beitragsrückstände: 7, fehlend: 17, ablaufend: 11 },
+  { name: "Sep", beitragsrückstände: 8, fehlend: 15, ablaufend: 8 },
+  { name: "Okt", beitragsrückstände: 6, fehlend: 14, ablaufend: 9 },
+  { name: "Nov", beitragsrückstände: 5, fehlend: 13, ablaufend: 7 },
+  { name: "Dez", beitragsrückstände: 4, fehlend: 12, ablaufend: 6 },
+];
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
@@ -108,7 +123,7 @@ const MainView = () => {
         </Card>
       </div>
 
-      {/* Historischer Chart */}
+      {/* Historischer Chart mit angepassten Daten */}
       <Card>
         <CardHeader>
           <CardTitle>Compliance Entwicklung</CardTitle>
@@ -117,7 +132,7 @@ const MainView = () => {
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={historicalData}
+                data={modifiedHistoricalData}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
@@ -162,23 +177,23 @@ const MainView = () => {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-2">
-              <Check className="h-5 w-5 text-green-500" />
+              <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-5 w-5" alt="Check" />
               <span>Alle erforderlichen Dokumente vorhanden</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-red-500" />
+              <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-5 w-5" alt="Clock" />
               <span>Dokument ist abgelaufen</span>
             </div>
             <div className="flex items-center gap-2">
-              <Hourglass className="h-5 w-5 text-yellow-500" />
+              <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-5 w-5" alt="Hourglass" />
               <span>Dokument läuft in 30 Tagen ab</span>
             </div>
             <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-red-500" />
+              <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-5 w-5" alt="Alert" />
               <span>Handlungsbedarf (z.B. Beitragsrückstände oder fehlende Dokumente)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">SOON</span>
+              <img src="/lovable-uploads/581e8146-ca78-4135-9b39-79770af11286.png" className="h-5 w-5" alt="Soon" />
               <span>Gültigkeitsstart liegt in der Zukunft</span>
             </div>
           </div>
@@ -186,10 +201,23 @@ const MainView = () => {
       </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="niederlassung-a">Niederlassung A</TabsTrigger>
-          <TabsTrigger value="niederlassung-b">Niederlassung B</TabsTrigger>
-        </TabsList>
+        <div className="flex justify-between items-center mb-4">
+          <TabsList>
+            <TabsTrigger value="niederlassung-a">Niederlassung A</TabsTrigger>
+            <TabsTrigger value="niederlassung-b">Niederlassung B</TabsTrigger>
+          </TabsList>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="flex gap-1 items-center">
+              <Plus className="h-4 w-4" />
+              <span>Personaldienstleister hinzufügen</span>
+            </Button>
+            <Button variant="outline" size="sm" className="flex gap-1 items-center">
+              <Plus className="h-4 w-4" />
+              <span>Subunternehmer hinzufügen</span>
+            </Button>
+          </div>
+        </div>
 
         <TabsContent value={activeTab} className="space-y-6">
           <ComplianceTable title="Subunternehmer" providers={filteredProviders} />
@@ -239,19 +267,19 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1">
-                      <Check className="h-4 w-4 text-green-500" />
+                      <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-4 w-4" alt="Check" />
                       <span>{provider.documentsCount.valid}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Hourglass className="h-4 w-4 text-yellow-500" />
+                      <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-4 w-4" alt="Hourglass" />
                       <span>{provider.documentsCount.expiring}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4 text-red-500" />
+                      <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-4 w-4" alt="Clock" />
                       <span>{provider.documentsCount.expired}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <AlertCircle className="h-4 w-4 text-red-500" />
+                      <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-4 w-4" alt="Alert" />
                       <span>{provider.documentsCount.missing}</span>
                     </div>
                   </div>
