@@ -1,5 +1,5 @@
 
-import { Search, Bell, Sun, Menu } from "lucide-react";
+import { Search, Bell, Sun, Menu, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -55,32 +55,22 @@ const Header = () => {
             </li>
             <li>
               <Link 
-                to="/documents" 
-                className={`transition-colors ${isActive('/documents') 
+                to="/document-requirements" 
+                className={`transition-colors ${isActive('/document-requirements') 
                   ? 'text-primary font-medium' 
                   : 'text-muted-foreground hover:text-primary'}`}
               >
-                Dokumente
+                Dokumentenanforderungen
               </Link>
             </li>
             <li>
               <Link 
-                to="/providers" 
-                className={`transition-colors ${isActive('/providers') 
+                to="/requests" 
+                className={`transition-colors ${isActive('/requests') 
                   ? 'text-primary font-medium' 
                   : 'text-muted-foreground hover:text-primary'}`}
               >
-                Dienstleister
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/ai-agent" 
-                className={`transition-colors ${isActive('/ai-agent') 
-                  ? 'text-primary font-medium' 
-                  : 'text-muted-foreground hover:text-primary'}`}
-              >
-                KI-Assistent
+                Anfragen
               </Link>
             </li>
           </ul>
