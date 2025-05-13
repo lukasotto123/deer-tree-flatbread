@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { cn } from "@/lib/utils";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 // Modified historical data with more realistic trends and some hickups
 const modifiedHistoricalData = [
@@ -28,7 +28,6 @@ const modifiedHistoricalData = [
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
-  const location = useLocation();
 
   const filteredProviders = providers.filter(provider => 
     provider.type === 'subunternehmer' && (
@@ -54,42 +53,13 @@ const MainView = () => {
     (total, provider) => total + provider.documentsCount.expiring, 0
   );
 
-  // Define navigation links
-  const navigationLinks = [
-    { name: "Dashboard", path: "/" },
-    { name: "Dokumentenanforderungen", path: "/document-requirements" },
-    { name: "Dokumentenprüfung", path: "/document-review/provider-3/new" },
-    { name: "Anfragen", path: "/requests" }
-  ];
-
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Compliance-Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            Überblick über den aktuellen Status aller Dokumente und Dienstleister
-          </p>
-        </div>
-        
-        <div className="flex gap-2">
-          {navigationLinks.map((link) => (
-            <Button 
-              key={link.path} 
-              asChild
-              variant={location.pathname === link.path ? "default" : "outline"}
-              className={cn(
-                location.pathname === link.path 
-                  ? "bg-[#005B41] hover:bg-[#005B41]/90 text-white" 
-                  : "bg-white hover:bg-slate-100 hover:text-black text-black"
-              )}
-            >
-              <Link to={link.path}>
-                {link.name}
-              </Link>
-            </Button>
-          ))}
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">Compliance-Dashboard</h1>
+        <p className="text-muted-foreground mt-1">
+          Überblick über den aktuellen Status aller Dokumente und Dienstleister
+        </p>
       </div>
 
       {/* Übersichtskarten basierend auf dem Screenshot */}
@@ -115,7 +85,7 @@ const MainView = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <h3 className="text-lg font-medium mb-2">Ablaufende Dokument</h3>
+              <h3 className="text-lg font-medium mb-2">Ablaufende Dokumente</h3>
               <p className="text-4xl font-bold">{ablaufendeDokumente}</p>
               <p className="text-sm text-muted-foreground mt-1">in den nächsten 30 Tagen</p>
             </div>
@@ -254,9 +224,12 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
             {providers.map((provider) => (
               <TableRow key={provider.id}>
                 <TableCell className="font-medium">
-                  <Link to={`/provider/${provider.id}`} className="text-primary hover:underline">
-                    {provider.name}
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    {getProviderStatusIcon(provider)}
+                    <Link to={`/provider/${provider.id}`} className="text-primary hover:underline">
+                      {provider.name}
+                    </Link>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <StatusBadgeGerman status={provider.status} />
@@ -297,6 +270,19 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
       </CardContent>
     </Card>
   );
+};
+
+// Helper function to determine the worst-case status icon for a provider
+const getProviderStatusIcon = (provider: typeof providers[0]) => {
+  if (provider.documentsCount.missing > 0) {
+    return <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-5 w-5" alt="Alert" />;
+  } else if (provider.documentsCount.expired > 0) {
+    return <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-5 w-5" alt="Clock" />;
+  } else if (provider.documentsCount.expiring > 0) {
+    return <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-5 w-5" alt="Hourglass" />;
+  } else {
+    return <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-5 w-5" alt="Check" />;
+  }
 };
 
 const StatusBadgeGerman = ({ status }: { status: 'active' | 'inactive' | 'pending' }) => {
