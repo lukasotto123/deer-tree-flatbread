@@ -1,9 +1,10 @@
 
-import { Building, Plus } from "lucide-react";
+import { Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Provider } from "@/types";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 interface ProviderCardProps {
   provider: Provider;
@@ -20,6 +21,12 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
     pending: { color: 'bg-yellow-100 text-yellow-800', text: 'Ausstehend' },
   };
   
+  // Determine worst document status
+  const hasExpired = provider.documentsCount.expired > 0;
+  const hasMissing = provider.documentsCount.missing > 0;
+  const hasExpiring = provider.documentsCount.expiring > 0;
+  const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+  
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden flex flex-col">
       <div className="p-6 border-b border-border flex justify-between items-start">
@@ -28,7 +35,10 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
             <Building className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold text-lg">{provider.name}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-lg">{provider.name}</h3>
+              <StatusBadge status={worstStatus} />
+            </div>
             <div className="mt-1 flex items-center gap-2">
               <Badge variant="outline">{providerTypeText}</Badge>
               <Badge className={cn(statusConfig[provider.status].color)}>
@@ -63,15 +73,15 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
               <span>{provider.documentsCount.valid}</span>
             </div>
             <div className="flex items-center">
-              <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-4 w-4 mr-1" alt="Clock" />
+              <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-4 w-4 mr-1" alt="Hourglass" />
               <span>{provider.documentsCount.expiring}</span>
             </div>
             <div className="flex items-center">
-              <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-4 w-4 mr-1" alt="Alert" />
+              <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-4 w-4 mr-1" alt="Clock" />
               <span>{provider.documentsCount.expired}</span>
             </div>
             <div className="flex items-center">
-              <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-4 w-4 mr-1" alt="Hourglass" />
+              <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-4 w-4 mr-1" alt="Alert" />
               <span>{provider.documentsCount.missing}</span>
             </div>
           </div>

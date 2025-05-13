@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,8 +6,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Check, Clock, FileText, Hourglass, User } from "lucide-react";
+import { User } from "lucide-react";
 import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,10 +31,20 @@ const ProviderView = () => {
   // Mitarbeiter dieses Dienstleisters
   const providerEmployees = employees.filter(e => e.providerId === id);
 
+  // Determine the worst document status for the provider
+  const hasExpired = providerDocuments.some(doc => doc.status === "expired");
+  const hasExpiring = providerDocuments.some(doc => doc.status === "expiring");
+  const hasMissing = providerDocuments.some(doc => doc.status === "missing");
+  
+  const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">{provider.name}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold">{provider.name}</h1>
+          <StatusBadge status={worstStatus} />
+        </div>
         <div className="flex gap-2">
           <Link to={`/document-review/${id}/new`}>
             <Button>Dokument hochladen</Button>
@@ -112,9 +124,9 @@ const ProviderView = () => {
                     <TableCell>{docType.name}</TableCell>
                     <TableCell>
                       {doc ? (
-                        <StatusBadgeDocument status={doc.status} />
+                        <StatusBadge status={doc.status} />
                       ) : (
-                        <StatusBadgeDocument status="missing" />
+                        <StatusBadge status="missing" />
                       )}
                     </TableCell>
                     <TableCell>
@@ -175,6 +187,25 @@ const ProviderView = () => {
               const expired = employeeDocuments.filter(d => d.status === 'expired').length;
               const missing = employeeDocuments.filter(d => d.status === 'missing').length;
               
+              // Determine the worst status for this employee
+              const hasExpired = expired > 0;
+              const hasMissing = missing > 0;
+              const hasExpiring = expiring > 0;
+              const worstEmployeeStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+              
+              // Assign nationality-appropriate names
+              let employeeName = employee.name;
+              if (employee.id === "employee-1") employeeName = "Hans Schmidt";
+              if (employee.id === "employee-2") employeeName = "Maria Wagner";
+              if (employee.id === "employee-3") employeeName = "Pierre Dubois";
+              if (employee.id === "employee-4") employeeName = "Isabella Romano";
+              if (employee.id === "employee-5") employeeName = "Miguel González";
+              if (employee.id === "employee-6") employeeName = "Sophia Müller";
+              if (employee.id === "employee-7") employeeName = "Jan Kowalski";
+              if (employee.id === "employee-8") employeeName = "Anna Hofer";
+              if (employee.id === "employee-9") employeeName = "Erik Johansson";
+              if (employee.id === "employee-10") employeeName = "Yuki Tanaka";
+              
               return (
                 <Card key={employee.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
@@ -184,7 +215,10 @@ const ProviderView = () => {
                           <User className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-medium">{employee.name}</h3>
+                          <div className="flex items-center">
+                            <h3 className="font-medium">{employeeName}</h3>
+                            <StatusBadge status={worstEmployeeStatus} className="ml-2" />
+                          </div>
                           <p className="text-sm text-muted-foreground">{employee.position}</p>
                         </div>
                       </div>
@@ -196,19 +230,19 @@ const ProviderView = () => {
                     <div className="mt-4 flex items-center justify-between">
                       <div className="flex space-x-3 text-sm">
                         <div className="flex items-center">
-                          <Check className="h-4 w-4 text-green-500 mr-1" />
+                          <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-4 w-4 mr-1" alt="Check" />
                           <span>{valid}</span>
                         </div>
                         <div className="flex items-center">
-                          <Hourglass className="h-4 w-4 text-yellow-500 mr-1" />
+                          <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-4 w-4 mr-1" alt="Hourglass" />
                           <span>{expiring}</span>
                         </div>
                         <div className="flex items-center">
-                          <Clock className="h-4 w-4 text-red-500 mr-1" />
+                          <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-4 w-4 mr-1" alt="Clock" />
                           <span>{expired}</span>
                         </div>
                         <div className="flex items-center">
-                          <AlertCircle className="h-4 w-4 text-red-500 mr-1" />
+                          <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-4 w-4 mr-1" alt="Alert" />
                           <span>{missing}</span>
                         </div>
                       </div>
@@ -237,26 +271,6 @@ const StatusBadgeGerman = ({ status }: { status: 'active' | 'inactive' | 'pendin
     <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>
       {text}
     </span>
-  );
-};
-
-const StatusBadgeDocument = ({ status }: { status: 'valid' | 'expiring' | 'expired' | 'missing' }) => {
-  const docStatusMap = {
-    valid: { text: "Gültig", className: "bg-green-100 text-green-800", icon: Check },
-    expiring: { text: "Läuft bald ab", className: "bg-yellow-100 text-yellow-800", icon: Hourglass },
-    expired: { text: "Abgelaufen", className: "bg-red-100 text-red-800", icon: Clock },
-    missing: { text: "Fehlt", className: "bg-gray-100 text-gray-800", icon: AlertCircle },
-  };
-  
-  const { text, className, icon: Icon } = docStatusMap[status];
-  
-  return (
-    <div className="flex items-center gap-1">
-      <Icon className={`h-4 w-4 ${status === 'valid' ? 'text-green-500' : status === 'expiring' ? 'text-yellow-500' : 'text-red-500'}`} />
-      <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>
-        {text}
-      </span>
-    </div>
   );
 };
 

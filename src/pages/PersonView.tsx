@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { FileText, AlertCircle, Clock, Hourglass, Check } from "lucide-react";
+import { FileText } from "lucide-react";
 
 const PersonView = () => {
   const { providerId, employeeId } = useParams<{ providerId: string; employeeId: string }>();
@@ -17,13 +17,44 @@ const PersonView = () => {
     return <div>Mitarbeiter nicht gefunden</div>;
   }
 
+  // Assign nationality-appropriate names and citizenships
+  let employeeName = employee.name;
+  let citizenship = "Deutschland"; // Default
+  
+  if (employee.id === "employee-1") {
+    employeeName = "Hans Schmidt";
+    citizenship = "Deutschland";
+  } else if (employee.id === "employee-2") {
+    employeeName = "Maria Wagner";
+    citizenship = "Deutschland";
+  } else if (employee.id === "employee-3") {
+    employeeName = "Pierre Dubois";
+    citizenship = "Frankreich";
+  } else if (employee.id === "employee-4") {
+    employeeName = "Isabella Romano";
+    citizenship = "Italien";
+  } else if (employee.id === "employee-5") {
+    employeeName = "Miguel González";
+    citizenship = "Spanien";
+  } else if (employee.id === "employee-6") {
+    employeeName = "Sophia Müller";
+    citizenship = "Deutschland";
+  } else if (employee.id === "employee-7") {
+    employeeName = "Jan Kowalski";
+    citizenship = "Polen";
+  } else if (employee.id === "employee-8") {
+    employeeName = "Anna Hofer";
+    citizenship = "Österreich";
+  } else if (employee.id === "employee-9") {
+    employeeName = "Erik Johansson";
+    citizenship = "Schweden";
+  } else if (employee.id === "employee-10") {
+    employeeName = "Yuki Tanaka";
+    citizenship = "Japan";
+  }
+
   // Tatsächliche Dokumente des Mitarbeiters
   const employeeDocuments = documents.filter(doc => doc.employeeId === employeeId);
-  
-  // Determine employee citizenship (for demo, assign randomly)
-  const citizenship = employee.id === "employee-8" ? "Österreich" : (
-    ["Deutschland", "Polen", "Frankreich", "Italien", "Spanien"][Math.floor(Math.random() * 5)]
-  );
 
   // Determine the worst document status for the employee
   const hasExpired = employeeDocuments.some(doc => doc.status === "expired");
@@ -31,13 +62,6 @@ const PersonView = () => {
   const hasMissing = employeeDocuments.some(doc => doc.status === "missing");
   
   const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
-  
-  const StatusIcon = {
-    valid: <Check className="h-5 w-5 text-green-500" />,
-    expiring: <Hourglass className="h-5 w-5 text-yellow-500" />,
-    expired: <Clock className="h-5 w-5 text-red-500" />,
-    missing: <AlertCircle className="h-5 w-5 text-red-500" />
-  }[worstStatus];
   
   // Alle Dokumenttypen, die für Mitarbeiter dieses Dienstleisters relevant sein könnten
   const relevantDocTypes = documentTypes.filter(dt => {
@@ -47,8 +71,8 @@ const PersonView = () => {
     // Filter by employee relevance
     if (!dt.isPerEmployee) return false;
     
-    // Filter based on citizenship
-    if (dt.id === "doc-type-11" && citizenship === "Deutschland") return false; // A1-Bescheinigung not needed for Germans
+    // Filter based on citizenship - A1-Bescheinigung not needed for Germans
+    if (dt.id === "doc-type-11" && citizenship === "Deutschland") return false; 
     
     return true;
   });
@@ -62,8 +86,8 @@ const PersonView = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold">{employee.name}</h1>
-          {StatusIcon}
+          <h1 className="text-3xl font-bold">{employeeName}</h1>
+          <StatusBadge status={worstStatus} />
         </div>
         <Link to={`/provider/${providerId}`}>
           <Button variant="outline">Zurück zum Unternehmen</Button>
