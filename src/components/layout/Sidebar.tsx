@@ -1,6 +1,7 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { FileText, Zap } from "lucide-react";
+import { FileText, User, Zap } from "lucide-react";
 
 const Sidebar = () => {
   const location = useLocation();
