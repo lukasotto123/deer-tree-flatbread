@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { FileText } from "lucide-react";
+import { FileText, Eye } from "lucide-react";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 
 const PersonView = () => {
@@ -164,14 +163,14 @@ const PersonView = () => {
                         {doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
                       </TableCell>
                       <TableCell>
-                        {doc.status === "missing" || doc.status === "expired" ? (
+                        {(doc.status === "missing" || doc.status === "expired") && (
                           <div className="text-sm">
                             <div>{doc.remindersSent || 0} gesendet</div>
                             <div className="text-xs text-muted-foreground">
                               Nächste: {doc.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
                             </div>
                           </div>
-                        ) : null}
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
@@ -182,6 +181,13 @@ const PersonView = () => {
                           >
                             <FileText className="h-4 w-4 mr-1" />
                             Historie
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Anzeigen
                           </Button>
                           {!isValid && (
                             <Link to={`/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`}>

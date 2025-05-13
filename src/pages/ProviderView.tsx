@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { User } from "lucide-react";
+import { User, FileText, Eye } from "lucide-react";
 import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
@@ -98,7 +99,7 @@ const ProviderView = () => {
         </CardContent>
       </Card>
 
-      {/* Mitarbeiter als Kärtchen - Moved above company documents */}
+      {/* Mitarbeiter als Kärtchen */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Mitarbeiter</CardTitle>
@@ -247,23 +248,34 @@ const ProviderView = () => {
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           {doc && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleShowDocumentHistory(doc.id)}
-                            >
-                              Historie
-                            </Button>
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleShowDocumentHistory(doc.id)}
+                              >
+                                <FileText className="h-4 w-4 mr-1" />
+                                Historie
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Anzeigen
+                              </Button>
+                              {!isValid && (
+                                <Link to={`/document-review/${id}/${doc.id}`}>
+                                  <Button variant="outline" size="sm">Prüfen</Button>
+                                </Link>
+                              )}
+                            </>
                           )}
-                          {doc && !isValid ? (
-                            <Link to={`/document-review/${id}/${doc.id}`}>
-                              <Button variant="outline" size="sm">Prüfen</Button>
-                            </Link>
-                          ) : (!doc && (
+                          {!doc && (
                             <Link to={`/document-review/${id}/new?documentType=${docType.id}`}>
                               <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
                             </Link>
-                          ))}
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>

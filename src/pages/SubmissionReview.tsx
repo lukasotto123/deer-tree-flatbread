@@ -13,7 +13,6 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { documents, providers, documentTypes, employees } from "@/data/dummy-data";
-import DocumentHistory from "@/components/ui/DocumentHistory";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,8 +35,14 @@ const SubmissionReview = () => {
   const employeeIdParam = searchParams.get("employeeId");
   const documentTypeParam = searchParams.get("documentType");
   
+  // Get provider
+  const provider = providers.find(p => p.id === providerId);
+  if (!provider) {
+    return <div>Dienstleister nicht gefunden</div>;
+  }
+  
   // Get document if it exists
-  const document = documents.find(d => d.id === documentId);
+  const document = documentId !== 'new' ? documents.find(d => d.id === documentId) : null;
   
   // Get document type
   let documentType;
@@ -47,8 +52,28 @@ const SubmissionReview = () => {
     documentType = documentTypes.find(dt => dt.id === documentTypeParam);
   }
   
-  // Get provider
-  const provider = providers.find(p => p.id === providerId);
+  if (!documentType) {
+    // Handle missing document type explicitly
+    return <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Fehler beim Laden</h1>
+      <p className="text-muted-foreground">
+        Der angeforderte Dokumenttyp wurde nicht gefunden. 
+        Bitte kehren Sie zurück und versuchen Sie es erneut.
+      </p>
+      <Button 
+        className="mt-4"
+        onClick={() => {
+          if (employeeIdParam) {
+            navigate(`/person/${providerId}/${employeeIdParam}`);
+          } else {
+            navigate(`/provider/${providerId}`);
+          }
+        }}
+      >
+        Zurück
+      </Button>
+    </div>;
+  }
 
   // Get employee if provided
   const employee = employeeIdParam ? employees.find(e => e.id === employeeIdParam) : null;
@@ -79,14 +104,6 @@ const SubmissionReview = () => {
     }, 1000);
   };
 
-  if (!provider) {
-    return <div>Dienstleister nicht gefunden</div>;
-  }
-  
-  if (!documentType) {
-    return <div>Dokumenttyp nicht gefunden</div>;
-  }
-
   const isNewDocument = documentId === 'new';
 
   return (
@@ -115,7 +132,7 @@ const SubmissionReview = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          {/* Document preview */}
+          {/* Document preview placeholder - No actual document shown */}
           <Card>
             <CardHeader>
               <CardTitle>Dokumentvorschau</CardTitle>
@@ -128,33 +145,20 @@ const SubmissionReview = () => {
             <CardContent className="flex justify-center">
               <div className="w-full max-w-2xl border rounded-md overflow-hidden">
                 <AspectRatio ratio={1 / 1.414}>
-                  {document?.fileUrl ? (
-                    <img
-                      src={document.fileUrl}
-                      alt="Document Preview"
-                      className="object-contain"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-muted flex items-center justify-center">
-                      {isNewDocument ? (
-                        <div className="text-center p-4">
-                          <p className="text-muted-foreground mb-4">Ziehen Sie eine Datei hierher oder klicken Sie, um eine Datei auszuwählen</p>
-                          <Button>Datei auswählen</Button>
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">Keine Vorschau verfügbar</p>
-                      )}
-                    </div>
-                  )}
+                  <div className="h-full w-full bg-muted flex items-center justify-center">
+                    {isNewDocument ? (
+                      <div className="text-center p-4">
+                        <p className="text-muted-foreground mb-4">Ziehen Sie eine Datei hierher oder klicken Sie, um eine Datei auszuwählen</p>
+                        <Button>Datei auswählen</Button>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">Dokument wird geladen...</p>
+                    )}
+                  </div>
                 </AspectRatio>
               </div>
             </CardContent>
           </Card>
-          
-          {/* Document history - Only show for existing documents */}
-          {!isNewDocument && documentId && (
-            <DocumentHistory documentId={documentId} />
-          )}
         </div>
         
         <div>
