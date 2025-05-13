@@ -43,13 +43,19 @@ const MainView = () => {
   const navigationLinks = [
     { name: "Dashboard", path: "/" },
     { name: "Dokumentenanforderungen", path: "/document-requirements" },
-    { name: "Dokumentenprüfung", path: "/document-review/provider-3/new" }
+    { name: "Dokumentenprüfung", path: "/document-review/provider-3/new" },
+    { name: "Anfragen", path: "/requests" }
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Compliance-Dashboard</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Compliance-Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
+            Überblick über den aktuellen Status aller Dokumente und Dienstleister
+          </p>
+        </div>
         
         <div className="flex gap-2">
           {navigationLinks.map((link) => (
@@ -58,7 +64,9 @@ const MainView = () => {
               asChild
               variant={location.pathname === link.path ? "default" : "outline"}
               className={cn(
-                location.pathname === link.path ? "bg-[#005B41] hover:bg-[#005B41]/90" : "bg-white hover:bg-slate-100"
+                location.pathname === link.path 
+                  ? "bg-[#005B41] hover:bg-[#005B41]/90 text-white" 
+                  : "bg-white hover:bg-slate-100 hover:text-black text-black"
               )}
             >
               <Link to={link.path}>
