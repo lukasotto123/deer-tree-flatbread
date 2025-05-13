@@ -1,4 +1,4 @@
-
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { FileText } from "lucide-react";
-import { useState } from "react";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 
 const PersonView = () => {
