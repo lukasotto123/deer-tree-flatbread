@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
   const [currentClient, setCurrentClient] = useState("hauptkunde");
+  const location = useLocation();
+  
+  // Helper to determine if a route is active
+  const isActive = (path: string) => location.pathname === path;
   
   return (
-    <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-white">
+    <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-white sticky top-0 z-10">
       <div className="flex items-center gap-4">
         <Button variant="outline" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
@@ -23,7 +27,6 @@ const Header = () => {
           </div>
         </div>
         
-        {/* Fixed the Select component by removing the className prop from Select and moving styles to SelectTrigger */}
         <div className="ml-4">
           <Select value={currentClient} onValueChange={setCurrentClient}>
             <SelectTrigger className="w-[220px] border-primary/20 bg-primary/5">
@@ -37,26 +40,46 @@ const Header = () => {
           </Select>
         </div>
         
-        {/* Add Navigation Links */}
+        {/* Add Navigation Links with active state */}
         <nav className="ml-6 hidden md:block">
           <ul className="flex items-center gap-6">
             <li>
-              <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/" 
+                className={`transition-colors ${isActive('/') 
+                  ? 'text-primary font-medium' 
+                  : 'text-muted-foreground hover:text-primary'}`}
+              >
                 Dashboard
               </Link>
             </li>
             <li>
-              <Link to="/providers" className="text-muted-foreground hover:text-primary transition-colors">
-                Dienstleister
-              </Link>
-            </li>
-            <li>
-              <Link to="/documents" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/documents" 
+                className={`transition-colors ${isActive('/documents') 
+                  ? 'text-primary font-medium' 
+                  : 'text-muted-foreground hover:text-primary'}`}
+              >
                 Dokumente
               </Link>
             </li>
             <li>
-              <Link to="/ai-agent" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/providers" 
+                className={`transition-colors ${isActive('/providers') 
+                  ? 'text-primary font-medium' 
+                  : 'text-muted-foreground hover:text-primary'}`}
+              >
+                Dienstleister
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/ai-agent" 
+                className={`transition-colors ${isActive('/ai-agent') 
+                  ? 'text-primary font-medium' 
+                  : 'text-muted-foreground hover:text-primary'}`}
+              >
                 KI-Assistent
               </Link>
             </li>
