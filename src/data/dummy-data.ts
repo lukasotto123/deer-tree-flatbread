@@ -720,7 +720,13 @@ export const documents: Document[] = [
     isSecureCheckRequired: true,
     isBasicCheckRequired: true,
     isPerEmployee: false,
-    fileUrl: "/documents/doc-1.pdf"
+    fileUrl: "/documents/doc-1.pdf",
+    isClientSpecific: false,
+    secureCheckFrequency: "bei Ablauf (jährlich)",
+    secureCheckRequirement: "Verpflichtend, wenn Mitarbeiter nicht in Deutschland angestellt",
+    basicCheckFrequency: "bei Ablauf (jährlich)",
+    basicCheckRequirement: "Verpflichtend, wenn Mitarbeiter nicht in Deutschland angestellt",
+    issuanceType: "pro Unternehmen"
   },
   {
     id: "doc-2",
@@ -741,7 +747,13 @@ export const documents: Document[] = [
     isPerEmployee: true,
     employeeId: "employee-1",
     employeeName: "Max Mustermann",
-    fileUrl: "/documents/doc-2.pdf"
+    fileUrl: "/documents/doc-2.pdf",
+    isClientSpecific: false,
+    secureCheckFrequency: "dauerhaft",
+    secureCheckRequirement: "Verpflichtend, wenn Mitarbeiter nicht in Deutschland angestellt",
+    basicCheckFrequency: "dauerhaft",
+    basicCheckRequirement: "Verpflichtend, wenn Mitarbeiter nicht in Deutschland angestellt",
+    issuanceType: "pro Mitarbeiter"
   },
   {
     id: "doc-3",
@@ -760,7 +772,13 @@ export const documents: Document[] = [
     isSecureCheckRequired: true,
     isBasicCheckRequired: true,
     isPerEmployee: false,
-    fileUrl: "/documents/doc-3.pdf"
+    fileUrl: "/documents/doc-3.pdf",
+    isClientSpecific: false,
+    secureCheckFrequency: "monatlich",
+    secureCheckRequirement: "Verpflichtend",
+    basicCheckFrequency: "quartalsweise",
+    basicCheckRequirement: "Verpflichtend",
+    issuanceType: "pro Unternehmen"
   },
   {
     id: "doc-4",
@@ -781,7 +799,13 @@ export const documents: Document[] = [
     isPerEmployee: true,
     employeeId: "employee-1",
     employeeName: "Max Mustermann",
-    fileUrl: "/documents/doc-4.pdf"
+    fileUrl: "/documents/doc-4.pdf",
+    isClientSpecific: false,
+    secureCheckFrequency: "bei Ablauf",
+    secureCheckRequirement: "Verpflichtend",
+    basicCheckFrequency: "bei Ablauf",
+    basicCheckRequirement: "Verpflichtend",
+    issuanceType: "pro Mitarbeiter"
   },
   {
     id: "doc-5",
@@ -800,7 +824,13 @@ export const documents: Document[] = [
     isSecureCheckRequired: true,
     isBasicCheckRequired: false,
     isPerEmployee: false,
-    fileUrl: "/documents/doc-5.pdf"
+    fileUrl: "/documents/doc-5.pdf",
+    isClientSpecific: false,
+    secureCheckFrequency: "bei Ablauf (jährlich)",
+    secureCheckRequirement: "Verpflichtend",
+    basicCheckFrequency: "bei Ablauf (jährlich)",
+    basicCheckRequirement: "Verpflichtend",
+    issuanceType: "pro Unternehmen"
   },
   {
     id: "doc-6",
@@ -819,7 +849,13 @@ export const documents: Document[] = [
     isSecureCheckRequired: true,
     isBasicCheckRequired: true,
     isPerEmployee: false,
-    fileUrl: "/documents/doc-6.pdf"
+    fileUrl: "/documents/doc-6.pdf",
+    isClientSpecific: false,
+    secureCheckFrequency: "monatlich",
+    secureCheckRequirement: "Verpflichtend",
+    basicCheckFrequency: "quartalsweise",
+    basicCheckRequirement: "Verpflichtend",
+    issuanceType: "pro Unternehmen"
   },
   {
     id: "doc-7",
@@ -840,7 +876,13 @@ export const documents: Document[] = [
     isPerEmployee: true,
     employeeId: "employee-3",
     employeeName: "Peter Zimmermann",
-    fileUrl: "/documents/doc-7.pdf"
+    fileUrl: "/documents/doc-7.pdf",
+    isClientSpecific: false,
+    secureCheckFrequency: "bei Ablauf",
+    secureCheckRequirement: "Verpflichtend",
+    basicCheckFrequency: "bei Ablauf",
+    basicCheckRequirement: "Verpflichtend",
+    issuanceType: "pro Mitarbeiter"
   },
   {
     id: "doc-8",
@@ -859,7 +901,13 @@ export const documents: Document[] = [
     isSecureCheckRequired: true,
     isBasicCheckRequired: false,
     isPerEmployee: false,
-    fileUrl: "/documents/doc-8.pdf"
+    fileUrl: "/documents/doc-8.pdf",
+    isClientSpecific: false,
+    secureCheckFrequency: "jährlich",
+    secureCheckRequirement: "Verpflichtend",
+    basicCheckFrequency: "jährlich",
+    basicCheckRequirement: "Optional",
+    issuanceType: "pro Unternehmen"
   },
   {
     id: "doc-101",
