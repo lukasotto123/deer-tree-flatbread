@@ -1,11 +1,13 @@
 
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import StatusBadge from "@/components/ui/StatusBadge";
-import { providers, documents, employees } from "@/data/dummy-data";
-import { User, FileText } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, Check, Clock, FileText, Hourglass, User } from "lucide-react";
+import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
 
 const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,35 +16,40 @@ const ProviderView = () => {
   if (!provider) {
     return <div>Dienstleister nicht gefunden</div>;
   }
-
-  const providerDocuments = documents.filter(doc => doc.providerId === id && !doc.employeeId);
-  const providerEmployees = employees.filter(emp => emp.providerId === id);
+  
+  // Dokumente für diesen Dienstleister
+  const providerDocuments = documents.filter(doc => 
+    doc.providerId === id && !doc.employeeId
+  );
+  
+  // Relevante Dokumenttypen für diesen Dienstleister
+  const relevantDocTypes = documentTypes.filter(dt => 
+    dt.providerType === provider.type && !dt.isPerEmployee
+  );
+  
+  // Mitarbeiter dieses Dienstleisters
+  const providerEmployees = employees.filter(e => e.providerId === id);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">{provider.name}</h1>
-        <Link to="/">
-          <Button variant="outline">Zurück zur Übersicht</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link to={`/submission-review/${id}/new`}>
+            <Button>Dokument hochladen</Button>
+          </Link>
+          <Link to="/">
+            <Button variant="outline">Zurück zur Übersicht</Button>
+          </Link>
+        </div>
       </div>
-
+      
       <Card>
         <CardHeader>
           <CardTitle>Unternehmensinformationen</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Typ</p>
-              <p>{provider.type === "personaldienstleister" ? "Personaldienstleister" : "Subunternehmer"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Status</p>
-              <p>
-                <StatusBadgeGerman status={provider.status} />
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <p className="text-sm text-muted-foreground">Kontakt E-Mail</p>
               <p>{provider.contactEmail}</p>
@@ -51,101 +58,82 @@ const ProviderView = () => {
               <p className="text-sm text-muted-foreground">Kontakt Telefon</p>
               <p>{provider.contactPhone}</p>
             </div>
-            <div className="md:col-span-2">
+            <div>
               <p className="text-sm text-muted-foreground">Adresse</p>
               <p>{provider.address}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Typ</p>
+              <p>{provider.type === 'subunternehmer' ? 'Subunternehmer' : 'Personaldienstleister'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Status</p>
+              <StatusBadgeGerman status={provider.status} />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Letzte Aktualisierung</p>
+              <p>{new Date(provider.lastUpdated).toLocaleDateString('de-DE')}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Dokumente des Unternehmens */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader>
           <CardTitle>Unternehmensdokumente</CardTitle>
-          <Link to={`/submission-review/${provider.id}/new`}>
-            <Button size="sm">Dokument hochladen</Button>
-          </Link>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Dokumentenname</TableHead>
+                <TableHead>Dokument</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Ausstellungsdatum</TableHead>
                 <TableHead>Ablaufdatum</TableHead>
+                <TableHead>Relevanz</TableHead>
                 <TableHead className="text-right">Aktionen</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {providerDocuments.map((doc) => (
-                <TableRow key={doc.id}>
-                  <TableCell className="font-medium">{doc.name}</TableCell>
-                  <TableCell>
-                    <StatusBadgeGerman document={doc.status} />
-                  </TableCell>
-                  <TableCell>{new Date(doc.issuedDate).toLocaleDateString('de-DE')}</TableCell>
-                  <TableCell>
-                    {doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Link to={`/submission-review/${provider.id}/${doc.id}`}>
-                        <Button variant="outline" size="sm">
-                          <FileText className="h-4 w-4 mr-1" />
-                          Prüfen
-                        </Button>
-                      </Link>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              {relevantDocTypes.map((docType) => {
+                const doc = providerDocuments.find(d => d.type === docType.id);
+                const isRelevant = true; // Default to true, would come from API
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Mitarbeiter</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Position</TableHead>
-                <TableHead>Dokumente Status</TableHead>
-                <TableHead className="text-right">Aktionen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {providerEmployees.map((employee) => {
-                const employeeDocuments = documents.filter(doc => doc.employeeId === employee.id);
-                const validDocs = employeeDocuments.filter(doc => doc.status === 'valid').length;
-                const expiringDocs = employeeDocuments.filter(doc => doc.status === 'expiring').length;
-                const expiredDocs = employeeDocuments.filter(doc => doc.status === 'expired').length;
-                const missingDocs = employeeDocuments.filter(doc => doc.status === 'missing').length;
-                
                 return (
-                  <TableRow key={employee.id}>
-                    <TableCell className="font-medium">{employee.name}</TableCell>
-                    <TableCell>{employee.position}</TableCell>
+                  <TableRow key={docType.id}>
+                    <TableCell>{docType.name}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-green-600">{validDocs}</span>
-                        <span className="text-yellow-600">{expiringDocs}</span>
-                        <span className="text-red-600">{expiredDocs}</span>
-                        <span className="text-gray-600">{missingDocs}</span>
+                      {doc ? (
+                        <StatusBadgeDocument status={doc.status} />
+                      ) : (
+                        <StatusBadgeDocument status="missing" />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {doc && doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Switch id={`relevance-${docType.id}`} checked={isRelevant} />
+                        <Label htmlFor={`relevance-${docType.id}`}>
+                          {isRelevant ? "Relevant" : "Nicht relevant"}
+                        </Label>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link to={`/person/${provider.id}/${employee.id}`}>
-                        <Button variant="outline" size="sm">
-                          <User className="h-4 w-4 mr-1" />
-                          Details
-                        </Button>
-                      </Link>
+                      {doc ? (
+                        <Link to={`/submission-review/${id}/${doc.id}`}>
+                          <Button variant="outline" size="sm">Prüfen</Button>
+                        </Link>
+                      ) : (
+                        <Link to={`/submission-review/${id}/new?documentType=${docType.id}`}>
+                          <Button variant="outline" size="sm">Hochladen</Button>
+                        </Link>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -154,51 +142,105 @@ const ProviderView = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Mitarbeiter als Kärtchen */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Mitarbeiter</CardTitle>
+          <Button size="sm">Mitarbeiter hinzufügen</Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {providerEmployees.map((employee) => {
+              const employeeDocuments = documents.filter(doc => doc.employeeId === employee.id);
+              const valid = employeeDocuments.filter(d => d.status === 'valid').length;
+              const expiring = employeeDocuments.filter(d => d.status === 'expiring').length;
+              const expired = employeeDocuments.filter(d => d.status === 'expired').length;
+              const missing = employeeDocuments.filter(d => d.status === 'missing').length;
+              
+              return (
+                <Card key={employee.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                          <User className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{employee.name}</h3>
+                          <p className="text-sm text-muted-foreground">{employee.position}</p>
+                        </div>
+                      </div>
+                      <Link to={`/person/${id}/${employee.id}`}>
+                        <Button variant="ghost" size="sm">Details</Button>
+                      </Link>
+                    </div>
+                    
+                    <div className="mt-4 flex items-center justify-between">
+                      <div className="flex space-x-3 text-sm">
+                        <div className="flex items-center">
+                          <Check className="h-4 w-4 text-green-500 mr-1" />
+                          <span>{valid}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Hourglass className="h-4 w-4 text-yellow-500 mr-1" />
+                          <span>{expiring}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 text-red-500 mr-1" />
+                          <span>{expired}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <AlertCircle className="h-4 w-4 text-red-500 mr-1" />
+                          <span>{missing}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-const StatusBadgeGerman = ({ 
-  status, 
-  document 
-}: { 
-  status?: 'active' | 'inactive' | 'pending';
-  document?: 'valid' | 'expiring' | 'expired' | 'missing';
-}) => {
-  if (document) {
-    const docStatusMap = {
-      valid: { text: "Gültig", className: "bg-green-100 text-green-800" },
-      expiring: { text: "Läuft bald ab", className: "bg-yellow-100 text-yellow-800" },
-      expired: { text: "Abgelaufen", className: "bg-red-100 text-red-800" },
-      missing: { text: "Fehlt", className: "bg-gray-100 text-gray-800" },
-    };
-    
-    const { text, className } = docStatusMap[document];
-    
-    return (
+const StatusBadgeGerman = ({ status }: { status: 'active' | 'inactive' | 'pending' }) => {
+  const statusMap = {
+    active: { text: "Aktiv", className: "bg-green-100 text-green-800" },
+    inactive: { text: "Inaktiv", className: "bg-red-100 text-red-800" },
+    pending: { text: "Ausstehend", className: "bg-yellow-100 text-yellow-800" },
+  };
+
+  const { text, className } = statusMap[status];
+  
+  return (
+    <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>
+      {text}
+    </span>
+  );
+};
+
+const StatusBadgeDocument = ({ status }: { status: 'valid' | 'expiring' | 'expired' | 'missing' }) => {
+  const docStatusMap = {
+    valid: { text: "Gültig", className: "bg-green-100 text-green-800", icon: Check },
+    expiring: { text: "Läuft bald ab", className: "bg-yellow-100 text-yellow-800", icon: Hourglass },
+    expired: { text: "Abgelaufen", className: "bg-red-100 text-red-800", icon: Clock },
+    missing: { text: "Fehlt", className: "bg-gray-100 text-gray-800", icon: AlertCircle },
+  };
+  
+  const { text, className, icon: Icon } = docStatusMap[status];
+  
+  return (
+    <div className="flex items-center gap-1">
+      <Icon className={`h-4 w-4 ${status === 'valid' ? 'text-green-500' : status === 'expiring' ? 'text-yellow-500' : 'text-red-500'}`} />
       <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>
         {text}
       </span>
-    );
-  }
-  
-  if (status) {
-    const providerStatusMap = {
-      active: { text: "Aktiv", className: "bg-green-100 text-green-800" },
-      inactive: { text: "Inaktiv", className: "bg-red-100 text-red-800" },
-      pending: { text: "Ausstehend", className: "bg-yellow-100 text-yellow-800" },
-    };
-    
-    const { text, className } = providerStatusMap[status];
-    
-    return (
-      <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>
-        {text}
-      </span>
-    );
-  }
-  
-  return null;
+    </div>
+  );
 };
 
 export default ProviderView;

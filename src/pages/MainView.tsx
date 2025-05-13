@@ -5,26 +5,153 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import StatusBadge from "@/components/ui/StatusBadge";
-import { Settings } from "lucide-react";
+import { AlertCircle, Check, Clock, FileText, Hourglass, Settings } from "lucide-react";
 import { providers } from "@/data/dummy-data";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+
+// Dummy historische Daten für den Chart
+const historicalData = [
+  { name: 'Jan', beitragsrückstände: 4, fehlend: 12, ablaufend: 5 },
+  { name: 'Feb', beitragsrückstände: 3, fehlend: 9, ablaufend: 7 },
+  { name: 'Mär', beitragsrückstände: 3, fehlend: 7, ablaufend: 6 },
+  { name: 'Apr', beitragsrückstände: 2, fehlend: 5, ablaufend: 5 },
+  { name: 'Mai', beitragsrückstände: 1, fehlend: 3, ablaufend: 4 },
+];
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
 
   const filteredProviders = providers.filter(provider => 
+    provider.type === 'subunternehmer' && (
     activeTab === "niederlassung-a" ? ["provider-1", "provider-2", "provider-3"].includes(provider.id) : 
-    ["provider-4", "provider-5"].includes(provider.id)
+    ["provider-4", "provider-5"].includes(provider.id))
   );
-
-  const personaldienstleister = filteredProviders.filter(p => p.type === "personaldienstleister");
-  const subunternehmer = filteredProviders.filter(p => p.type === "subunternehmer");
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Compliance-Dashboard</h1>
+        
+        <div className="flex gap-2">
+          <Button asChild>
+            <Link to="/requests">Anfragen</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/document-requirements">
+              <Settings className="h-4 w-4 mr-2" />
+              Dokumentenanforderungen
+            </Link>
+          </Button>
+        </div>
       </div>
+
+      {/* Übersichtskarten basierend auf dem Screenshot */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <h3 className="text-lg font-medium mb-2">Beitragsrückstände</h3>
+              <p className="text-4xl font-bold">0</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <h3 className="text-lg font-medium mb-2">Fehlende Dokumente</h3>
+              <p className="text-4xl font-bold">0</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <h3 className="text-lg font-medium mb-2">Ablaufende Dokument</h3>
+              <p className="text-4xl font-bold">0</p>
+              <p className="text-sm text-muted-foreground mt-1">in den nächsten 30 Tagen</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Historischer Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Compliance Entwicklung</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={historicalData}
+                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Area 
+                  type="monotone" 
+                  dataKey="beitragsrückstände" 
+                  name="Beitragsrückstände" 
+                  stackId="1" 
+                  stroke="#ff5555" 
+                  fill="#ff5555" 
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="fehlend" 
+                  name="Fehlende Dokumente" 
+                  stackId="1" 
+                  stroke="#ff8c00" 
+                  fill="#ff8c00" 
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="ablaufend" 
+                  name="Ablaufende Dokumente" 
+                  stackId="1" 
+                  stroke="#ffb74d" 
+                  fill="#ffb74d" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Legende</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="flex items-center gap-2">
+              <Check className="h-5 w-5 text-green-500" />
+              <span>Alle erforderlichen Dokumente vorhanden</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-red-500" />
+              <span>Dokument ist abgelaufen</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Hourglass className="h-5 w-5 text-yellow-500" />
+              <span>Dokument läuft in 30 Tagen ab</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-red-500" />
+              <span>Handlungsbedarf (z.B. Beitragsrückstände oder fehlende Dokumente)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">SOON</span>
+              <span>Gültigkeitsstart liegt in der Zukunft</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-4">
@@ -32,35 +159,20 @@ const MainView = () => {
           <TabsTrigger value="niederlassung-b">Niederlassung B</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="niederlassung-a" className="space-y-6">
-          <ComplianceOverview title="Personaldienstleister" providers={personaldienstleister} />
-          <ComplianceOverview title="Subunternehmer" providers={subunternehmer} />
-        </TabsContent>
-
-        <TabsContent value="niederlassung-b" className="space-y-6">
-          <ComplianceOverview title="Personaldienstleister" providers={personaldienstleister} />
-          <ComplianceOverview title="Subunternehmer" providers={subunternehmer} />
+        <TabsContent value={activeTab} className="space-y-6">
+          <ComplianceTable title="Subunternehmer" providers={filteredProviders} />
         </TabsContent>
       </Tabs>
-
-      <div className="flex justify-end mt-8">
-        <Link to="/document-requirements">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Dokumentenmanagement
-          </Button>
-        </Link>
-      </div>
     </div>
   );
 };
 
-interface ComplianceOverviewProps {
+interface ComplianceTableProps {
   title: string;
   providers: typeof providers;
 }
 
-const ComplianceOverview = ({ title, providers }: ComplianceOverviewProps) => {
+const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
   return (
     <Card>
       <CardHeader>
@@ -85,11 +197,23 @@ const ComplianceOverview = ({ title, providers }: ComplianceOverviewProps) => {
                   <StatusBadgeGerman status={provider.status} />
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-green-600">{provider.documentsCount.valid}</span>
-                    <span className="text-yellow-600">{provider.documentsCount.expiring}</span>
-                    <span className="text-red-600">{provider.documentsCount.expired}</span>
-                    <span className="text-gray-600">{provider.documentsCount.missing}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>{provider.documentsCount.valid}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Hourglass className="h-4 w-4 text-yellow-500" />
+                      <span>{provider.documentsCount.expiring}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-red-500" />
+                      <span>{provider.documentsCount.expired}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <AlertCircle className="h-4 w-4 text-red-500" />
+                      <span>{provider.documentsCount.missing}</span>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>{new Date(provider.lastUpdated).toLocaleDateString('de-DE')}</TableCell>

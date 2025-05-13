@@ -12,6 +12,7 @@ import RequestView from "./pages/RequestView";
 import PersonView from "./pages/PersonView";
 import NotFound from "./pages/NotFound";
 
+// Create a client
 const queryClient = new QueryClient();
 
 const App = () => (
