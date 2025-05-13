@@ -24,7 +24,7 @@ const AppLayout = () => {
       <div className="flex-1 ml-64">
         <div className="flex flex-col min-h-screen">
           <Header />
-          <div className="py-3 px-6 border-b border-border bg-white">
+          <div className="py-2 px-6 border-b border-border bg-white">
             <div className="flex gap-2">
               {navigationLinks.map((link) => (
                 <Button 
