@@ -11,6 +11,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import StatusBadge from "@/components/ui/StatusBadge";
 import { getDocumentStatusIcon } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Modified historical data with percentages instead of absolute values
 const modifiedHistoricalData = [
@@ -156,58 +157,60 @@ const MainView = () => {
         <CardContent>
           <div className="h-80">
             <ChartContainer config={chartConfig}>
-              <AreaChart
-                data={modifiedHistoricalData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                stackOffset="expand"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis 
-                  tickFormatter={(value) => `${Math.round(value * 100)}%`} 
-                  domain={[0, 1]}
-                />
-                <ChartTooltip 
-                  content={
-                    <ChartTooltipContent 
-                      formatter={(value, name) => [`${Math.round(Number(value) * 100)}%`, name]}
-                    />
-                  }
-                />
-                <Legend />
-                <Area 
-                  type="monotone" 
-                  dataKey="gültig" 
-                  name="Gültige Dokumente" 
-                  stackId="1" 
-                  stroke="#75C270" 
-                  fill="#75C270" 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="ablaufend" 
-                  name="Ablaufende Dokumente" 
-                  stackId="1" 
-                  stroke="#ffb74d" 
-                  fill="#ffb74d" 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="fehlend" 
-                  name="Fehlende Dokumente" 
-                  stackId="1" 
-                  stroke="#ff8c00" 
-                  fill="#ff8c00" 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="beitragsrückstände" 
-                  name="Beitragsrückstände" 
-                  stackId="1" 
-                  stroke="#ff5555" 
-                  fill="#ff5555" 
-                />
-              </AreaChart>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={modifiedHistoricalData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  stackOffset="expand"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis 
+                    tickFormatter={(value) => `${Math.round(value * 100)}%`} 
+                    domain={[0, 1]}
+                  />
+                  <ChartTooltip 
+                    content={
+                      <ChartTooltipContent 
+                        formatter={(value, name) => [`${Math.round(Number(value) * 100)}%`, name]}
+                      />
+                    }
+                  />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="gültig" 
+                    name="Gültige Dokumente" 
+                    stackId="1" 
+                    stroke="#75C270" 
+                    fill="#75C270" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="ablaufend" 
+                    name="Ablaufende Dokumente" 
+                    stackId="1" 
+                    stroke="#ffb74d" 
+                    fill="#ffb74d" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="fehlend" 
+                    name="Fehlende Dokumente" 
+                    stackId="1" 
+                    stroke="#ff8c00" 
+                    fill="#ff8c00" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="beitragsrückstände" 
+                    name="Beitragsrückstände" 
+                    stackId="1" 
+                    stroke="#ff5555" 
+                    fill="#ff5555" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </ChartContainer>
           </div>
         </CardContent>
