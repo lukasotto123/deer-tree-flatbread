@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -5,7 +6,7 @@ import { documentHistory } from "@/data/document-history";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { FileText, AlertTriangle } from "lucide-react";
+import { FileText, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 
 interface DocumentHistoryProps {
   documentId: string;
@@ -113,6 +114,20 @@ const DocumentHistory = ({ documentId }: DocumentHistoryProps) => {
 const StatusBadgeGerman = ({ status }: { status: 'valid' | 'expiring' | 'expired' | 'missing' | null }) => {
   if (!status) return null;
   
+  const renderStatusIcon = () => {
+    switch(status) {
+      case 'valid':
+        return <CheckCircle className="h-4 w-4 mr-1 text-green-600" />;
+      case 'expiring':
+        return <Clock className="h-4 w-4 mr-1 text-amber-500" />;
+      case 'expired':
+      case 'missing':
+        return <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />;
+      default:
+        return null;
+    }
+  };
+  
   const docStatusMap = {
     valid: { text: "Gültig", className: "bg-green-100 text-green-800" },
     expiring: { text: "Läuft bald ab", className: "bg-yellow-100 text-yellow-800" },
@@ -123,9 +138,12 @@ const StatusBadgeGerman = ({ status }: { status: 'valid' | 'expiring' | 'expired
   const { text, className } = docStatusMap[status];
   
   return (
-    <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>
-      {text}
-    </span>
+    <div className="flex items-center">
+      {renderStatusIcon()}
+      <span className={`rounded-full px-2 py-1 text-xs font-medium ${className}`}>
+        {text}
+      </span>
+    </div>
   );
 };
 

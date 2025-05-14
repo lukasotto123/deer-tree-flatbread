@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { User, FileText, Eye } from "lucide-react";
+import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle } from "lucide-react";
 import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
@@ -157,19 +157,19 @@ const ProviderView = () => {
                     <div className="mt-4 flex items-center justify-between">
                       <div className="flex space-x-3 text-sm">
                         <div className="flex items-center">
-                          <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-4 w-4 mr-1" alt="Check" />
+                          <CheckCircle className="h-4 w-4 mr-1 text-green-600" />
                           <span>{valid}</span>
                         </div>
                         <div className="flex items-center">
-                          <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-4 w-4 mr-1" alt="Hourglass" />
+                          <Clock className="h-4 w-4 mr-1 text-amber-500" />
                           <span>{expiring}</span>
                         </div>
                         <div className="flex items-center">
-                          <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-4 w-4 mr-1" alt="Clock" />
+                          <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />
                           <span>{expired}</span>
                         </div>
                         <div className="flex items-center">
-                          <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-4 w-4 mr-1" alt="Alert" />
+                          <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />
                           <span>{missing}</span>
                         </div>
                       </div>

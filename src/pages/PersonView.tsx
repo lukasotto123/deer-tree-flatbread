@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { FileText, Eye, AlertTriangle } from "lucide-react";
+import { FileText, Eye, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 
 const PersonView = () => {
