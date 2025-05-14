@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle, Euro, ToggleLeft, ToggleRight, Trash2, X, Check } from "lucide-react";
+import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle, Euro, ToggleLeft, ToggleRight, X, Check } from "lucide-react";
 import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
@@ -67,11 +67,6 @@ const ProviderView = () => {
         ? `${provider.name} wurde deaktiviert` 
         : `${provider.name} wurde aktiviert`
     );
-  };
-
-  // Funktion zum Löschen eines Dokuments (Dummy)
-  const handleDeleteDocument = (docType: string) => {
-    toast.success(`Dokument ${docType} wurde gelöscht`);
   };
 
   return (
@@ -302,18 +297,7 @@ const ProviderView = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          {/* Delete Button */}
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleDeleteDocument(docType.name)}
-                            disabled={!isActive}
-                          >
-                            <Trash2 className="h-4 w-4 mr-1 text-red-500" />
-                            Löschen
-                          </Button>
-                          
-                          {/* Always show History button */}
+                          {/* Only show History and View buttons */}
                           <Button 
                             variant="outline" 
                             size="sm"

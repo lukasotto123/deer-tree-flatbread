@@ -105,8 +105,8 @@ const MainView = () => {
               <p className="text-4xl font-bold">{beitragsrückstände}</p>
             </div>
             <div className="mt-6">
-              <Button className="w-full" asChild>
-                <Link to="/documents">Anzeigen</Link>
+              <Button className="w-full" disabled>
+                Anzeigen
               </Button>
             </div>
           </CardContent>
@@ -163,7 +163,10 @@ const MainView = () => {
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `${Math.round(value * 100)}%`} />
+                <YAxis 
+                  tickFormatter={(value) => `${Math.round(value * 100)}%`} 
+                  domain={[0, 1]}
+                />
                 <ChartTooltip 
                   content={
                     <ChartTooltipContent 
