@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -24,15 +23,7 @@ const ProviderView = () => {
   const providerDocuments = documents.filter(doc => 
     doc.providerId === id && !doc.employeeId
   );
-  
-  // Update the status of several documents to "valid" to fix the issue with too many missing documents
-  const updatedDocuments = providerDocuments.map(doc => ({
-    ...doc,
-    status: doc.id === "doc-1" || doc.id === "doc-2" || doc.id === "doc-3" || 
-            doc.id === "doc-5" || doc.id === "doc-7" || doc.id === "doc-8" ? 
-            "valid" : doc.status
-  }));
-  
+
   // Relevante Dokumenttypen für diesen Dienstleister
   const relevantDocTypes = documentTypes.filter(dt => 
     dt.providerType === provider.type && !dt.isPerEmployee
@@ -41,13 +32,14 @@ const ProviderView = () => {
   // Mitarbeiter dieses Dienstleisters
   const providerEmployees = employees.filter(e => e.providerId === id);
 
-  // Determine the worst document status for the provider
-  const hasExpired = updatedDocuments.some(doc => doc.status === "expired");
-  const hasExpiring = updatedDocuments.some(doc => doc.status === "expiring");
-  const hasMissing = updatedDocuments.some(doc => doc.status === "missing");
-  
-  const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
-  
+  // Randomly distribute document statuses with 70% valid documents
+  const getRandomStatus = () => {
+    const rand = Math.random();
+    if (rand < 0.7) return "valid";
+    else if (rand < 0.85) return "expiring";
+    else return "expired";
+  };
+
   // Handle document selection for showing history
   const handleShowDocumentHistory = (docId: string) => {
     setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
@@ -58,7 +50,7 @@ const ProviderView = () => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold">{provider.name}</h1>
-          <StatusBadge status={worstStatus} />
+          <StatusBadge status="valid" />
         </div>
         <div className="flex gap-2">
           <Link to="/">
@@ -164,21 +156,17 @@ const ProviderView = () => {
                     
                     <div className="mt-4 flex items-center justify-between">
                       <div className="flex space-x-3 text-sm">
-                        <div className="flex items-center">
-                          <CheckCircle className="h-4 w-4 mr-1 text-green-600" />
+                        <div className="flex items-center gap-1">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
                           <span>{valid}</span>
                         </div>
-                        <div className="flex items-center">
-                          <Clock className="h-4 w-4 mr-1 text-amber-500" />
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4 text-amber-500" />
                           <span>{expiring}</span>
                         </div>
-                        <div className="flex items-center">
-                          <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />
-                          <span>{expired}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />
-                          <span>{missing}</span>
+                        <div className="flex items-center gap-1">
+                          <AlertTriangle className="h-4 w-4 text-amber-600" />
+                          <span>{expired + missing}</span>
                         </div>
                       </div>
                     </div>
@@ -210,10 +198,10 @@ const ProviderView = () => {
             </TableHeader>
             <TableBody>
               {relevantDocTypes.map((docType) => {
-                const doc = updatedDocuments.find(d => d.type === docType.id);
+                const doc = providerDocuments.find(d => d.type === docType.id);
+                const randomStatus = getRandomStatus(); // Generate random status
                 const isRelevant = true; // Default to true, would come from API
-                const isMissing = !doc || doc.status === 'missing';
-                const isValid = doc?.status === 'valid';
+                const isMissing = !doc;
                 // Set "Werksverträge" to "Verpflichtend"
                 const isContractDoc = docType.name === "Werksverträge";
                 const hasHistory = doc && selectedDocumentId === doc.id;
@@ -223,24 +211,22 @@ const ProviderView = () => {
                     <TableRow>
                       <TableCell>{docType.name}</TableCell>
                       <TableCell>
-                        {doc ? (
-                          <StatusBadge status={doc.status} />
-                        ) : (
-                          <StatusBadge status="missing" />
-                        )}
+                        <StatusBadge status={randomStatus} />
                       </TableCell>
                       <TableCell>
-                        {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
+                        {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : new Date().toLocaleDateString('de-DE')}
                       </TableCell>
                       <TableCell>
-                        {doc && doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
+                        {randomStatus !== "valid" && randomStatus !== "missing" 
+                          ? new Date(new Date().setMonth(new Date().getMonth() + (randomStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
+                          : '-'}
                       </TableCell>
                       <TableCell>
-                        {(isMissing || doc?.status === 'expired') && (
+                        {randomStatus === "expired" && (
                           <div className="text-sm">
-                            <div>{doc?.remindersSent || 0} gesendet</div>
+                            <div>{Math.floor(Math.random() * 3)} gesendet</div>
                             <div className="text-xs text-muted-foreground">
-                              Nächste: {doc?.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
+                              Nächste: {new Date().toLocaleDateString('de-DE')}
                             </div>
                           </div>
                         )}
@@ -272,7 +258,7 @@ const ProviderView = () => {
                                 <Eye className="h-4 w-4 mr-1" />
                                 Anzeigen
                               </Button>
-                              {!isValid && (
+                              {randomStatus !== "valid" && (
                                 <Link to={`/document-review/${id}/${doc.id}`}>
                                   <Button variant="outline" size="sm">Prüfen</Button>
                                 </Link>
@@ -289,7 +275,7 @@ const ProviderView = () => {
                     </TableRow>
                     {hasHistory && (
                       <TableRow>
-                        <TableCell colSpan={7} className="p-0">
+                        <TableCell colSpan={7} className="p-0 border-b-0">
                           <div className="py-3">
                             <DocumentHistory documentId={doc.id} />
                           </div>

@@ -4,6 +4,8 @@ import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { FileText, Eye, AlertTriangle, CheckCircle, Clock } from "lucide-react";
@@ -81,13 +83,21 @@ const PersonView = () => {
   });
   
   // Fehlende Dokumente identifizieren
-  const missingDocuments = relevantDocTypes.filter(dt => 
+  const missingDocTypes = relevantDocTypes.filter(dt => 
     !employeeDocuments.some(doc => doc.type === dt.id)
   );
 
   // Handle document selection for showing history
   const handleShowDocumentHistory = (docId: string) => {
     setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
+  };
+
+  // Function to get randomly distributed status (used for existing documents)
+  const getRandomStatus = () => {
+    const rand = Math.random();
+    if (rand < 0.7) return "valid";
+    else if (rand < 0.85) return "expiring";
+    else return "expired";
   };
 
   return (
@@ -139,70 +149,100 @@ const PersonView = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Dokumentenname</TableHead>
+                <TableHead>Dokument</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Ausstellungsdatum</TableHead>
                 <TableHead>Ablaufdatum</TableHead>
                 <TableHead>Erinnerungen</TableHead>
+                <TableHead>Relevanz</TableHead>
                 <TableHead className="text-right">Aktionen</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {employeeDocuments.map((doc) => {
-                const docTypeName = documentTypes.find(dt => dt.id === doc.type)?.name || doc.name;
-                const isValid = doc.status === "valid";
+              {relevantDocTypes.map((docType) => {
+                const doc = employeeDocuments.find(d => d.type === docType.id);
+                const randomStatus = getRandomStatus(); // Generate random status
+                const docStatus = doc ? randomStatus : "missing";
+                const isRelevant = true;
                 
+                // Special case for A1-Bescheinigung - only relevant for non-Germans
+                const isA1Doc = docType.id === "doc-type-11";
+                const isRequired = isA1Doc ? citizenship !== "Deutschland" : true;
+
+                const hasHistory = doc && selectedDocumentId === doc.id;
+
                 return (
-                  <React.Fragment key={doc.id}>
+                  <React.Fragment key={docType.id}>
                     <TableRow>
-                      <TableCell className="font-medium">{docTypeName}</TableCell>
+                      <TableCell>{docType.name}</TableCell>
                       <TableCell>
-                        <StatusBadge status={doc.status} />
-                      </TableCell>
-                      <TableCell>{new Date(doc.issuedDate).toLocaleDateString('de-DE')}</TableCell>
-                      <TableCell>
-                        {doc.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
+                        <StatusBadge status={docStatus} />
                       </TableCell>
                       <TableCell>
-                        {(doc.status === "missing" || doc.status === "expired") && (
+                        {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {docStatus !== "valid" && docStatus !== "missing" 
+                          ? new Date(new Date().setMonth(new Date().getMonth() + (docStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
+                          : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {(docStatus === "missing" || docStatus === "expired") && (
                           <div className="text-sm">
-                            <div>{doc.remindersSent || 0} gesendet</div>
+                            <div>{Math.floor(Math.random() * 3)} gesendet</div>
                             <div className="text-xs text-muted-foreground">
-                              Nächste: {doc.nextReminderDate ? new Date(doc.nextReminderDate).toLocaleDateString('de-DE') : 'Heute'}
+                              Nächste: {new Date().toLocaleDateString('de-DE')}
                             </div>
                           </div>
                         )}
                       </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Switch id={`relevance-${docType.id}`} checked={isRequired} />
+                          <Label htmlFor={`relevance-${docType.id}`}>
+                            {isA1Doc && citizenship !== "Deutschland" 
+                              ? "Verpflichtend (A1)" 
+                              : (isRequired ? "Relevant" : "Nicht relevant")}
+                          </Label>
+                        </div>
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleShowDocumentHistory(doc.id)}
-                          >
-                            <FileText className="h-4 w-4 mr-1" />
-                            Historie
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Anzeigen
-                          </Button>
-                          {!isValid && (
-                            <Link to={`/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`}>
-                              <Button variant="outline" size="sm">
-                                Prüfen
+                          {doc && (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleShowDocumentHistory(doc.id)}
+                              >
+                                <FileText className="h-4 w-4 mr-1" />
+                                Historie
                               </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Anzeigen
+                              </Button>
+                              {docStatus !== "valid" && (
+                                <Link to={`/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`}>
+                                  <Button variant="outline" size="sm">Prüfen</Button>
+                                </Link>
+                              )}
+                            </>
+                          )}
+                          {!doc && (
+                            <Link to={`/submission-review/${providerId}/new?documentType=${docType.id}&employeeId=${employeeId}`}>
+                              <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
                             </Link>
                           )}
                         </div>
                       </TableCell>
                     </TableRow>
-                    {selectedDocumentId === doc.id && (
+                    {hasHistory && (
                       <TableRow>
-                        <TableCell colSpan={6} className="p-0 border-b-0">
+                        <TableCell colSpan={7} className="p-0 border-b-0">
                           <div className="py-3">
                             <DocumentHistory documentId={doc.id} />
                           </div>
@@ -216,51 +256,6 @@ const PersonView = () => {
           </Table>
         </CardContent>
       </Card>
-
-      {missingDocuments.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-600" />
-              <CardTitle>Fehlende Dokumente</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Dokumentenname</TableHead>
-                  <TableHead>Beschreibung</TableHead>
-                  <TableHead>Erfordernis</TableHead>
-                  <TableHead className="text-right">Aktionen</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {missingDocuments.map((docType) => {
-                  // Adjust requirement based on citizenship
-                  let requirement = docType.requiredFor.secure;
-                  if (docType.id === "doc-type-11" && citizenship !== "Deutschland") {
-                    requirement = "Verpflichtend (A1-Bescheinigung für nicht-deutsche Staatsangehörige)";
-                  }
-                  
-                  return (
-                    <TableRow key={docType.id}>
-                      <TableCell className="font-medium">{docType.name}</TableCell>
-                      <TableCell>{docType.description}</TableCell>
-                      <TableCell>{requirement}</TableCell>
-                      <TableCell className="text-right">
-                        <Link to={`/submission-review/${providerId}/new?documentType=${docType.id}&employeeId=${employeeId}`}>
-                          <Button variant="outline" size="sm">Anfordern</Button>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
