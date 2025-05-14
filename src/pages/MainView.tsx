@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -148,7 +149,7 @@ const MainView = () => {
       </div>
 
       {/* Updated historical chart with percentages */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Compliance Entwicklung</CardTitle>
         </CardHeader>

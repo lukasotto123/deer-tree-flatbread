@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+
+import React, { useState, useEffect, useMemo } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle, Euro, ToggleLeft, ToggleRight } from "lucide-react";
+import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle, Euro, ToggleLeft, ToggleRight, Trash2, X, Check } from "lucide-react";
 import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
@@ -13,6 +14,7 @@ import { toast } from "sonner";
 
 const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const provider = providers.find(p => p.id === id);
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [isActive, setIsActive] = useState<boolean>(provider?.status === 'active');
@@ -57,7 +59,7 @@ const ProviderView = () => {
     setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
   };
 
-  // Dummy function to handle activation/deactivation
+  // Funktion zur Behandlung der Aktivierung/Deaktivierung
   const handleToggleActivation = () => {
     setIsActive(!isActive);
     toast.success(
@@ -65,6 +67,11 @@ const ProviderView = () => {
         ? `${provider.name} wurde deaktiviert` 
         : `${provider.name} wurde aktiviert`
     );
+  };
+
+  // Funktion zum Löschen eines Dokuments (Dummy)
+  const handleDeleteDocument = (docType: string) => {
+    toast.success(`Dokument ${docType} wurde gelöscht`);
   };
 
   return (
@@ -82,12 +89,12 @@ const ProviderView = () => {
           >
             {isActive ? (
               <>
-                <ToggleRight className="h-5 w-5 text-green-600" />
+                <X className="h-5 w-5 text-red-600" />
                 Deaktivieren
               </>
             ) : (
               <>
-                <ToggleLeft className="h-5 w-5 text-muted-foreground" />
+                <Check className="h-5 w-5 text-green-600" />
                 Aktivieren
               </>
             )}
@@ -122,7 +129,7 @@ const ProviderView = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>
-              <StatusBadgeGerman status={provider.status} />
+              <StatusBadgeGerman status={isActive ? 'active' : 'inactive'} />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">ANÜ Erlaubnis</p>
@@ -157,7 +164,9 @@ const ProviderView = () => {
               const hasExpired = expired > 0;
               const hasMissing = missing > 0;
               const hasExpiring = expiring > 0;
-              const worstEmployeeStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+              const worstEmployeeStatus = isActive 
+                ? (hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid")))
+                : "expired";
               
               // Assign nationality-appropriate names
               let employeeName = employee.name;
@@ -173,7 +182,7 @@ const ProviderView = () => {
               if (employee.id === "employee-10") employeeName = "Yuki Tanaka";
               
               return (
-                <Card key={employee.id} className="hover:shadow-md transition-shadow">
+                <Card key={employee.id} className={`hover:shadow-md transition-shadow ${!isActive ? 'opacity-60' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center">
@@ -183,7 +192,7 @@ const ProviderView = () => {
                         <div>
                           <div className="flex items-center">
                             <h3 className="font-medium">{employeeName}</h3>
-                            <StatusBadge status={worstEmployeeStatus} className="ml-2" />
+                            {isActive && <StatusBadge status={worstEmployeeStatus} className="ml-2" />}
                           </div>
                           <p className="text-sm text-muted-foreground">{employee.position}</p>
                         </div>
@@ -193,22 +202,24 @@ const ProviderView = () => {
                       </Link>
                     </div>
                     
-                    <div className="mt-4 flex items-center justify-between">
-                      <div className="flex space-x-3 text-sm">
-                        <div className="flex items-center gap-1">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          <span>{valid}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 text-amber-500" />
-                          <span>{expiring}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4 text-amber-600" />
-                          <span>{expired + missing}</span>
+                    {isActive && (
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex space-x-3 text-sm">
+                          <div className="flex items-center gap-1">
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                            <span>{valid}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 text-amber-500" />
+                            <span>{expiring}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <AlertTriangle className="h-4 w-4 text-amber-600" />
+                            <span>{expired + missing}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               );
@@ -218,7 +229,7 @@ const ProviderView = () => {
       </Card>
 
       {/* Dokumente des Unternehmens */}
-      <Card>
+      <Card className={!isActive ? 'opacity-60' : ''}>
         <CardHeader>
           <CardTitle>Unternehmensdokumente</CardTitle>
         </CardHeader>
@@ -250,7 +261,7 @@ const ProviderView = () => {
 
                 return (
                   <React.Fragment key={docType.id}>
-                    <TableRow>
+                    <TableRow className={!isActive ? 'opacity-60' : ''}>
                       <TableCell>{docType.name}</TableCell>
                       <TableCell>
                         {isMissing ? (
@@ -279,7 +290,11 @@ const ProviderView = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <Switch id={`relevance-${docType.id}`} checked={isRelevant} />
+                          <Switch 
+                            id={`relevance-${docType.id}`} 
+                            checked={isRelevant} 
+                            disabled={!isActive}
+                          />
                           <Label htmlFor={`relevance-${docType.id}`}>
                             {isContractDoc ? "Verpflichtend" : (isRelevant ? "Relevant" : "Nicht relevant")}
                           </Label>
@@ -287,11 +302,23 @@ const ProviderView = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
+                          {/* Delete Button */}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleDeleteDocument(docType.name)}
+                            disabled={!isActive}
+                          >
+                            <Trash2 className="h-4 w-4 mr-1 text-red-500" />
+                            Löschen
+                          </Button>
+                          
                           {/* Always show History button */}
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
+                            disabled={!isActive}
                           >
                             <FileText className="h-4 w-4 mr-1" />
                             Historie
@@ -302,6 +329,7 @@ const ProviderView = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
+                              disabled={!isActive}
                             >
                               <Eye className="h-4 w-4 mr-1" />
                               Anzeigen
@@ -311,12 +339,12 @@ const ProviderView = () => {
                           {/* Upload/Check button for non-valid or missing documents */}
                           {(isMissing || (doc && randomStatus !== "valid")) && (
                             isMissing ? (
-                              <Button variant="outline" size="sm">
+                              <Button variant="outline" size="sm" disabled={!isActive}>
                                 Hochladen
                               </Button>
                             ) : (
                               <Link to={`/document-review/${id}/${doc.id}`}>
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" disabled={!isActive}>
                                   Prüfen
                                 </Button>
                               </Link>
