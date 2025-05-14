@@ -244,14 +244,17 @@ const PersonView = () => {
                           
                           {/* Upload/Check button for non-valid or missing documents */}
                           {(isMissing || (doc && randomStatus !== "valid")) && (
-                            <Link to={isMissing 
-                              ? `/submission-review/${providerId}/new?documentType=${docType.id}&employeeId=${employeeId}`
-                              : `/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`
-                            }>
+                            isMissing ? (
                               <Button variant="outline" size="sm">
-                                {isMissing ? "Hochladen" : "Prüfen"}
+                                Hochladen
                               </Button>
-                            </Link>
+                            ) : (
+                              <Link to={`/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`}>
+                                <Button variant="outline" size="sm">
+                                  Prüfen
+                                </Button>
+                              </Link>
+                            )
                           )}
                         </div>
                       </TableCell>

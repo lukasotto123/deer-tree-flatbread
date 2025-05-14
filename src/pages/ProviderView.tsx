@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -280,16 +279,19 @@ const ProviderView = () => {
                             </Button>
                           )}
                           
-                          {/* Check button for non-valid or missing documents */}
+                          {/* Upload/Check button for non-valid or missing documents */}
                           {(isMissing || (doc && randomStatus !== "valid")) && (
-                            <Link to={isMissing 
-                              ? `/document-review/${id}/new?documentType=${docType.id}`
-                              : `/document-review/${id}/${doc.id}`
-                            }>
+                            isMissing ? (
                               <Button variant="outline" size="sm">
-                                {isMissing ? "Hochladen" : "Prüfen"}
+                                Hochladen
                               </Button>
-                            </Link>
+                            ) : (
+                              <Link to={`/document-review/${id}/${doc.id}`}>
+                                <Button variant="outline" size="sm">
+                                  Prüfen
+                                </Button>
+                              </Link>
+                            )
                           )}
                         </div>
                       </TableCell>
