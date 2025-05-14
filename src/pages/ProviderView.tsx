@@ -33,6 +33,16 @@ const ProviderView = () => {
   // Mitarbeiter dieses Dienstleisters
   const providerEmployees = employees.filter(e => e.providerId === id);
 
+  // Function to determine if a document should be missing based on provider and document type
+  const shouldDocumentBeMissing = (providerId: string, documentTypeId: string) => {
+    // For specific providers, mark certain documents as missing
+    if (providerId === "provider-1" && documentTypeId === "doc-type-1") return true;
+    if (providerId === "provider-2" && documentTypeId === "doc-type-2") return true;
+    if (providerId === "provider-3" && documentTypeId === "doc-type-3") return true;
+    if (providerId === "provider-4" && documentTypeId === "doc-type-4") return true;
+    return false;
+  };
+
   // Randomly distribute document statuses with 70% valid documents
   const getRandomStatus = () => {
     const rand = Math.random();
@@ -199,7 +209,10 @@ const ProviderView = () => {
             </TableHeader>
             <TableBody>
               {relevantDocTypes.map((docType) => {
-                const doc = providerDocuments.find(d => d.type === docType.id);
+                // Check if this document should be missing for this provider
+                const forceMissing = shouldDocumentBeMissing(provider.id, docType.id);
+                const doc = forceMissing ? null : providerDocuments.find(d => d.type === docType.id);
+                
                 const randomStatus = getRandomStatus(); // Generate random status
                 const isRelevant = true; // Default to true, would come from API
                 const isMissing = !doc;
@@ -212,18 +225,22 @@ const ProviderView = () => {
                     <TableRow>
                       <TableCell>{docType.name}</TableCell>
                       <TableCell>
-                        <StatusBadge status={randomStatus} />
+                        {isMissing ? (
+                          <StatusBadge status="missing" />
+                        ) : (
+                          <StatusBadge status={randomStatus} />
+                        )}
                       </TableCell>
                       <TableCell>
-                        {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : new Date().toLocaleDateString('de-DE')}
+                        {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
                       </TableCell>
                       <TableCell>
-                        {randomStatus === "expiring" || randomStatus === "expired"
+                        {!isMissing && (randomStatus === "expiring" || randomStatus === "expired")
                           ? new Date(new Date().setMonth(new Date().getMonth() + (randomStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
                           : '-'}
                       </TableCell>
                       <TableCell>
-                        {randomStatus === "expired" && (
+                        {(isMissing || randomStatus === "expired") && (
                           <div className="text-sm">
                             <div>{Math.floor(Math.random() * 3)} gesendet</div>
                             <div className="text-xs text-muted-foreground">
@@ -242,33 +259,36 @@ const ProviderView = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
+                          {/* Always show History button */}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
+                          >
+                            <FileText className="h-4 w-4 mr-1" />
+                            Historie
+                          </Button>
+                          
+                          {/* Only show View button for existing documents */}
                           {doc && (
-                            <>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleShowDocumentHistory(doc.id)}
-                              >
-                                <FileText className="h-4 w-4 mr-1" />
-                                Historie
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                              >
-                                <Eye className="h-4 w-4 mr-1" />
-                                Anzeigen
-                              </Button>
-                              {randomStatus !== "valid" && (
-                                <Link to={`/document-review/${id}/${doc.id}`}>
-                                  <Button variant="outline" size="sm">Prüfen</Button>
-                                </Link>
-                              )}
-                            </>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Anzeigen
+                            </Button>
                           )}
-                          {!doc && (
-                            <Link to={`/document-review/${id}/new?documentType=${docType.id}`}>
-                              <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
+                          
+                          {/* Check button for non-valid or missing documents */}
+                          {(isMissing || (doc && randomStatus !== "valid")) && (
+                            <Link to={isMissing 
+                              ? `/document-review/${id}/new?documentType=${docType.id}`
+                              : `/document-review/${id}/${doc.id}`
+                            }>
+                              <Button variant="outline" size="sm">
+                                {isMissing ? "Hochladen" : "Prüfen"}
+                              </Button>
                             </Link>
                           )}
                         </div>

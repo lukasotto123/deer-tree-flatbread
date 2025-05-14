@@ -22,6 +22,16 @@ const PersonView = () => {
     return <div>Mitarbeiter nicht gefunden</div>;
   }
 
+  // Function to determine if a document should be missing based on employee and document type
+  const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
+    // Mark some documents as missing for specific employees
+    if (employeeId === "employee-1" && documentTypeId === "doc-type-5") return true;
+    if (employeeId === "employee-2" && documentTypeId === "doc-type-6") return true;
+    if (employeeId === "employee-3" && documentTypeId === "doc-type-7") return true;
+    if (employeeId === "employee-4" && documentTypeId === "doc-type-8") return true;
+    return false;
+  };
+
   // Assign nationality-appropriate names and citizenships
   let employeeName = employee.name;
   let citizenship = "Deutschland"; // Default
@@ -81,11 +91,6 @@ const PersonView = () => {
     
     return true;
   });
-  
-  // Fehlende Dokumente identifizieren
-  const missingDocTypes = relevantDocTypes.filter(dt => 
-    !employeeDocuments.some(doc => doc.type === dt.id)
-  );
 
   // Handle document selection for showing history
   const handleShowDocumentHistory = (docId: string) => {
@@ -160,7 +165,10 @@ const PersonView = () => {
             </TableHeader>
             <TableBody>
               {relevantDocTypes.map((docType) => {
-                const doc = employeeDocuments.find(d => d.type === docType.id);
+                // Check if this document should be missing for this employee
+                const forceMissing = shouldDocumentBeMissing(employeeId, docType.id);
+                const doc = forceMissing ? null : employeeDocuments.find(d => d.type === docType.id);
+                
                 const randomStatus = getRandomStatus(); // Generate random status
                 const docStatus = doc ? randomStatus : "missing";
                 const isRelevant = true;
@@ -170,24 +178,29 @@ const PersonView = () => {
                 const isRequired = isA1Doc ? citizenship !== "Deutschland" : true;
 
                 const hasHistory = doc && selectedDocumentId === doc.id;
+                const isMissing = !doc;
 
                 return (
                   <React.Fragment key={docType.id}>
                     <TableRow>
                       <TableCell>{docType.name}</TableCell>
                       <TableCell>
-                        <StatusBadge status={docStatus} />
+                        {isMissing ? (
+                          <StatusBadge status="missing" />
+                        ) : (
+                          <StatusBadge status={randomStatus} />
+                        )}
                       </TableCell>
                       <TableCell>
                         {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
                       </TableCell>
                       <TableCell>
-                        {docStatus !== "valid" && docStatus !== "missing" 
-                          ? new Date(new Date().setMonth(new Date().getMonth() + (docStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
+                        {!isMissing && (randomStatus === "expiring" || randomStatus === "expired")
+                          ? new Date(new Date().setMonth(new Date().getMonth() + (randomStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
                           : '-'}
                       </TableCell>
                       <TableCell>
-                        {(docStatus === "missing" || docStatus === "expired") && (
+                        {(isMissing || randomStatus === "expired") && (
                           <div className="text-sm">
                             <div>{Math.floor(Math.random() * 3)} gesendet</div>
                             <div className="text-xs text-muted-foreground">
@@ -208,33 +221,36 @@ const PersonView = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
+                          {/* Always show History button */}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
+                          >
+                            <FileText className="h-4 w-4 mr-1" />
+                            Historie
+                          </Button>
+                          
+                          {/* Only show View button for existing documents */}
                           {doc && (
-                            <>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleShowDocumentHistory(doc.id)}
-                              >
-                                <FileText className="h-4 w-4 mr-1" />
-                                Historie
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                              >
-                                <Eye className="h-4 w-4 mr-1" />
-                                Anzeigen
-                              </Button>
-                              {docStatus !== "valid" && (
-                                <Link to={`/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`}>
-                                  <Button variant="outline" size="sm">Prüfen</Button>
-                                </Link>
-                              )}
-                            </>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Anzeigen
+                            </Button>
                           )}
-                          {!doc && (
-                            <Link to={`/submission-review/${providerId}/new?documentType=${docType.id}&employeeId=${employeeId}`}>
-                              <Button variant="outline" size="sm" className="text-muted-foreground border-dashed">Hochladen</Button>
+                          
+                          {/* Upload/Check button for non-valid or missing documents */}
+                          {(isMissing || (doc && randomStatus !== "valid")) && (
+                            <Link to={isMissing 
+                              ? `/submission-review/${providerId}/new?documentType=${docType.id}&employeeId=${employeeId}`
+                              : `/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`
+                            }>
+                              <Button variant="outline" size="sm">
+                                {isMissing ? "Hochladen" : "Prüfen"}
+                              </Button>
                             </Link>
                           )}
                         </div>
