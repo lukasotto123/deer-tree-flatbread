@@ -1,7 +1,7 @@
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Euro, Clock } from "lucide-react";
+import { Euro, AlertTriangle, Clock } from "lucide-react";
 import { documents } from "@/data/dummy-data";
 
 export function cn(...inputs: ClassValue[]) {
@@ -21,7 +21,7 @@ export function getDocumentStatusIcon(status: string, isBeitrag: boolean = false
   if (status === 'expired' && isBeitrag) {
     return { icon: Euro, className: "h-5 w-5 text-red-600" };
   } else if (status === 'expired' || status === 'missing') {
-    return { icon: Clock, className: "h-5 w-5 text-amber-600" };
+    return { icon: AlertTriangle, className: "h-5 w-5 text-amber-600" };
   } else if (status === 'expiring') {
     return { icon: Clock, className: "h-5 w-5 text-amber-500" };
   } else {

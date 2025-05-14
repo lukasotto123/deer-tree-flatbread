@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Euro, Clock, Hourglass } from "lucide-react";
+import { Plus, Euro, Clock, Hourglass, AlertTriangle } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -97,7 +96,7 @@ const MainView = () => {
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
               <div className="flex justify-center items-center mb-2">
-                <Clock className="h-5 w-5 text-amber-600 mr-2" />
+                <AlertTriangle className="h-5 w-5 text-amber-600 mr-2" />
                 <h3 className="text-lg font-medium">Fehlende oder abgelaufene Dokumente</h3>
               </div>
               <p className="text-4xl font-bold">{fehlendeDokumente}</p>
@@ -187,7 +186,7 @@ const MainView = () => {
               <span>Dokument ist gültig</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-amber-600" />
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
               <span>Dokument fehlt oder ist abgelaufen</span>
             </div>
             <div className="flex items-center gap-2">
@@ -320,7 +319,7 @@ const getProviderStatusIcon = (provider: typeof providers[0]) => {
   if (hasBeitragsrückstände) {
     return <Euro className="h-5 w-5 text-red-600" />;
   } else if (provider.documentsCount.missing > 0 || provider.documentsCount.expired > 0) {
-    return <Clock className="h-5 w-5 text-amber-600" />;
+    return <AlertTriangle className="h-5 w-5 text-amber-600" />;
   } else if (provider.documentsCount.expiring > 0) {
     return <Hourglass className="h-5 w-5 text-amber-500" />;
   } else {

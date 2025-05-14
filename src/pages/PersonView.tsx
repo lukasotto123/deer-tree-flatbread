@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { FileText, Eye } from "lucide-react";
+import { FileText, Eye, AlertTriangle } from "lucide-react";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 
 const PersonView = () => {
@@ -219,7 +219,10 @@ const PersonView = () => {
       {missingDocuments.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Fehlende Dokumente</CardTitle>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <CardTitle>Fehlende Dokumente</CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>

@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { Clock, Hourglass, CheckCircle } from "lucide-react";
+import { Clock, Hourglass, CheckCircle, AlertTriangle } from "lucide-react";
 
 interface StatusBadgeProps {
   status: "valid" | "expiring" | "expired" | "missing";
@@ -32,7 +32,7 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
         return <Hourglass className="h-4 w-4 mr-1 text-amber-500" />;
       case 'expired':
       case 'missing':
-        return <Clock className="h-4 w-4 mr-1 text-amber-600" />;
+        return <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />;
       default:
         return null;
     }

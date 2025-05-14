@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { BellOff, BellPlus, Clock, Hourglass, Euro } from "lucide-react";
+import { BellOff, BellPlus, AlertTriangle, Hourglass, Euro } from "lucide-react";
 import { providers } from "@/data/dummy-data";
 
 const RequestView = () => {
@@ -101,7 +100,7 @@ const RequestView = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-amber-600" />
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
             <CardTitle>Offene Anfragen (Fehlende oder abgelaufene Dokumente)</CardTitle>
           </div>
         </CardHeader>
