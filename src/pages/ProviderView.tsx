@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -217,7 +218,7 @@ const ProviderView = () => {
                         {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : new Date().toLocaleDateString('de-DE')}
                       </TableCell>
                       <TableCell>
-                        {randomStatus !== "valid" && randomStatus !== "missing" 
+                        {randomStatus === "expiring" || randomStatus === "expired"
                           ? new Date(new Date().setMonth(new Date().getMonth() + (randomStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
                           : '-'}
                       </TableCell>
