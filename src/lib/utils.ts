@@ -16,15 +16,20 @@ export function isBeitragsrückstand(doc: typeof documents[0]) {
      doc.name.includes("Sozialversicherung"));
 }
 
-// Get the appropriate icon based on document status
+// Get the appropriate icon component based on document status
 export function getDocumentStatusIcon(status: string, isBeitrag: boolean = false) {
   if (status === 'expired' && isBeitrag) {
-    return <Euro className="h-5 w-5 text-red-600" />;
+    return { icon: Euro, className: "h-5 w-5 text-red-600" };
   } else if (status === 'expired' || status === 'missing') {
-    return <Clock className="h-5 w-5 text-amber-600" />;
+    return { icon: Clock, className: "h-5 w-5 text-amber-600" };
   } else if (status === 'expiring') {
-    return <Clock className="h-5 w-5 text-amber-500" />;
+    return { icon: Clock, className: "h-5 w-5 text-amber-500" };
   } else {
-    return <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-5 w-5" alt="Check" />;
+    return { 
+      isImage: true, 
+      src: "/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png", 
+      className: "h-5 w-5", 
+      alt: "Check" 
+    };
   }
 }

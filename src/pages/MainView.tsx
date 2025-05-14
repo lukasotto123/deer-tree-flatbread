@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +9,7 @@ import { Plus, Euro, Clock, Hourglass } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import StatusBadge from "@/components/ui/StatusBadge";
+import { getDocumentStatusIcon } from "@/lib/utils";
 
 // Modified historical data with more realistic trends and some hickups
 const modifiedHistoricalData = [
@@ -51,6 +53,17 @@ const MainView = () => {
   const ablaufendeDokumente = filteredProviders.reduce(
     (total, provider) => total + provider.documentsCount.expiring, 0
   );
+
+  // Helper function to render the icon based on the new utils format
+  const renderIcon = (iconData: ReturnType<typeof getDocumentStatusIcon>) => {
+    if ('isImage' in iconData && iconData.isImage) {
+      return <img src={iconData.src} className={iconData.className} alt={iconData.alt} />;
+    } else if ('icon' in iconData) {
+      const IconComponent = iconData.icon;
+      return <IconComponent className={iconData.className} />;
+    }
+    return null;
+  };
 
   return (
     <div className="space-y-6">
@@ -174,11 +187,11 @@ const MainView = () => {
               <span>Dokument ist gültig</span>
             </div>
             <div className="flex items-center gap-2">
-              <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-5 w-5" alt="Clock" />
+              <Clock className="h-5 w-5 text-amber-600" />
               <span>Dokument fehlt oder ist abgelaufen</span>
             </div>
             <div className="flex items-center gap-2">
-              <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-5 w-5" alt="Hourglass" />
+              <Hourglass className="h-5 w-5 text-amber-500" />
               <span>Dokument läuft in 30 Tagen ab</span>
             </div>
             <div className="flex items-center gap-2">

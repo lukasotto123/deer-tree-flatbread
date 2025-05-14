@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { BellOff, BellPlus, Clock, Hourglass } from "lucide-react";
+import { BellOff, BellPlus, Clock, Hourglass, Euro } from "lucide-react";
 import { providers } from "@/data/dummy-data";
 
 const RequestView = () => {

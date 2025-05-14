@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { Euro, Clock, Hourglass, CheckCircle } from "lucide-react";
+import { Clock, Hourglass, CheckCircle } from "lucide-react";
 
 interface StatusBadgeProps {
   status: "valid" | "expiring" | "expired" | "missing";
@@ -24,16 +24,23 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
     missing: "Fehlt",
   };
 
-  const statusIcons = {
-    valid: <CheckCircle className="h-4 w-4 mr-1 text-green-600" />,
-    expiring: <Hourglass className="h-4 w-4 mr-1 text-amber-500" />,
-    expired: <Clock className="h-4 w-4 mr-1 text-amber-600" />,
-    missing: <Clock className="h-4 w-4 mr-1 text-amber-600" />,
+  const renderStatusIcon = () => {
+    switch(status) {
+      case 'valid':
+        return <CheckCircle className="h-4 w-4 mr-1 text-green-600" />;
+      case 'expiring':
+        return <Hourglass className="h-4 w-4 mr-1 text-amber-500" />;
+      case 'expired':
+      case 'missing':
+        return <Clock className="h-4 w-4 mr-1 text-amber-600" />;
+      default:
+        return null;
+    }
   };
 
   return (
     <div className="flex items-center gap-1">
-      {statusIcons[status]}
+      {renderStatusIcon()}
       <span className={cn(baseClasses, statusClasses[status], className)}>
         {statusText[status]}
       </span>
