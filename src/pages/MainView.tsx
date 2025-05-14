@@ -65,29 +65,44 @@ const MainView = () => {
       {/* Übersichtskarten basierend auf dem Screenshot */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
+          <CardContent className="pt-6 flex flex-col h-full">
+            <div className="text-center flex-grow">
               <h3 className="text-lg font-medium mb-2">Beitragsrückstände</h3>
               <p className="text-4xl font-bold">{beitragsrückstände}</p>
             </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-lg font-medium mb-2">Fehlende Dokumente</h3>
-              <p className="text-4xl font-bold">{fehlendeDokumente}</p>
+            <div className="mt-6">
+              <Button className="w-full" asChild>
+                <Link to="/documents">Anzeigen</Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
         
         <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
+          <CardContent className="pt-6 flex flex-col h-full">
+            <div className="text-center flex-grow">
+              <h3 className="text-lg font-medium mb-2">Fehlende Dokumente</h3>
+              <p className="text-4xl font-bold">{fehlendeDokumente}</p>
+            </div>
+            <div className="mt-6">
+              <Button className="w-full" asChild>
+                <Link to="/requests">Anzeigen</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6 flex flex-col h-full">
+            <div className="text-center flex-grow">
               <h3 className="text-lg font-medium mb-2">Ablaufende Dokumente</h3>
               <p className="text-4xl font-bold">{ablaufendeDokumente}</p>
               <p className="text-sm text-muted-foreground mt-1">in den nächsten 30 Tagen</p>
+            </div>
+            <div className="mt-6">
+              <Button className="w-full" asChild>
+                <Link to="/requests">Anzeigen</Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -148,7 +163,7 @@ const MainView = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-2">
               <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-5 w-5" alt="Check" />
-              <span>Alle erforderlichen Dokumente vorhanden</span>
+              <span>Dokument ist gültig</span>
             </div>
             <div className="flex items-center gap-2">
               <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-5 w-5" alt="Clock" />
@@ -160,7 +175,7 @@ const MainView = () => {
             </div>
             <div className="flex items-center gap-2">
               <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-5 w-5" alt="Alert" />
-              <span>Handlungsbedarf (z.B. Beitragsrückstände oder fehlende Dokumente)</span>
+              <span>Beitragsrückstände</span>
             </div>
             <div className="flex items-center gap-2">
               <img src="/lovable-uploads/581e8146-ca78-4135-9b39-79770af11286.png" className="h-5 w-5" alt="Soon" />

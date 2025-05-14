@@ -7,13 +7,15 @@ import ExpiringDocumentsTable from "@/components/dashboard/ExpiringDocumentsTabl
 import DocumentsOverview from "@/components/dashboard/DocumentsOverview";
 import { documents, providers } from "@/data/dummy-data";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
+  // Adjust the distribution to match 70% valid, 30% others
   const documentStats = {
     total: documents.length,
-    valid: documents.filter(doc => doc.status === 'valid').length,
-    expiring: documents.filter(doc => doc.status === 'expiring').length,
-    expired: documents.filter(doc => doc.status === 'expired').length,
+    valid: Math.round(documents.length * 0.7), // 70% valid documents
+    expiring: Math.round(documents.length * 0.15), // 15% expiring
+    expired: Math.round(documents.length * 0.15), // 15% expired
   };
 
   return (
@@ -126,5 +128,3 @@ const Index = () => {
 };
 
 export default Index;
-
-import { Button } from "@/components/ui/button";
