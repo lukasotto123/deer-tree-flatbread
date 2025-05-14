@@ -5,15 +5,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle, Euro } from "lucide-react";
+import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle, Euro, ToggleLeft, ToggleRight } from "lucide-react";
 import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
+import { toast } from "sonner";
 
 const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
   const provider = providers.find(p => p.id === id);
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState<boolean>(provider?.status === 'active');
   
   if (!provider) {
     return <div>Dienstleister nicht gefunden</div>;
@@ -55,14 +57,41 @@ const ProviderView = () => {
     setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
   };
 
+  // Dummy function to handle activation/deactivation
+  const handleToggleActivation = () => {
+    setIsActive(!isActive);
+    toast.success(
+      isActive 
+        ? `${provider.name} wurde deaktiviert` 
+        : `${provider.name} wurde aktiviert`
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold">{provider.name}</h1>
-          <StatusBadge status="valid" />
+          <StatusBadge status={isActive ? "valid" : "expired"} />
         </div>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={handleToggleActivation}
+          >
+            {isActive ? (
+              <>
+                <ToggleRight className="h-5 w-5 text-green-600" />
+                Deaktivieren
+              </>
+            ) : (
+              <>
+                <ToggleLeft className="h-5 w-5 text-muted-foreground" />
+                Aktivieren
+              </>
+            )}
+          </Button>
           <Link to="/">
             <Button variant="outline">Zurück zur Übersicht</Button>
           </Link>

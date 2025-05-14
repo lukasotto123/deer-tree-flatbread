@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,14 +5,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { FileText, Eye, AlertTriangle, CheckCircle, Clock, ToggleLeft, ToggleRight } from "lucide-react";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { FileText, Eye, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import DocumentHistory from "@/components/ui/DocumentHistory";
+import { toast } from "sonner";
 
 const PersonView = () => {
   const { providerId, employeeId } = useParams<{ providerId: string; employeeId: string }>();
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState<boolean>(true); // Default to active
   
   const employee = employees.find(e => e.id === employeeId);
   const provider = providers.find(p => p.id === providerId);
@@ -22,6 +23,16 @@ const PersonView = () => {
     return <div>Mitarbeiter nicht gefunden</div>;
   }
 
+  // Dummy function to handle activation/deactivation
+  const handleToggleActivation = () => {
+    setIsActive(!isActive);
+    toast.success(
+      isActive 
+        ? `Mitarbeiter wurde deaktiviert` 
+        : `Mitarbeiter wurde aktiviert`
+    );
+  };
+  
   // Function to determine if a document should be missing based on employee and document type
   const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
     // Mark some documents as missing for specific employees
@@ -110,11 +121,30 @@ const PersonView = () => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold">{employeeName}</h1>
-          <StatusBadge status={worstStatus} />
+          <StatusBadge status={isActive ? worstStatus : "expired"} />
         </div>
-        <Link to={`/provider/${providerId}`}>
-          <Button variant="outline">Zurück zum Unternehmen</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={handleToggleActivation}
+          >
+            {isActive ? (
+              <>
+                <ToggleRight className="h-5 w-5 text-green-600" />
+                Deaktivieren
+              </>
+            ) : (
+              <>
+                <ToggleLeft className="h-5 w-5 text-muted-foreground" />
+                Aktivieren
+              </>
+            )}
+          </Button>
+          <Link to={`/provider/${providerId}`}>
+            <Button variant="outline">Zurück zum Unternehmen</Button>
+          </Link>
+        </div>
       </div>
 
       <Card>

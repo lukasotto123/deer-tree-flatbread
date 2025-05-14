@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { documentTypes } from "@/data/dummy-data";
+import { Trash2 } from "lucide-react";
 
 const DocumentRequirements = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,6 +32,12 @@ const DocumentRequirements = () => {
     const matchesFilter = filter === "all" || doc.providerType === filter;
     return matchesSearch && matchesFilter;
   });
+
+  // Dummy function for delete button
+  const handleDeleteDocument = (docId: string) => {
+    console.log(`Document deletion requested for ID: ${docId}`);
+    // This is just a dummy function with no actual implementation
+  };
 
   return (
     <div className="space-y-6">
@@ -110,9 +117,20 @@ const DocumentRequirements = () => {
                   <TableCell>{doc.checkFrequency.secure}</TableCell>
                   <TableCell>{doc.checkFrequency.basic}</TableCell>
                   <TableCell className="text-right">
-                    <Link to={`/document/${doc.id}`}>
-                      <Button variant="outline" size="sm">Details</Button>
-                    </Link>
+                    <div className="flex justify-end gap-2">
+                      <Link to={`/document/${doc.id}`}>
+                        <Button variant="outline" size="sm">Details</Button>
+                      </Link>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDeleteDocument(doc.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Löschen</span>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

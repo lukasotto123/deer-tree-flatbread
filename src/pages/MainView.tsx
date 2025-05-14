@@ -9,22 +9,43 @@ import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { getDocumentStatusIcon } from "@/lib/utils";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
-// Modified historical data with more realistic trends and some hickups
+// Modified historical data with percentages instead of absolute values
 const modifiedHistoricalData = [
-  { name: "Jan", beitragsrückstände: 12, fehlend: 25, ablaufend: 13 },
-  { name: "Feb", beitragsrückstände: 13, fehlend: 22, ablaufend: 14 },
-  { name: "März", beitragsrückstände: 11, fehlend: 20, ablaufend: 12 },
-  { name: "Apr", beitragsrückstände: 14, fehlend: 19, ablaufend: 11 },
-  { name: "Mai", beitragsrückstände: 10, fehlend: 17, ablaufend: 13 },
-  { name: "Jun", beitragsrückstände: 8, fehlend: 19, ablaufend: 10 },
-  { name: "Jul", beitragsrückstände: 9, fehlend: 16, ablaufend: 9 },
-  { name: "Aug", beitragsrückstände: 7, fehlend: 17, ablaufend: 11 },
-  { name: "Sep", beitragsrückstände: 8, fehlend: 15, ablaufend: 8 },
-  { name: "Okt", beitragsrückstände: 6, fehlend: 14, ablaufend: 9 },
-  { name: "Nov", beitragsrückstände: 5, fehlend: 13, ablaufend: 7 },
-  { name: "Dez", beitragsrückstände: 4, fehlend: 12, ablaufend: 6 },
+  { name: "Jan", beitragsrückstände: 12, fehlend: 25, ablaufend: 13, gültig: 50 },
+  { name: "Feb", beitragsrückstände: 13, fehlend: 22, ablaufend: 14, gültig: 51 },
+  { name: "März", beitragsrückstände: 11, fehlend: 20, ablaufend: 12, gültig: 57 },
+  { name: "Apr", beitragsrückstände: 14, fehlend: 19, ablaufend: 11, gültig: 56 },
+  { name: "Mai", beitragsrückstände: 10, fehlend: 17, ablaufend: 13, gültig: 60 },
+  { name: "Jun", beitragsrückstände: 8, fehlend: 19, ablaufend: 10, gültig: 63 },
+  { name: "Jul", beitragsrückstände: 9, fehlend: 16, ablaufend: 9, gültig: 66 },
+  { name: "Aug", beitragsrückstände: 7, fehlend: 17, ablaufend: 11, gültig: 65 },
+  { name: "Sep", beitragsrückstände: 8, fehlend: 15, ablaufend: 8, gültig: 69 },
+  { name: "Okt", beitragsrückstände: 6, fehlend: 14, ablaufend: 9, gültig: 71 },
+  { name: "Nov", beitragsrückstände: 5, fehlend: 13, ablaufend: 7, gültig: 75 },
+  { name: "Dez", beitragsrückstände: 4, fehlend: 12, ablaufend: 6, gültig: 78 },
 ];
+
+// Chart configuration
+const chartConfig = {
+  beitragsrückstände: {
+    label: "Beitragsrückstände",
+    color: "#ff5555"
+  },
+  fehlend: {
+    label: "Fehlende Dokumente",
+    color: "#ff8c00"
+  },
+  ablaufend: {
+    label: "Ablaufende Dokumente",
+    color: "#ffb74d"
+  },
+  gültig: {
+    label: "Gültige Dokumente",
+    color: "#75C270" // Green color for valid documents
+  }
+};
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
@@ -126,30 +147,46 @@ const MainView = () => {
         </Card>
       </div>
 
-      {/* Historischer Chart mit angepassten Daten */}
+      {/* Updated historical chart with percentages */}
       <Card>
         <CardHeader>
           <CardTitle>Compliance Entwicklung</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
+            <ChartContainer config={chartConfig}>
               <AreaChart
                 data={modifiedHistoricalData}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                stackOffset="expand"
+                baseValue={0}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
+                <YAxis tickFormatter={(value) => `${Math.round(value * 100)}%`} />
+                <ChartTooltip 
+                  content={
+                    <ChartTooltipContent 
+                      formatter={(value, name) => [`${Math.round(Number(value) * 100)}%`, name]}
+                    />
+                  }
+                />
                 <Legend />
                 <Area 
                   type="monotone" 
-                  dataKey="beitragsrückstände" 
-                  name="Beitragsrückstände" 
+                  dataKey="gültig" 
+                  name="Gültige Dokumente" 
                   stackId="1" 
-                  stroke="#ff5555" 
-                  fill="#ff5555" 
+                  stroke="#75C270" 
+                  fill="#75C270" 
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="ablaufend" 
+                  name="Ablaufende Dokumente" 
+                  stackId="1" 
+                  stroke="#ffb74d" 
+                  fill="#ffb74d" 
                 />
                 <Area 
                   type="monotone" 
@@ -161,14 +198,14 @@ const MainView = () => {
                 />
                 <Area 
                   type="monotone" 
-                  dataKey="ablaufend" 
-                  name="Ablaufende Dokumente" 
+                  dataKey="beitragsrückstände" 
+                  name="Beitragsrückstände" 
                   stackId="1" 
-                  stroke="#ffb74d" 
-                  fill="#ffb74d" 
+                  stroke="#ff5555" 
+                  fill="#ff5555" 
                 />
               </AreaChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           </div>
         </CardContent>
       </Card>
