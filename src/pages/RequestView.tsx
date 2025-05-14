@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { BellOff, BellPlus } from "lucide-react";
+import { BellOff, BellPlus, Clock, Hourglass } from "lucide-react";
 import { providers } from "@/data/dummy-data";
 
 const RequestView = () => {
@@ -100,7 +100,10 @@ const RequestView = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Offene Anfragen</CardTitle>
+          <div className="flex items-center gap-2">
+            <Clock className="h-5 w-5 text-amber-600" />
+            <CardTitle>Offene Anfragen (Fehlende oder abgelaufene Dokumente)</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -136,7 +139,10 @@ const RequestView = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Geplante Anfragen</CardTitle>
+          <div className="flex items-center gap-2">
+            <Hourglass className="h-5 w-5 text-amber-500" />
+            <CardTitle>Geplante Anfragen (Bald ablaufende Dokumente)</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>

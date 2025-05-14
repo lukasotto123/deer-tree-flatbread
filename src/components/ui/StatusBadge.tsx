@@ -1,5 +1,6 @@
 
 import { cn } from "@/lib/utils";
+import { Euro, Clock, Hourglass, CheckCircle } from "lucide-react";
 
 interface StatusBadgeProps {
   status: "valid" | "expiring" | "expired" | "missing";
@@ -24,10 +25,10 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
   };
 
   const statusIcons = {
-    valid: <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-4 w-4 mr-1" alt="Check" />,
-    expiring: <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-4 w-4 mr-1" alt="Hourglass" />,
-    expired: <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-4 w-4 mr-1" alt="Clock" />,
-    missing: <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-4 w-4 mr-1" alt="Alert" />,
+    valid: <CheckCircle className="h-4 w-4 mr-1 text-green-600" />,
+    expiring: <Hourglass className="h-4 w-4 mr-1 text-amber-500" />,
+    expired: <Clock className="h-4 w-4 mr-1 text-amber-600" />,
+    missing: <Clock className="h-4 w-4 mr-1 text-amber-600" />,
   };
 
   return (

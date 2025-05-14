@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus } from "lucide-react";
+import { Plus, Euro, Clock, Hourglass } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -46,7 +45,7 @@ const MainView = () => {
   ).length;
   
   const fehlendeDokumente = filteredProviders.reduce(
-    (total, provider) => total + provider.documentsCount.missing, 0
+    (total, provider) => total + provider.documentsCount.missing + provider.documentsCount.expired, 0
   );
   
   const ablaufendeDokumente = filteredProviders.reduce(
@@ -67,7 +66,10 @@ const MainView = () => {
         <Card>
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
-              <h3 className="text-lg font-medium mb-2">Beitragsrückstände</h3>
+              <div className="flex justify-center items-center mb-2">
+                <Euro className="h-5 w-5 text-red-600 mr-2" />
+                <h3 className="text-lg font-medium">Beitragsrückstände</h3>
+              </div>
               <p className="text-4xl font-bold">{beitragsrückstände}</p>
             </div>
             <div className="mt-6">
@@ -81,7 +83,10 @@ const MainView = () => {
         <Card>
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
-              <h3 className="text-lg font-medium mb-2">Fehlende Dokumente</h3>
+              <div className="flex justify-center items-center mb-2">
+                <Clock className="h-5 w-5 text-amber-600 mr-2" />
+                <h3 className="text-lg font-medium">Fehlende oder abgelaufene Dokumente</h3>
+              </div>
               <p className="text-4xl font-bold">{fehlendeDokumente}</p>
             </div>
             <div className="mt-6">
@@ -95,7 +100,10 @@ const MainView = () => {
         <Card>
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
-              <h3 className="text-lg font-medium mb-2">Ablaufende Dokumente</h3>
+              <div className="flex justify-center items-center mb-2">
+                <Hourglass className="h-5 w-5 text-amber-500 mr-2" />
+                <h3 className="text-lg font-medium">Ablaufende Dokumente</h3>
+              </div>
               <p className="text-4xl font-bold">{ablaufendeDokumente}</p>
               <p className="text-sm text-muted-foreground mt-1">in den nächsten 30 Tagen</p>
             </div>
@@ -167,14 +175,14 @@ const MainView = () => {
             </div>
             <div className="flex items-center gap-2">
               <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-5 w-5" alt="Clock" />
-              <span>Dokument ist abgelaufen</span>
+              <span>Dokument fehlt oder ist abgelaufen</span>
             </div>
             <div className="flex items-center gap-2">
               <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-5 w-5" alt="Hourglass" />
               <span>Dokument läuft in 30 Tagen ab</span>
             </div>
             <div className="flex items-center gap-2">
-              <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-5 w-5" alt="Alert" />
+              <Euro className="h-5 w-5 text-red-600" />
               <span>Beitragsrückstände</span>
             </div>
             <div className="flex items-center gap-2">
@@ -289,12 +297,19 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
 
 // Helper function to determine the worst-case status icon for a provider
 const getProviderStatusIcon = (provider: typeof providers[0]) => {
-  if (provider.documentsCount.missing > 0) {
-    return <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-5 w-5" alt="Alert" />;
-  } else if (provider.documentsCount.expired > 0) {
-    return <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-5 w-5" alt="Clock" />;
+  const hasBeitragsrückstände = provider.documentsCount.expired > 0 && 
+    documents.some(d => 
+      d.providerId === provider.id && 
+      d.status === 'expired' && 
+      (d.name.includes("Unbedenklichkeitsbescheinigung") || d.name.includes("Beitrag"))
+    );
+
+  if (hasBeitragsrückstände) {
+    return <Euro className="h-5 w-5 text-red-600" />;
+  } else if (provider.documentsCount.missing > 0 || provider.documentsCount.expired > 0) {
+    return <Clock className="h-5 w-5 text-amber-600" />;
   } else if (provider.documentsCount.expiring > 0) {
-    return <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-5 w-5" alt="Hourglass" />;
+    return <Hourglass className="h-5 w-5 text-amber-500" />;
   } else {
     return <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-5 w-5" alt="Check" />;
   }

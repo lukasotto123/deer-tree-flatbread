@@ -1,5 +1,5 @@
 
-import { FileText, AlertTriangle, Clock, CheckCircle } from "lucide-react";
+import { FileText, Euro, Clock, CheckCircle } from "lucide-react";
 import StatCard from "./StatCard";
 import ExpiringDocumentsTable from "./ExpiringDocumentsTable";
 import DocumentsOverview from "./DocumentsOverview";
@@ -44,7 +44,7 @@ const Dashboard = () => {
         <StatCard
           title="Abgelaufen"
           value={documentStats.expired}
-          icon={<AlertTriangle className="h-5 w-5" />}
+          icon={<Euro className="h-5 w-5 text-red-600" />}
           colorClass="bg-destructive text-white"
         />
       </div>
