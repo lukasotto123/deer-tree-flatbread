@@ -1,7 +1,7 @@
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Euro, AlertTriangle, Clock } from "lucide-react";
+import { Euro, AlertTriangle, Clock, CheckCircle } from "lucide-react";
 import { documents } from "@/data/dummy-data";
 
 export function cn(...inputs: ClassValue[]) {
@@ -25,11 +25,6 @@ export function getDocumentStatusIcon(status: string, isBeitrag: boolean = false
   } else if (status === 'expiring') {
     return { icon: Clock, className: "h-5 w-5 text-amber-500" };
   } else {
-    return { 
-      isImage: true, 
-      src: "/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png", 
-      className: "h-5 w-5", 
-      alt: "Check" 
-    };
+    return { icon: CheckCircle, className: "h-5 w-5 text-green-600" };
   }
 }

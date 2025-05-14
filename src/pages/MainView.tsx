@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Euro, Clock, Hourglass, AlertTriangle } from "lucide-react";
+import { Plus, Euro, Clock, Hourglass, AlertTriangle, CheckCircle } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -55,9 +55,7 @@ const MainView = () => {
 
   // Helper function to render the icon based on the new utils format
   const renderIcon = (iconData: ReturnType<typeof getDocumentStatusIcon>) => {
-    if ('isImage' in iconData && iconData.isImage) {
-      return <img src={iconData.src} className={iconData.className} alt={iconData.alt} />;
-    } else if ('icon' in iconData) {
+    if ('icon' in iconData) {
       const IconComponent = iconData.icon;
       return <IconComponent className={iconData.className} />;
     }
@@ -182,7 +180,7 @@ const MainView = () => {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-2">
-              <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-5 w-5" alt="Check" />
+              <CheckCircle className="h-5 w-5 text-green-600" />
               <span>Dokument ist gültig</span>
             </div>
             <div className="flex items-center gap-2">
@@ -190,7 +188,7 @@ const MainView = () => {
               <span>Dokument fehlt oder ist abgelaufen</span>
             </div>
             <div className="flex items-center gap-2">
-              <Hourglass className="h-5 w-5 text-amber-500" />
+              <Clock className="h-5 w-5 text-amber-500" />
               <span>Dokument läuft in 30 Tagen ab</span>
             </div>
             <div className="flex items-center gap-2">
@@ -275,19 +273,19 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1">
-                      <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-4 w-4" alt="Check" />
+                      <CheckCircle className="h-4 w-4 text-green-600" />
                       <span>{provider.documentsCount.valid}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <img src="/lovable-uploads/ea473a11-611d-4bb0-8828-d510a457a99b.png" className="h-4 w-4" alt="Hourglass" />
+                      <Clock className="h-4 w-4 text-amber-500" />
                       <span>{provider.documentsCount.expiring}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <img src="/lovable-uploads/666d55f0-3a14-41c8-ada9-829e8a7aef6c.png" className="h-4 w-4" alt="Clock" />
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
                       <span>{provider.documentsCount.expired}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <img src="/lovable-uploads/77a453bb-338d-4749-8726-3a6bfe7a0190.png" className="h-4 w-4" alt="Alert" />
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
                       <span>{provider.documentsCount.missing}</span>
                     </div>
                   </div>
@@ -321,9 +319,9 @@ const getProviderStatusIcon = (provider: typeof providers[0]) => {
   } else if (provider.documentsCount.missing > 0 || provider.documentsCount.expired > 0) {
     return <AlertTriangle className="h-5 w-5 text-amber-600" />;
   } else if (provider.documentsCount.expiring > 0) {
-    return <Hourglass className="h-5 w-5 text-amber-500" />;
+    return <Clock className="h-5 w-5 text-amber-500" />;
   } else {
-    return <img src="/lovable-uploads/dfa3a23e-acc3-4e0e-9f2b-25a4942a6753.png" className="h-5 w-5" alt="Check" />;
+    return <CheckCircle className="h-5 w-5 text-green-600" />;
   }
 };
 
