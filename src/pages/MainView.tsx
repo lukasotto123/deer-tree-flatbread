@@ -159,7 +159,6 @@ const MainView = () => {
                 data={modifiedHistoricalData}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                 stackOffset="expand"
-                baseValue={0}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
@@ -210,6 +209,7 @@ const MainView = () => {
         </CardContent>
       </Card>
 
+      {/* Legend card */}
       <Card>
         <CardHeader>
           <CardTitle>Legende</CardTitle>
@@ -240,6 +240,7 @@ const MainView = () => {
         </CardContent>
       </Card>
 
+      {/* Tabs and ComplianceTable */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex justify-between items-center mb-4">
           <TabsList>
