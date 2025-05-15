@@ -13,7 +13,7 @@ import { getDocumentStatusIcon } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-// Modified historical data with direct percentages (0-100) instead of decimal values
+// Modified historical data with percentages instead of absolute values
 const modifiedHistoricalData = [
   { name: "Jan", beitragsrückstände: 12, fehlend: 25, ablaufend: 13, gültig: 50 },
   { name: "Feb", beitragsrückstände: 13, fehlend: 22, ablaufend: 14, gültig: 51 },
@@ -106,7 +106,7 @@ const MainView = () => {
               <p className="text-4xl font-bold">{beitragsrückstände}</p>
             </div>
             <div className="mt-6">
-              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled>
+              <Button className="w-full" disabled>
                 Anzeigen
               </Button>
             </div>
@@ -149,18 +149,18 @@ const MainView = () => {
         </Card>
       </div>
 
-      {/* Updated historical chart with percentages and vertical margin */}
+      {/* Updated historical chart with percentages */}
       <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Compliance Entwicklung</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-80 my-4">
+          <div className="h-80">
             <ChartContainer config={chartConfig}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={modifiedHistoricalData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                   stackOffset="expand"
                 >
                   <CartesianGrid strokeDasharray="3 3" />
@@ -330,7 +330,7 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
                       <span>{provider.documentsCount.expired}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Hourglass className="h-4 w-4 text-amber-600" />
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
                       <span>{provider.documentsCount.missing}</span>
                     </div>
                   </div>
