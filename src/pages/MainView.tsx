@@ -134,7 +134,7 @@ const MainView = () => {
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
               <div className="flex justify-center items-center mb-2">
-                <Clock className="h-5 w-5 text-amber-500 mr-2" />
+                <Hourglass className="h-5 w-5 text-amber-500 mr-2" />
                 <h3 className="text-lg font-medium">Ablaufende Dokumente</h3>
               </div>
               <p className="text-4xl font-bold">{ablaufendeDokumente}</p>
@@ -155,58 +155,63 @@ const MainView = () => {
           <CardTitle>Compliance Entwicklung</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-80 my-8">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={modifiedHistoricalData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-                stackOffset="expand"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis 
-                  tickFormatter={(value) => `${Math.round(value)}%`} 
-                  domain={[0, 100]}
-                />
-                <Tooltip 
-                  formatter={(value) => [`${value}%`, '']}
-                  labelFormatter={(label) => `Monat: ${label}`}
-                />
-                <Legend />
-                <Area 
-                  type="monotone" 
-                  dataKey="gültig" 
-                  name="Gültige Dokumente" 
-                  stackId="1" 
-                  stroke="#75C270" 
-                  fill="#75C270" 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="ablaufend" 
-                  name="Ablaufende Dokumente" 
-                  stackId="1" 
-                  stroke="#ffb74d" 
-                  fill="#ffb74d" 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="fehlend" 
-                  name="Fehlende Dokumente" 
-                  stackId="1" 
-                  stroke="#ff8c00" 
-                  fill="#ff8c00" 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="beitragsrückstände" 
-                  name="Beitragsrückstände" 
-                  stackId="1" 
-                  stroke="#ff5555" 
-                  fill="#ff5555" 
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="h-80 my-4">
+            <ChartContainer config={chartConfig}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={modifiedHistoricalData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
+                  stackOffset="expand"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis 
+                    tickFormatter={(value) => `${Math.round(value * 100)}%`} 
+                    domain={[0, 1]}
+                  />
+                  <ChartTooltip 
+                    content={
+                      <ChartTooltipContent 
+                        formatter={(value, name) => [`${Math.round(Number(value) * 100)}%`, name]}
+                      />
+                    }
+                  />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="gültig" 
+                    name="Gültige Dokumente" 
+                    stackId="1" 
+                    stroke="#75C270" 
+                    fill="#75C270" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="ablaufend" 
+                    name="Ablaufende Dokumente" 
+                    stackId="1" 
+                    stroke="#ffb74d" 
+                    fill="#ffb74d" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="fehlend" 
+                    name="Fehlende Dokumente" 
+                    stackId="1" 
+                    stroke="#ff8c00" 
+                    fill="#ff8c00" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="beitragsrückstände" 
+                    name="Beitragsrückstände" 
+                    stackId="1" 
+                    stroke="#ff5555" 
+                    fill="#ff5555" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </div>
         </CardContent>
       </Card>
@@ -325,7 +330,7 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
                       <span>{provider.documentsCount.expired}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4 text-amber-500" />
+                      <Hourglass className="h-4 w-4 text-amber-600" />
                       <span>{provider.documentsCount.missing}</span>
                     </div>
                   </div>
