@@ -13,20 +13,20 @@ import { getDocumentStatusIcon } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-// Modified historical data with direct percentages (0-100) instead of decimal values
+// Updated historical data with meaningful percentage values that sum to 100%
 const modifiedHistoricalData = [
-  { name: "Jan", beitragsrückstände: 12, fehlend: 25, ablaufend: 13, gültig: 50 },
-  { name: "Feb", beitragsrückstände: 13, fehlend: 22, ablaufend: 14, gültig: 51 },
-  { name: "März", beitragsrückstände: 11, fehlend: 20, ablaufend: 12, gültig: 57 },
-  { name: "Apr", beitragsrückstände: 14, fehlend: 19, ablaufend: 11, gültig: 56 },
-  { name: "Mai", beitragsrückstände: 10, fehlend: 17, ablaufend: 13, gültig: 60 },
-  { name: "Jun", beitragsrückstände: 8, fehlend: 19, ablaufend: 10, gültig: 63 },
-  { name: "Jul", beitragsrückstände: 9, fehlend: 16, ablaufend: 9, gültig: 66 },
-  { name: "Aug", beitragsrückstände: 7, fehlend: 17, ablaufend: 11, gültig: 65 },
-  { name: "Sep", beitragsrückstände: 8, fehlend: 15, ablaufend: 8, gültig: 69 },
-  { name: "Okt", beitragsrückstände: 6, fehlend: 14, ablaufend: 9, gültig: 71 },
-  { name: "Nov", beitragsrückstände: 5, fehlend: 13, ablaufend: 7, gültig: 75 },
-  { name: "Dez", beitragsrückstände: 4, fehlend: 12, ablaufend: 6, gültig: 78 },
+  { name: "Jan", beitragsrückstände: 15, fehlend: 25, ablaufend: 20, gültig: 40 },
+  { name: "Feb", beitragsrückstände: 14, fehlend: 23, ablaufend: 18, gültig: 45 },
+  { name: "März", beitragsrückstände: 12, fehlend: 20, ablaufend: 18, gültig: 50 },
+  { name: "Apr", beitragsrückstände: 10, fehlend: 18, ablaufend: 17, gültig: 55 },
+  { name: "Mai", beitragsrückstände: 9, fehlend: 16, ablaufend: 15, gültig: 60 },
+  { name: "Jun", beitragsrückstände: 8, fehlend: 14, ablaufend: 13, gültig: 65 },
+  { name: "Jul", beitragsrückstände: 7, fehlend: 12, ablaufend: 11, gültig: 70 },
+  { name: "Aug", beitragsrückstände: 6, fehlend: 10, ablaufend: 9, gültig: 75 },
+  { name: "Sep", beitragsrückstände: 5, fehlend: 8, ablaufend: 7, gültig: 80 },
+  { name: "Okt", beitragsrückstände: 4, fehlend: 6, ablaufend: 5, gültig: 85 },
+  { name: "Nov", beitragsrückstände: 3, fehlend: 4, ablaufend: 3, gültig: 90 },
+  { name: "Dez", beitragsrückstände: 2, fehlend: 3, ablaufend: 2, gültig: 93 },
 ];
 
 // Chart configuration
@@ -165,8 +165,8 @@ const MainView = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis 
-                  tickFormatter={(value) => `${Math.round(value)}%`} 
-                  domain={[0, 100]}
+                  tickFormatter={(value) => `${Math.round(value * 100)}%`} 
+                  domain={[0, 1]}
                 />
                 <Tooltip 
                   formatter={(value) => [`${value}%`, '']}
@@ -325,7 +325,7 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
                       <span>{provider.documentsCount.expired}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4 text-amber-500" />
+                      <Euro className="h-4 w-4 text-red-600" />
                       <span>{provider.documentsCount.missing}</span>
                     </div>
                   </div>
