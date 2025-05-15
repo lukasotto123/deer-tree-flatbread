@@ -27,12 +27,12 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
   const renderStatusIcon = () => {
     switch(status) {
       case 'valid':
-        return <CheckCircle className="h-4 w-4 mr-1 text-green-600" />;
+        return <CheckCircle className="h-5 w-5 mr-1 text-green-600" />;
       case 'expiring':
-        return <Clock className="h-4 w-4 mr-1 text-amber-500" />;
+        return <Clock className="h-5 w-5 mr-1 text-amber-500" />;
       case 'expired':
       case 'missing':
-        return <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />;
+        return <AlertTriangle className="h-5 w-5 mr-1 text-amber-600" />;
       default:
         return null;
     }
