@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import DocumentRequest from "@/components/documents/DocumentRequest";
 import { toast } from "sonner";
@@ -47,42 +47,9 @@ const RequestView = () => {
     }
   ];
 
-  // Simulierte Anfragen für einzelne Dokumente
-  const pendingRequests = [
-    {
-      id: "req-1",
-      providerId: "provider-1",
-      documentName: "Unbedenklichkeitsbescheinigung Finanzamt",
-      dateSent: "2025-05-01",
-      dueDate: "2025-05-15",
-      status: "pending"
-    },
-    {
-      id: "req-2",
-      providerId: "provider-3",
-      documentName: "Betriebshaftpflichtversicherung",
-      dateSent: "2025-04-28",
-      dueDate: "2025-05-12",
-      status: "pending"
-    },
-    {
-      id: "req-3",
-      providerId: "provider-2",
-      documentName: "A1-Bescheinigung für Max Schmidt",
-      dateSent: "2025-05-05",
-      dueDate: "2025-05-19",
-      status: "pending"
-    }
-  ];
-
   // Handler für das Senden einer wöchentlichen Anfrage
   const handleSendWeeklyRequest = (groupId: string) => {
     toast.success("Wöchentliche Dokumentenanfrage wurde erfolgreich versendet");
-  };
-
-  // Handler für das Senden einer Erinnerung
-  const handleSendReminder = (requestId: string) => {
-    toast.success("Erinnerung wurde erfolgreich versendet");
   };
 
   return (
@@ -175,51 +142,6 @@ const RequestView = () => {
               </ul>
             </div>
           ))}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-amber-600" />
-            <CardTitle>Fehlende oder abgelaufene Dokumente</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Unternehmen</TableHead>
-                <TableHead>Dokument</TableHead>
-                <TableHead>Gesendet am</TableHead>
-                <TableHead>Fällig bis</TableHead>
-                <TableHead className="text-right">Aktionen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pendingRequests.map((request) => {
-                const providerName = providers.find(p => p.id === request.providerId)?.name || '';
-                
-                return (
-                  <TableRow key={request.id}>
-                    <TableCell className="font-medium">{providerName}</TableCell>
-                    <TableCell>{request.documentName}</TableCell>
-                    <TableCell>{new Date(request.dateSent).toLocaleDateString('de-DE')}</TableCell>
-                    <TableCell>{new Date(request.dueDate).toLocaleDateString('de-DE')}</TableCell>
-                    <TableCell className="text-right">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleSendReminder(request.id)}
-                      >
-                        Erinnern
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
         </CardContent>
       </Card>
     </div>
