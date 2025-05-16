@@ -44,7 +44,7 @@ const DocumentRequest = () => {
     }
 
     // Hier würde die Logik zur Dokumentenanfrage kommen
-    toast.success("Dokumentenanfrage wurde erfolgreich versendet");
+    toast.success("Manuelle Dokumentenanfrage wurde erfolgreich versendet");
     setOpen(false);
     setSelectedProvider("");
     setSelectedDocType("");
@@ -58,13 +58,13 @@ const DocumentRequest = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Send className="h-4 w-4 mr-2" />
-          Dokument anfragen
+          <Send className="h-5 w-5 mr-2" />
+          Einzeldokument anfragen
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Neue Dokumentenanfrage erstellen</DialogTitle>
+          <DialogTitle>Manuelle Dokumentenanfrage erstellen</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
