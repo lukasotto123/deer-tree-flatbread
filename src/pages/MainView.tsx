@@ -286,9 +286,6 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
-              {providers.some(p => p.type === 'personaldienstleister') && (
-                <TableHead>ANÜ</TableHead>
-              )}
               <TableHead>Dokumente</TableHead>
               <TableHead>Letzte Aktualisierung</TableHead>
               <TableHead className="text-right">Aktion</TableHead>
@@ -308,11 +305,6 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
                 <TableCell>
                   <StatusBadgeGerman status={provider.status} />
                 </TableCell>
-                {provider.type === 'personaldienstleister' && (
-                  <TableCell className={provider.hasANUPermission ? 'text-success' : 'text-destructive'}>
-                    {provider.hasANUPermission ? 'Ja' : 'Nein'}
-                  </TableCell>
-                )}
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1">
