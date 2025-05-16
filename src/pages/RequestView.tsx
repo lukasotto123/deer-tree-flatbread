@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Clock, Euro, Calendar } from "lucide-react";
+import { AlertTriangle, Calendar } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import DocumentRequest from "@/components/documents/DocumentRequest";
 import { toast } from "sonner";
@@ -91,7 +91,7 @@ const RequestView = () => {
         <div>
           <h1 className="text-3xl font-bold">Dokumentenanfragen</h1>
           <p className="text-muted-foreground mt-1">
-            Wöchentliche Anfragen für fehlende oder abgelaufende Dokumente
+            Wöchentliche Anfragen für fehlende oder abgelaufene Dokumente
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -220,25 +220,6 @@ const RequestView = () => {
               })}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-amber-500" />
-            <CardTitle>Geplante Anfragen (Bald ablaufende Dokumente)</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">
-            Dokumente, die in den nächsten 30 Tagen ablaufen, werden automatisch im wöchentlichen Rhythmus angefragt.
-          </p>
-          <div className="flex justify-end">
-            <Button onClick={() => toast.success("Alle geplanten Anfragen wurden manuell ausgelöst")}>
-              Alle geplanten Anfragen jetzt senden
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>
