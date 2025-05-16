@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Euro, Clock, Hourglass, AlertTriangle, CheckCircle } from "lucide-react";
+import { Plus, Euro, Clock, Hourglass, AlertTriangle, CheckCircle, Users } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -52,7 +53,7 @@ const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
 
   const filteredProviders = providers.filter(provider => 
-    provider.type === 'subunternehmer' && (
+    provider.type === 'nachunternehmer' && (
     activeTab === "niederlassung-a" ? ["provider-3", "provider-4", "provider-6"].includes(provider.id) : 
     ["provider-5", "provider-7", "provider-8"].includes(provider.id))
   );
@@ -75,6 +76,19 @@ const MainView = () => {
     (total, provider) => total + provider.documentsCount.expiring, 0
   );
 
+  // Calculate compliant and non-compliant Nachunternehmer
+  const nachunternehmer = filteredProviders;
+  const compliantNachunternehmer = nachunternehmer.filter(p => 
+    p.documentsCount.expired === 0 && 
+    p.documentsCount.missing === 0 && 
+    p.status === 'active'
+  );
+  const nonCompliantNachunternehmer = nachunternehmer.filter(p => 
+    p.documentsCount.expired > 0 || 
+    p.documentsCount.missing > 0 || 
+    p.status !== 'active'
+  );
+
   // Helper function to render the icon based on the new utils format
   const renderIcon = (iconData: ReturnType<typeof getDocumentStatusIcon>) => {
     if ('icon' in iconData) {
@@ -94,7 +108,27 @@ const MainView = () => {
       </div>
 
       {/* Übersichtskarten basierend auf dem Screenshot */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6 flex flex-col h-full">
+            <div className="text-center flex-grow">
+              <div className="flex justify-center items-center mb-2">
+                <Users className="h-5 w-5 text-blue-600 mr-2" />
+                <h3 className="text-lg font-medium">Nachunternehmer Compliance</h3>
+              </div>
+              <p className="text-4xl font-bold">{nachunternehmer.length}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {compliantNachunternehmer.length} compliant, {nonCompliantNachunternehmer.length} nicht compliant
+              </p>
+            </div>
+            <div className="mt-6">
+              <Button className="w-full">
+                Anzeigen
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
         <Card>
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
@@ -256,13 +290,13 @@ const MainView = () => {
             </Button>
             <Button variant="outline" size="sm" className="flex gap-1 items-center">
               <Plus className="h-4 w-4" />
-              <span>Subunternehmer hinzufügen</span>
+              <span>Nachunternehmer hinzufügen</span>
             </Button>
           </div>
         </div>
 
         <TabsContent value={activeTab} className="space-y-6">
-          <ComplianceTable title="Subunternehmer" providers={filteredProviders} />
+          <ComplianceTable title="Nachunternehmer" providers={filteredProviders} />
         </TabsContent>
       </Tabs>
     </div>

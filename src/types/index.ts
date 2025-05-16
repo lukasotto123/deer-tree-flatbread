@@ -1,5 +1,13 @@
 
-export type ProviderType = 'personaldienstleister' | 'subunternehmer';
+export type ProviderType = 'personaldienstleister' | 'nachunternehmer';
+
+export type DocumentCategory = 
+  | 'behördliche_steuerliche_nachweise' 
+  | 'arbeits_mindestlohn_compliance' 
+  | 'sozial_versicherungsnachweise' 
+  | 'personal_qualifikationsnachweise' 
+  | 'bonitäts_risikoprüfung' 
+  | 'kundenspezifisch';
 
 export interface Document {
   id: string;
@@ -8,6 +16,8 @@ export interface Document {
   providerId: string;
   providerType: ProviderType;
   type: string;
+  category?: DocumentCategory;
+  categoryLabel?: string;
   issuedDate: string;
   expiryDate: string | null;
   status: 'valid' | 'expiring' | 'expired' | 'missing';
@@ -38,6 +48,9 @@ export interface Provider {
   contactEmail: string;
   contactPhone: string;
   address: string;
+  billingAddress?: string;
+  managingDirector?: string;
+  contactPerson?: string;
   status: 'active' | 'inactive' | 'pending';
   documentsCount: {
     total: number;
@@ -63,6 +76,8 @@ export interface DocumentType {
   name: string;
   description: string;
   providerType: ProviderType;
+  category: DocumentCategory;
+  categoryLabel: string;
   isPerEmployee: boolean;
   isClientSpecific: boolean; // Klientenspezfisch oder -unabhängig
   issuanceType: 'pro Unternehmen' | 'pro Mitarbeiter'; // Ausstellung

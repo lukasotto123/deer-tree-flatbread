@@ -14,7 +14,7 @@ interface ProviderCardProps {
 const ProviderCard = ({ provider }: ProviderCardProps) => {
   const providerTypeText = provider.type === 'personaldienstleister' 
     ? 'Personaldienstleister' 
-    : 'Subunternehmer';
+    : 'Nachunternehmer';
   
   const statusConfig = {
     active: { color: 'bg-green-100 text-green-800', text: 'Aktiv' },

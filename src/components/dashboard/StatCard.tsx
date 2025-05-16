@@ -7,6 +7,7 @@ interface StatCardProps {
   description?: string;
   icon?: React.ReactNode;
   colorClass?: string;
+  actionButton?: React.ReactNode;
 }
 
 const StatCard = ({
@@ -14,7 +15,8 @@ const StatCard = ({
   value,
   description,
   icon,
-  colorClass = "bg-primary text-white"
+  colorClass = "bg-primary text-white",
+  actionButton
 }: StatCardProps) => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
@@ -34,6 +36,11 @@ const StatCard = ({
           </div>
         )}
       </div>
+      {actionButton && (
+        <div className="mt-2">
+          {actionButton}
+        </div>
+      )}
     </div>
   );
 };

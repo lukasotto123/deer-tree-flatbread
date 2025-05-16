@@ -16,7 +16,7 @@ const ProvidersOverview = ({ providers }: ProvidersOverviewProps) => {
   const filteredProviders = providers.filter(provider => {
     if (activeTab === "all") return true;
     if (activeTab === "personaldienstleister") return provider.type === "personaldienstleister";
-    if (activeTab === "subunternehmer") return provider.type === "subunternehmer";
+    if (activeTab === "nachunternehmer") return provider.type === "nachunternehmer";
     return true;
   });
 
@@ -27,7 +27,7 @@ const ProvidersOverview = ({ providers }: ProvidersOverviewProps) => {
           <TabsList>
             <TabsTrigger value="all">Alle</TabsTrigger>
             <TabsTrigger value="personaldienstleister">Personaldienstleister</TabsTrigger>
-            <TabsTrigger value="subunternehmer">Subunternehmer</TabsTrigger>
+            <TabsTrigger value="nachunternehmer">Nachunternehmer</TabsTrigger>
           </TabsList>
         </Tabs>
         
@@ -38,7 +38,7 @@ const ProvidersOverview = ({ providers }: ProvidersOverviewProps) => {
           </Button>
           <Button variant="outline" size="sm" className="flex gap-1 items-center">
             <Plus className="h-4 w-4" />
-            <span>Subunternehmer hinzufügen</span>
+            <span>Nachunternehmer hinzufügen</span>
           </Button>
         </div>
       </div>
@@ -59,7 +59,7 @@ const ProvidersOverview = ({ providers }: ProvidersOverviewProps) => {
         </div>
       </TabsContent>
       
-      <TabsContent value="subunternehmer" className="mt-6">
+      <TabsContent value="nachunternehmer" className="mt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProviders.map((provider) => (
             <ProviderCard key={provider.id} provider={provider} />

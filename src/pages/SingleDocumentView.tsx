@@ -40,6 +40,16 @@ const SingleDocumentView = () => {
     ? {...docType, requiredFor: {...docType.requiredFor, secure: "Verpflichtend", basic: "Verpflichtend"}} 
     : docType;
 
+  // Document categories mapping
+  const categoryMap = {
+    'behördliche_steuerliche_nachweise': 'Behördliche & steuerliche Nachweise',
+    'arbeits_mindestlohn_compliance': 'Arbeits- & Mindestlohn-compliance',
+    'sozial_versicherungsnachweise': 'Sozial- & Versicherungsnachweise',
+    'personal_qualifikationsnachweise': 'Personal- & Qualifikationsnachweise',
+    'bonitäts_risikoprüfung': 'Bonitäts- & Risikoprüfung',
+    'kundenspezifisch': 'Kundenspezifisch',
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -87,29 +97,31 @@ const SingleDocumentView = () => {
                     Personaldienstleister
                   </Button>
                   <Button 
-                    variant={displayDocType.providerType === "subunternehmer" ? "default" : "outline"}
+                    variant={displayDocType.providerType === "nachunternehmer" ? "default" : "outline"}
                     size="sm"
                   >
-                    Subunternehmer
+                    Nachunternehmer
                   </Button>
                 </div>
               ) : (
                 <p>{displayDocType.providerType === "personaldienstleister" 
                     ? "Personaldienstleister" 
-                    : "Subunternehmer"}
+                    : "Nachunternehmer"}
                 </p>
               )}
             </div>
             
             <div>
-              <div className="flex items-center space-x-2">
-                <Switch 
-                  id="isPerEmployee"
-                  defaultChecked={displayDocType.isPerEmployee}
-                  disabled={!isEditing}
+              <Label htmlFor="category" className="text-sm text-muted-foreground">Kategorie</Label>
+              {isEditing ? (
+                <Input 
+                  id="category"
+                  defaultValue={displayDocType.category ? categoryMap[displayDocType.category] : 'Kundenspezifisch'} 
+                  className="mt-1"
                 />
-                <Label htmlFor="isPerEmployee" className="text-sm text-muted-foreground">Pro Mitarbeiter</Label>
-              </div>
+              ) : (
+                <p>{displayDocType.category ? categoryMap[displayDocType.category] : 'Kundenspezifisch'}</p>
+              )}
             </div>
             
             <div>
@@ -174,28 +186,6 @@ const SingleDocumentView = () => {
                 <p>{displayDocType.requiredFor.basic}</p>
               )}
             </div>
-            
-            <div>
-              <Label htmlFor="issuanceType" className="text-sm text-muted-foreground">Ausstellungstyp</Label>
-              {isEditing ? (
-                <div className="flex gap-2 mt-1">
-                  <Button 
-                    variant={displayDocType.issuanceType === "pro Unternehmen" ? "default" : "outline"}
-                    size="sm"
-                  >
-                    Pro Unternehmen
-                  </Button>
-                  <Button 
-                    variant={displayDocType.issuanceType === "pro Mitarbeiter" ? "default" : "outline"}
-                    size="sm"
-                  >
-                    Pro Mitarbeiter
-                  </Button>
-                </div>
-              ) : (
-                <p>{displayDocType.issuanceType}</p>
-              )}
-            </div>
           </div>
         </CardContent>
         {isEditing && (
@@ -210,7 +200,7 @@ const SingleDocumentView = () => {
         )}
       </Card>
 
-      {displayDocType.isPerEmployee && (
+      {displayDocType.category === 'personal_qualifikationsnachweise' && (
         <Card>
           <CardHeader>
             <CardTitle>Mitarbeitermatrix</CardTitle>
@@ -288,7 +278,7 @@ const SingleDocumentView = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Unternehmen</TableHead>
-                {displayDocType.isPerEmployee && <TableHead>Mitarbeiter</TableHead>}
+                {displayDocType.category === 'personal_qualifikationsnachweise' && <TableHead>Mitarbeiter</TableHead>}
                 <TableHead>Status</TableHead>
                 <TableHead>Ausstellungsdatum</TableHead>
                 <TableHead>Ablaufdatum</TableHead>
@@ -308,7 +298,7 @@ const SingleDocumentView = () => {
                 return (
                   <TableRow key={doc.id}>
                     <TableCell className="font-medium">{providerName}</TableCell>
-                    {displayDocType.isPerEmployee && <TableCell>{employeeName}</TableCell>}
+                    {displayDocType.category === 'personal_qualifikationsnachweise' && <TableCell>{employeeName}</TableCell>}
                     <TableCell>
                       <StatusBadgeGerman document={doc.status} />
                     </TableCell>

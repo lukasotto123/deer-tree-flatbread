@@ -18,6 +18,19 @@ const Index = () => {
     expired: Math.round(documents.length * 0.15), // 15% expired
   };
 
+  // Calculate compliant and non-compliant Nachunternehmer
+  const nachunternehmer = providers.filter(p => p.type === 'nachunternehmer');
+  const compliantNachunternehmer = nachunternehmer.filter(p => 
+    p.documentsCount.expired === 0 && 
+    p.documentsCount.missing === 0 && 
+    p.status === 'active'
+  );
+  const nonCompliantNachunternehmer = nachunternehmer.filter(p => 
+    p.documentsCount.expired > 0 || 
+    p.documentsCount.missing > 0 || 
+    p.status !== 'active'
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -30,6 +43,14 @@ const Index = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Nachunternehmer Compliance"
+          description={`${compliantNachunternehmer.length} compliant, ${nonCompliantNachunternehmer.length} nicht compliant`}
+          value={nachunternehmer.length}
+          icon={<Users className="h-5 w-5" />}
+          colorClass="bg-blue-600 text-white"
+          actionButton={<Button variant="secondary" size="sm" className="mt-2 w-full">Anzeigen</Button>}
+        />
         <StatCard
           title="Gesamt Dokumente"
           value={documentStats.total}
@@ -47,12 +68,6 @@ const Index = () => {
           value={documentStats.expiring}
           icon={<Clock className="h-5 w-5" />}
           colorClass="bg-warning text-warning-foreground"
-        />
-        <StatCard
-          title="Abgelaufen"
-          value={documentStats.expired}
-          icon={<AlertTriangle className="h-5 w-5" />}
-          colorClass="bg-destructive text-white"
         />
       </div>
       
@@ -87,8 +102,8 @@ const Index = () => {
                   <Users className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Subunternehmer</h3>
-                  <p className="text-2xl font-bold">{providers.filter(p => p.type === 'subunternehmer').length}</p>
+                  <h3 className="font-medium">Nachunternehmer</h3>
+                  <p className="text-2xl font-bold">{providers.filter(p => p.type === 'nachunternehmer').length}</p>
                 </div>
               </div>
             </div>

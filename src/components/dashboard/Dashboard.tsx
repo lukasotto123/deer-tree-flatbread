@@ -1,9 +1,10 @@
 
-import { FileText, Euro, Clock, CheckCircle } from "lucide-react";
+import { FileText, Euro, Clock, CheckCircle, Users, AlertTriangle } from "lucide-react";
 import StatCard from "./StatCard";
 import ExpiringDocumentsTable from "./ExpiringDocumentsTable";
 import DocumentsOverview from "./DocumentsOverview";
 import { documents, providers } from "@/data/dummy-data";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   const documentStats = {
@@ -12,6 +13,19 @@ const Dashboard = () => {
     expiring: documents.filter(doc => doc.status === 'expiring').length,
     expired: documents.filter(doc => doc.status === 'expired').length,
   };
+
+  // Calculate compliant and non-compliant Nachunternehmer
+  const nachunternehmer = providers.filter(p => p.type === 'nachunternehmer');
+  const compliantNachunternehmer = nachunternehmer.filter(p => 
+    p.documentsCount.expired === 0 && 
+    p.documentsCount.missing === 0 && 
+    p.status === 'active'
+  );
+  const nonCompliantNachunternehmer = nachunternehmer.filter(p => 
+    p.documentsCount.expired > 0 || 
+    p.documentsCount.missing > 0 || 
+    p.status !== 'active'
+  );
 
   return (
     <div className="space-y-6">
@@ -23,6 +37,14 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Nachunternehmer Compliance"
+          description={`${compliantNachunternehmer.length} compliant, ${nonCompliantNachunternehmer.length} nicht compliant`}
+          value={nachunternehmer.length}
+          icon={<Users className="h-5 w-5" />}
+          colorClass="bg-blue-600 text-white"
+          actionButton={<Button variant="secondary" size="sm" className="mt-2 w-full">Anzeigen</Button>}
+        />
         <StatCard
           title="Gesamt Dokumente"
           value={documentStats.total}
@@ -40,12 +62,6 @@ const Dashboard = () => {
           value={documentStats.expiring}
           icon={<Clock className="h-5 w-5" />}
           colorClass="bg-warning text-warning-foreground"
-        />
-        <StatCard
-          title="Abgelaufen"
-          value={documentStats.expired}
-          icon={<Euro className="h-5 w-5 text-red-600" />}
-          colorClass="bg-destructive text-white"
         />
       </div>
       

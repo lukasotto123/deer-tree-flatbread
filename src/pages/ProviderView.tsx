@@ -11,6 +11,7 @@ import { providers, employees, documents, documentTypes } from "@/data/dummy-dat
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 import { toast } from "sonner";
+import { DocumentCategory } from "@/types";
 
 const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
@@ -69,6 +70,22 @@ const ProviderView = () => {
     );
   };
 
+  // Group document types by category
+  const docTypesByCategory = relevantDocTypes.reduce((acc, docType) => {
+    const category = docType.category || 'kundenspezifisch';
+    const categoryLabel = docType.categoryLabel || 'Kundenspezifisch';
+    
+    if (!acc[category]) {
+      acc[category] = {
+        label: categoryLabel,
+        docTypes: []
+      };
+    }
+    
+    acc[category].docTypes.push(docType);
+    return acc;
+  }, {} as Record<string, { label: string, docTypes: typeof relevantDocTypes }>);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -119,8 +136,20 @@ const ProviderView = () => {
               <p>{provider.address}</p>
             </div>
             <div>
+              <p className="text-sm text-muted-foreground">Rechnungsadresse</p>
+              <p>{provider.billingAddress || provider.address}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Geschäftsführer</p>
+              <p>{provider.managingDirector || "Nicht angegeben"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Ansprechpartner</p>
+              <p>{provider.contactPerson || "Nicht angegeben"}</p>
+            </div>
+            <div>
               <p className="text-sm text-muted-foreground">Typ</p>
-              <p>{provider.type === 'subunternehmer' ? 'Subunternehmer' : 'Personaldienstleister'}</p>
+              <p>{provider.type === 'nachunternehmer' ? 'Nachunternehmer' : 'Personaldienstleister'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>
@@ -142,217 +171,138 @@ const ProviderView = () => {
         </CardContent>
       </Card>
 
-      {/* Mitarbeiter als Kärtchen */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Mitarbeiter</CardTitle>
-          <Button size="sm">Mitarbeiter hinzufügen</Button>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {providerEmployees.map((employee) => {
-              const employeeDocuments = documents.filter(doc => doc.employeeId === employee.id);
-              const valid = employeeDocuments.filter(d => d.status === 'valid').length;
-              const expiring = employeeDocuments.filter(d => d.status === 'expiring').length;
-              const expired = employeeDocuments.filter(d => d.status === 'expired').length;
-              const missing = employeeDocuments.filter(d => d.status === 'missing').length;
-              
-              // Determine the worst status for this employee
-              const hasExpired = expired > 0;
-              const hasMissing = missing > 0;
-              const hasExpiring = expiring > 0;
-              const worstEmployeeStatus = isActive 
-                ? (hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid")))
-                : "expired";
-              
-              // Assign nationality-appropriate names
-              let employeeName = employee.name;
-              if (employee.id === "employee-1") employeeName = "Hans Schmidt";
-              if (employee.id === "employee-2") employeeName = "Maria Wagner";
-              if (employee.id === "employee-3") employeeName = "Pierre Dubois";
-              if (employee.id === "employee-4") employeeName = "Isabella Romano";
-              if (employee.id === "employee-5") employeeName = "Miguel González";
-              if (employee.id === "employee-6") employeeName = "Sophia Müller";
-              if (employee.id === "employee-7") employeeName = "Jan Kowalski";
-              if (employee.id === "employee-8") employeeName = "Anna Hofer";
-              if (employee.id === "employee-9") employeeName = "Erik Johansson";
-              if (employee.id === "employee-10") employeeName = "Yuki Tanaka";
-              
-              return (
-                <Card key={employee.id} className={`hover:shadow-md transition-shadow ${!isActive ? 'opacity-60' : ''}`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                          <User className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
-                          <div className="flex items-center">
-                            <h3 className="font-medium">{employeeName}</h3>
-                            {isActive && <StatusBadge status={worstEmployeeStatus} className="ml-2" />}
-                          </div>
-                          <p className="text-sm text-muted-foreground">{employee.position}</p>
-                        </div>
-                      </div>
-                      <Link to={`/person/${id}/${employee.id}`}>
-                        <Button variant="ghost" size="sm">Details</Button>
-                      </Link>
-                    </div>
-                    
-                    {isActive && (
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex space-x-3 text-sm">
-                          <div className="flex items-center gap-1">
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                            <span>{valid}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4 text-amber-500" />
-                            <span>{expiring}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <AlertTriangle className="h-4 w-4 text-amber-600" />
-                            <span>{expired + missing}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Dokumente des Unternehmens */}
+      {/* Dokumente des Unternehmens nach Kategorien */}
       <Card className={!isActive ? 'opacity-60' : ''}>
         <CardHeader>
           <CardTitle>Unternehmensdokumente</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Dokument</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ausstellungsdatum</TableHead>
-                <TableHead>Ablaufdatum</TableHead>
-                <TableHead>Erinnerungen</TableHead>
-                <TableHead>Relevanz</TableHead>
-                <TableHead className="text-right">Aktionen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {relevantDocTypes.map((docType) => {
-                // Check if this document should be missing for this provider
-                const forceMissing = shouldDocumentBeMissing(provider.id, docType.id);
-                const doc = forceMissing ? null : providerDocuments.find(d => d.type === docType.id);
-                
-                const randomStatus = getRandomStatus(); // Generate random status
-                const isRelevant = true; // Default to true, would come from API
-                const isMissing = !doc;
-                // Set "Werksverträge" to "Verpflichtend"
-                const isContractDoc = docType.name === "Werksverträge";
-                const hasHistory = doc && selectedDocumentId === doc.id;
+        <CardContent className="space-y-8">
+          {Object.entries(docTypesByCategory).map(([category, { label, docTypes }]) => (
+            <div key={category}>
+              <h3 className="text-lg font-semibold mb-4">{label}</h3>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Dokument</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Ausstellungsdatum</TableHead>
+                    <TableHead>Ablaufdatum</TableHead>
+                    <TableHead>Erinnerungen</TableHead>
+                    <TableHead>Relevanz</TableHead>
+                    <TableHead className="text-right">Aktionen</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {docTypes.map((docType) => {
+                    // Check if this document should be missing for this provider
+                    const forceMissing = shouldDocumentBeMissing(provider.id, docType.id);
+                    const doc = forceMissing ? null : providerDocuments.find(d => d.type === docType.id);
+                    
+                    const randomStatus = getRandomStatus(); // Generate random status
+                    const isRelevant = true; // Default to true, would come from API
+                    const isMissing = !doc;
+                    // Set "Werksverträge" to "Verpflichtend"
+                    const isContractDoc = docType.name === "Werksverträge";
+                    const hasHistory = doc && selectedDocumentId === doc.id;
 
-                return (
-                  <React.Fragment key={docType.id}>
-                    <TableRow className={!isActive ? 'opacity-60' : ''}>
-                      <TableCell>{docType.name}</TableCell>
-                      <TableCell>
-                        {isMissing ? (
-                          <StatusBadge status="missing" />
-                        ) : (
-                          <StatusBadge status={randomStatus} />
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {!isMissing && (randomStatus === "expiring" || randomStatus === "expired")
-                          ? new Date(new Date().setMonth(new Date().getMonth() + (randomStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
-                          : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {(isMissing || randomStatus === "expired") && (
-                          <div className="text-sm">
-                            <div>{Math.floor(Math.random() * 3)} gesendet</div>
-                            <div className="text-xs text-muted-foreground">
-                              Nächste: {new Date().toLocaleDateString('de-DE')}
-                            </div>
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Switch 
-                            id={`relevance-${docType.id}`} 
-                            checked={isRelevant} 
-                            disabled={!isActive}
-                          />
-                          <Label htmlFor={`relevance-${docType.id}`}>
-                            {isContractDoc ? "Verpflichtend" : (isRelevant ? "Relevant" : "Nicht relevant")}
-                          </Label>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          {/* Only show History and View buttons */}
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
-                            disabled={!isActive}
-                          >
-                            <FileText className="h-4 w-4 mr-1" />
-                            Historie
-                          </Button>
-                          
-                          {/* Only show View button for existing documents */}
-                          {doc && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              disabled={!isActive}
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Anzeigen
-                            </Button>
-                          )}
-                          
-                          {/* Upload/Check button for non-valid or missing documents */}
-                          {(isMissing || (doc && randomStatus !== "valid")) && (
-                            isMissing ? (
-                              <Button variant="outline" size="sm" disabled={!isActive}>
-                                Hochladen
-                              </Button>
+                    return (
+                      <React.Fragment key={docType.id}>
+                        <TableRow className={!isActive ? 'opacity-60' : ''}>
+                          <TableCell>{docType.name}</TableCell>
+                          <TableCell>
+                            {isMissing ? (
+                              <StatusBadge status="missing" />
                             ) : (
-                              <Link to={`/document-review/${id}/${doc.id}`}>
-                                <Button variant="outline" size="sm" disabled={!isActive}>
-                                  Prüfen
+                              <StatusBadge status={randomStatus} />
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {!isMissing && (randomStatus === "expiring" || randomStatus === "expired")
+                              ? new Date(new Date().setMonth(new Date().getMonth() + (randomStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {(isMissing || randomStatus === "expired") && (
+                              <div className="text-sm">
+                                <div>{Math.floor(Math.random() * 3)} gesendet</div>
+                                <div className="text-xs text-muted-foreground">
+                                  Nächste: {new Date().toLocaleDateString('de-DE')}
+                                </div>
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Switch 
+                                id={`relevance-${docType.id}`} 
+                                checked={isRelevant} 
+                                disabled={!isActive}
+                              />
+                              <Label htmlFor={`relevance-${docType.id}`}>
+                                {isContractDoc ? "Verpflichtend" : (isRelevant ? "Relevant" : "Nicht relevant")}
+                              </Label>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
+                                disabled={!isActive}
+                              >
+                                <FileText className="h-4 w-4 mr-1" />
+                                Historie
+                              </Button>
+                              
+                              {/* Only show View button for existing documents */}
+                              {doc && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  disabled={!isActive}
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Anzeigen
                                 </Button>
-                              </Link>
-                            )
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                    {hasHistory && (
-                      <TableRow>
-                        <TableCell colSpan={7} className="p-0 border-b-0">
-                          <div className="py-3">
-                            <DocumentHistory documentId={doc.id} />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
+                              )}
+                              
+                              {/* Upload/Check button for non-valid or missing documents */}
+                              {(isMissing || (doc && randomStatus !== "valid")) && (
+                                isMissing ? (
+                                  <Button variant="outline" size="sm" disabled={!isActive}>
+                                    Hochladen
+                                  </Button>
+                                ) : (
+                                  <Link to={`/document-review/${id}/${doc.id}`}>
+                                    <Button variant="outline" size="sm" disabled={!isActive}>
+                                      Prüfen
+                                    </Button>
+                                  </Link>
+                                )
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        {hasHistory && (
+                          <TableRow>
+                            <TableCell colSpan={7} className="p-0 border-b-0">
+                              <div className="py-3">
+                                <DocumentHistory documentId={doc.id} />
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          ))}
         </CardContent>
       </Card>
     </div>
