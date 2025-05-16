@@ -126,12 +126,14 @@ const ProviderView = () => {
               <p className="text-sm text-muted-foreground">Status</p>
               <StatusBadgeGerman status={isActive ? 'active' : 'inactive'} />
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">ANÜ Erlaubnis</p>
-              <span className={`${provider.hasANUPermission ? 'text-success' : 'text-destructive'} font-medium`}>
-                {provider.hasANUPermission ? 'Ja' : 'Nein'}
-              </span>
-            </div>
+            {provider.type === 'personaldienstleister' && (
+              <div>
+                <p className="text-sm text-muted-foreground">ANÜ Erlaubnis</p>
+                <span className={`${provider.hasANUPermission ? 'text-success' : 'text-destructive'} font-medium`}>
+                  {provider.hasANUPermission ? 'Ja' : 'Nein'}
+                </span>
+              </div>
+            )}
             <div>
               <p className="text-sm text-muted-foreground">Letzte Aktualisierung</p>
               <p>{new Date(provider.lastUpdated).toLocaleDateString('de-DE')}</p>

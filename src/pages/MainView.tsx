@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -287,7 +286,9 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>ANÜ</TableHead>
+              {providers.some(p => p.type === 'personaldienstleister') && (
+                <TableHead>ANÜ</TableHead>
+              )}
               <TableHead>Dokumente</TableHead>
               <TableHead>Letzte Aktualisierung</TableHead>
               <TableHead className="text-right">Aktion</TableHead>
@@ -307,9 +308,11 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
                 <TableCell>
                   <StatusBadgeGerman status={provider.status} />
                 </TableCell>
-                <TableCell className={provider.hasANUPermission ? 'text-success' : 'text-destructive'}>
-                  {provider.hasANUPermission ? 'Ja' : 'Nein'}
-                </TableCell>
+                {provider.type === 'personaldienstleister' && (
+                  <TableCell className={provider.hasANUPermission ? 'text-success' : 'text-destructive'}>
+                    {provider.hasANUPermission ? 'Ja' : 'Nein'}
+                  </TableCell>
+                )}
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1">
