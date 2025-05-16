@@ -182,7 +182,7 @@ const RequestView = () => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-amber-600" />
-            <CardTitle>Offene Anfragen (Fehlende oder abgelaufene Dokumente)</CardTitle>
+            <CardTitle>Fehlende oder abgelaufene Dokumente</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
