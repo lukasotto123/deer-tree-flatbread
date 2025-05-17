@@ -23,7 +23,7 @@ const AppLayout = ({ userMode, onModeChange }: AppLayoutProps) => {
     { name: "Anfragen", path: "/requests" }
   ];
   
-  // For lieferant view, add Anfragen to the navigation links
+  // For lieferant view, update to only have Dashboard and Anfragen
   const lieferantNavLinks = [
     { name: "Dashboard", path: "/" },
     { name: "Anfragen", path: "/requests" }

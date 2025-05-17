@@ -43,10 +43,10 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow">
           <div className="p-6">
-            <h3 className="flex items-center gap-2 text-lg font-medium">
+            <div className="flex items-center gap-2 mb-2">
               <Users className="h-5 w-5 text-blue-600" />
-              Partner Compliance
-            </h3>
+              <h3 className="text-lg font-medium">Partner Compliance</h3>
+            </div>
             <div className="text-3xl font-bold text-center mt-3">{allPartners.length}</div>
             <div className="flex justify-center items-center gap-4 mt-2">
               <div className="text-center">
