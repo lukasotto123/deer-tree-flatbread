@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { FileText, AlertTriangle, Clock, Euro, CheckCircle, Users, Upload, Plus } from "lucide-react";
+import { FileText, AlertTriangle, Clock, Euro, CheckCircle, Users, Upload, Plus, Building } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -64,15 +64,45 @@ const customers = [
   }
 ];
 
+// Additional document examples for each category
+const categoryDocuments = {
+  "Behördliche & steuerliche Nachweise": [
+    { id: "doc-1", name: "Umsatzsteuer-Identifikationsnummer", status: "valid" },
+    { id: "doc-2", name: "Handelsregisterauszug", status: "valid" },
+    { id: "doc-3", name: "Gewerbeanmeldung", status: "expiring" }
+  ],
+  "Sozial- & Versicherungsnachweise": [
+    { id: "doc-4", name: "Unbedenklichkeitsbescheinigung Krankenkasse", status: "valid" },
+    { id: "doc-5", name: "Unbedenklichkeitsbescheinigung Berufsgenossenschaft", status: "expired" },
+    { id: "doc-6", name: "Betriebshaftpflichtversicherung", status: "valid" }
+  ],
+  "Arbeits- & Mindestlohn-compliance": [
+    { id: "doc-7", name: "Selbsterklärung Mindestlohn", status: "valid" },
+    { id: "doc-8", name: "Bescheinigung über Zahlung Mindestlohn", status: "valid" },
+    { id: "doc-9", name: "Verpflichtungserklärung AEntG", status: "expiring" }
+  ],
+  "Bonitäts- & Risikoprüfung": [
+    { id: "doc-10", name: "Creditreform-Selbstauskunft über Liquidität", status: "expired" },
+    { id: "doc-11", name: "Jahresabschluss", status: "valid" },
+    { id: "doc-12", name: "Bestätigung Zahlungsfähigkeit", status: "valid" }
+  ],
+  "Personal- & Qualifikationsnachweise": [
+    { id: "doc-13", name: "Qualifikationszertifikate", status: "valid" },
+    { id: "doc-14", name: "Schulungsnachweise", status: "expiring" },
+    { id: "doc-15", name: "Arbeitserlaubnis", status: "valid" }
+  ]
+};
+
 // Group documents by category
 const groupDocumentsByCategory = () => {
-  const categorized: Record<string, typeof documents> = {};
+  const categorized = {};
   
   documentCategories.forEach(category => {
-    categorized[category] = documents.filter(doc => 
-      doc.category === category && 
-      !doc.employeeId // Only non-employee documents
-    );
+    if (category !== "Kundenspezifisch") {
+      categorized[category] = categoryDocuments[category] || [];
+    } else {
+      categorized[category] = [];
+    }
   });
   
   return categorized;
@@ -198,6 +228,11 @@ const VendorDashboard = () => {
                                 Wählen Sie aus, ob dieses Dokument für das gesamte Unternehmen oder 
                                 für eine bestimmte Niederlassung gilt.
                               </p>
+                              <div className="flex items-center space-x-2 mt-2">
+                                <Button variant="outline" size="sm">Hauptsitz</Button>
+                                <Button variant="outline" size="sm">Niederlassung Nord</Button>
+                                <Button variant="outline" size="sm">Niederlassung Süd</Button>
+                              </div>
                             </div>
                           </DialogContent>
                         </Dialog>
@@ -223,6 +258,10 @@ const VendorDashboard = () => {
                                   </DialogHeader>
                                   <div className="grid gap-4 py-4">
                                     <p>Upload-Formular für {doc.name}</p>
+                                    <div className="flex items-center space-x-2 mt-2">
+                                      <Button variant="outline" size="sm">Alle Standorte</Button>
+                                      <Button variant="outline" size="sm">Nur Hauptsitz</Button>
+                                    </div>
                                   </div>
                                 </DialogContent>
                               </Dialog>
@@ -403,7 +442,7 @@ const VendorDashboard = () => {
                           </div>
                           <div className="flex gap-2">
                             <Button variant="outline" size="sm">Anzeigen</Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="secondary" size="sm">
                               <Upload className="h-3 w-3 mr-1" />
                               Hochladen
                             </Button>
@@ -444,22 +483,10 @@ const VendorDashboard = () => {
                         "Betriebshaftpflichtversicherung"].map((docName, i) => (
                         <li key={i} className="text-sm flex justify-between">
                           <span>{docName}</span>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="secondary" size="sm" className="h-6 text-xs">
-                                <Upload className="h-3 w-3 mr-1" />
-                                Hochladen
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Dokument hochladen</DialogTitle>
-                              </DialogHeader>
-                              <div className="grid gap-4 py-4">
-                                <p>Upload-Formular für {docName}</p>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <Button variant="secondary" size="sm" className="h-6 text-xs">
+                            <Upload className="h-3 w-3 mr-1" />
+                            Hochladen
+                          </Button>
                         </li>
                       ))}
                     </ul>

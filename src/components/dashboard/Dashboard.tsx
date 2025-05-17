@@ -40,25 +40,28 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Partner Compliance"
-          description={
-            <div className="flex justify-between items-center mt-2">
-              <div>
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6">
+            <h3 className="flex items-center gap-2 text-lg font-medium">
+              <Users className="h-5 w-5 text-blue-600" />
+              Partner Compliance
+            </h3>
+            <div className="text-3xl font-bold text-center mt-3">{allPartners.length}</div>
+            <div className="flex justify-center items-center gap-4 mt-2">
+              <div className="text-center">
                 <span className="text-green-600 font-bold text-2xl">{compliantPartners.length}</span>
                 <span className="text-xs block">compliant</span>
               </div>
-              <div>
+              <div className="text-center">
                 <span className="text-red-600 font-bold text-2xl">{nonCompliantPartners.length}</span>
                 <span className="text-xs block">nicht compliant</span>
               </div>
             </div>
-          }
-          value={allPartners.length}
-          icon={<Users className="h-5 w-5" />}
-          colorClass="bg-blue-600 text-white"
-          actionButton={<Button variant="secondary" size="sm" className="mt-2 w-full">Anzeigen</Button>}
-        />
+            <Button variant="default" size="sm" className="mt-4 w-full bg-[#005B41] hover:bg-[#005B41]/90">
+              Anzeigen
+            </Button>
+          </div>
+        </div>
         <StatCard
           title="Gesamt Dokumente"
           value={documentStats.total}
