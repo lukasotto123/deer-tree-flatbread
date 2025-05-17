@@ -1,3 +1,4 @@
+
 import { Link, Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -22,9 +23,10 @@ const AppLayout = ({ userMode, onModeChange }: AppLayoutProps) => {
     { name: "Anfragen", path: "/requests" }
   ];
   
-  // For lieferant view, we'll only keep the main navigation in the Tabs component
+  // For lieferant view, add Anfragen to the navigation links
   const lieferantNavLinks = [
-    { name: "Dashboard", path: "/" }
+    { name: "Dashboard", path: "/" },
+    { name: "Anfragen", path: "/requests" }
   ];
   
   const navigationLinks = userMode === "kunde" ? kundeNavLinks : lieferantNavLinks;

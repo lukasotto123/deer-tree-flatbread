@@ -5,6 +5,7 @@ import ExpiringDocumentsTable from "./ExpiringDocumentsTable";
 import DocumentsOverview from "./DocumentsOverview";
 import { documents, providers } from "@/data/dummy-data";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const documentStats = {
@@ -57,8 +58,8 @@ const Dashboard = () => {
                 <span className="text-xs block">nicht compliant</span>
               </div>
             </div>
-            <Button variant="default" size="sm" className="mt-4 w-full bg-[#005B41] hover:bg-[#005B41]/90">
-              Anzeigen
+            <Button variant="default" size="sm" className="mt-4 w-full bg-[#005B41] hover:bg-[#005B41]/90" asChild>
+              <Link to="/providers">Anzeigen</Link>
             </Button>
           </div>
         </div>
