@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 interface StatCardProps {
   title: string;
   value: string | number;
-  description?: string;
+  description?: string | React.ReactNode;
   icon?: React.ReactNode;
   colorClass?: string;
   actionButton?: React.ReactNode;
-  valueColorClass?: string; // New prop for value color
+  valueColorClass?: string;
 }
 
 const StatCard = ({
@@ -18,7 +18,7 @@ const StatCard = ({
   icon,
   colorClass = "bg-primary text-white",
   actionButton,
-  valueColorClass = "" // Default to no custom color
+  valueColorClass = ""
 }: StatCardProps) => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
@@ -27,7 +27,7 @@ const StatCard = ({
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <h3 className={cn("text-2xl font-bold mt-1", valueColorClass)}>{value}</h3>
           {description && (
-            <p className="text-sm text-muted-foreground mt-1">{description}</p>
+            <div className="text-sm text-muted-foreground mt-1">{description}</div>
           )}
         </div>
         {icon && (
