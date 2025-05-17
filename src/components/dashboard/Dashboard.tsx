@@ -14,14 +14,17 @@ const Dashboard = () => {
     expired: documents.filter(doc => doc.status === 'expired').length,
   };
 
-  // Calculate compliant and non-compliant Nachunternehmer
+  // Calculate compliant and non-compliant Partners
   const nachunternehmer = providers.filter(p => p.type === 'nachunternehmer');
-  const compliantNachunternehmer = nachunternehmer.filter(p => 
+  const personaldienstleister = providers.filter(p => p.type === 'personaldienstleister');
+  const allPartners = [...nachunternehmer, ...personaldienstleister];
+  
+  const compliantPartners = allPartners.filter(p => 
     p.documentsCount.expired === 0 && 
     p.documentsCount.missing === 0 && 
     p.status === 'active'
   );
-  const nonCompliantNachunternehmer = nachunternehmer.filter(p => 
+  const nonCompliantPartners = allPartners.filter(p => 
     p.documentsCount.expired > 0 || 
     p.documentsCount.missing > 0 || 
     p.status !== 'active'
@@ -38,9 +41,20 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Nachunternehmer Compliance"
-          description={`${compliantNachunternehmer.length} compliant, ${nonCompliantNachunternehmer.length} nicht compliant`}
-          value={nachunternehmer.length}
+          title="Partner Compliance"
+          description={
+            <div className="flex justify-between items-center mt-2">
+              <div>
+                <span className="text-green-600 font-bold text-xl">{compliantPartners.length}</span>
+                <span className="text-xs block">compliant</span>
+              </div>
+              <div>
+                <span className="text-red-600 font-bold text-xl">{nonCompliantPartners.length}</span>
+                <span className="text-xs block">nicht compliant</span>
+              </div>
+            </div>
+          }
+          value={allPartners.length}
           icon={<Users className="h-5 w-5" />}
           colorClass="bg-blue-600 text-white"
           actionButton={<Button variant="secondary" size="sm" className="mt-2 w-full">Anzeigen</Button>}

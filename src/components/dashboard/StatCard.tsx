@@ -8,6 +8,7 @@ interface StatCardProps {
   icon?: React.ReactNode;
   colorClass?: string;
   actionButton?: React.ReactNode;
+  valueColorClass?: string; // New prop for value color
 }
 
 const StatCard = ({
@@ -16,14 +17,15 @@ const StatCard = ({
   description,
   icon,
   colorClass = "bg-primary text-white",
-  actionButton
+  actionButton,
+  valueColorClass = "" // Default to no custom color
 }: StatCardProps) => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <h3 className="text-2xl font-bold mt-1">{value}</h3>
+          <h3 className={cn("text-2xl font-bold mt-1", valueColorClass)}>{value}</h3>
           {description && (
             <p className="text-sm text-muted-foreground mt-1">{description}</p>
           )}
