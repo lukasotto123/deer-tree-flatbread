@@ -1,4 +1,3 @@
-
 import { FileText, AlertTriangle, Clock, CheckCircle, Building, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -51,11 +50,11 @@ const Index = () => {
           description={
             <div className="flex justify-between items-center mt-2">
               <div>
-                <span className="text-green-600 font-bold text-xl">{compliantPartners.length}</span>
+                <span className="text-green-600 font-bold text-2xl">{compliantPartners.length}</span>
                 <span className="text-xs block">compliant</span>
               </div>
               <div>
-                <span className="text-red-600 font-bold text-xl">{nonCompliantPartners.length}</span>
+                <span className="text-red-600 font-bold text-2xl">{nonCompliantPartners.length}</span>
                 <span className="text-xs block">nicht compliant</span>
               </div>
             </div>

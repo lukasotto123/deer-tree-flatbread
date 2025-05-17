@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar, Upload } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import DocumentRequest from "@/components/documents/DocumentRequest";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const RequestView = () => {
   // Group documents by provider for weekly requests
@@ -129,14 +130,26 @@ const RequestView = () => {
                 {group.documents.map((doc, idx) => (
                   <li key={idx} className="flex items-center justify-between">
                     <span>{doc}</span>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-xs"
-                      onClick={() => toast.success(`Einzelne Anfrage für "${doc}" wurde gesendet`)}
-                    >
-                      Einzeln anfragen
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="text-xs"
+                        >
+                          <Upload className="h-3 w-3 mr-1" />
+                          Hochladen
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Dokument hochladen</DialogTitle>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <p>Upload-Formular für "{doc}"</p>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </li>
                 ))}
               </ul>

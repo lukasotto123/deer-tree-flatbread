@@ -1,4 +1,3 @@
-
 import { Link, Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -6,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
 
 interface AppLayoutProps {
   userMode: "kunde" | "lieferant";
@@ -24,9 +22,9 @@ const AppLayout = ({ userMode, onModeChange }: AppLayoutProps) => {
     { name: "Anfragen", path: "/requests" }
   ];
   
+  // For lieferant view, we'll only keep the main navigation in the Tabs component
   const lieferantNavLinks = [
-    { name: "Dashboard", path: "/" },
-    { name: "Anfragen", path: "/requests" }
+    { name: "Dashboard", path: "/" }
   ];
   
   const navigationLinks = userMode === "kunde" ? kundeNavLinks : lieferantNavLinks;

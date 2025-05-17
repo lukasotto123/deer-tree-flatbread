@@ -45,11 +45,11 @@ const Dashboard = () => {
           description={
             <div className="flex justify-between items-center mt-2">
               <div>
-                <span className="text-green-600 font-bold text-xl">{compliantPartners.length}</span>
+                <span className="text-green-600 font-bold text-2xl">{compliantPartners.length}</span>
                 <span className="text-xs block">compliant</span>
               </div>
               <div>
-                <span className="text-red-600 font-bold text-xl">{nonCompliantPartners.length}</span>
+                <span className="text-red-600 font-bold text-2xl">{nonCompliantPartners.length}</span>
                 <span className="text-xs block">nicht compliant</span>
               </div>
             </div>

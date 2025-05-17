@@ -19,11 +19,49 @@ const documentCategories = [
   "Kundenspezifisch"
 ];
 
-// Mock customers for vendor-specific documents
+// Named employees for better identification
+const employees = [
+  { id: "employee-1", name: "Max Müller", position: "Bauarbeiter", valid: 3, expiring: 1, expired: 0 },
+  { id: "employee-2", name: "Anna Schmidt", position: "Elektrikerin", valid: 2, expiring: 0, expired: 1 },
+  { id: "employee-3", name: "Klaus Weber", position: "Vorarbeiter", valid: 4, expiring: 0, expired: 0 },
+  { id: "employee-4", name: "Sarah Fischer", position: "Ingenieurin", valid: 1, expiring: 2, expired: 1 }
+];
+
+// Mock customers for vendor-specific documents with required document types
 const customers = [
-  { id: "customer-1", name: "Bauunternehmen Müller GmbH" },
-  { id: "customer-2", name: "Schmidt Immobilien AG" },
-  { id: "customer-3", name: "Technische Gebäudeausstattung Berlin" }
+  { 
+    id: "customer-1", 
+    name: "Bauunternehmen Müller GmbH",
+    documents: [
+      { name: "Meldung an die Generalzolldirektion nach § 18 AEntG", status: "valid" },
+      { name: "Werkverträge", status: "expiring" },
+      { name: "Auftragsverarbeitungsvereinbarung", status: "expired" },
+      { name: "Onboarding Selbstauskunft", status: "valid" },
+      { name: "Erklärung Subunternehmer", status: "valid" }
+    ]
+  },
+  { 
+    id: "customer-2", 
+    name: "Schmidt Immobilien AG",
+    documents: [
+      { name: "Meldung an die Generalzolldirektion nach § 18 AEntG", status: "valid" },
+      { name: "Werkverträge", status: "valid" },
+      { name: "Auftragsverarbeitungsvereinbarung", status: "valid" },
+      { name: "Onboarding Selbstauskunft", status: "expired" },
+      { name: "Erklärung Subunternehmer", status: "expiring" }
+    ]
+  },
+  { 
+    id: "customer-3", 
+    name: "Technische Gebäudeausstattung Berlin",
+    documents: [
+      { name: "Meldung an die Generalzolldirektion nach § 18 AEntG", status: "expired" },
+      { name: "Werkverträge", status: "expired" },
+      { name: "Auftragsverarbeitungsvereinbarung", status: "valid" },
+      { name: "Onboarding Selbstauskunft", status: "valid" },
+      { name: "Erklärung Subunternehmer", status: "valid" }
+    ]
+  }
 ];
 
 // Group documents by category
@@ -39,22 +77,6 @@ const groupDocumentsByCategory = () => {
   
   return categorized;
 };
-
-// Group employee documents
-const employeeDocuments = documents.filter(doc => doc.employeeId);
-const employees = Array.from(new Set(employeeDocuments.map(doc => doc.employeeId)))
-  .filter(Boolean)
-  .map(id => {
-    const docs = employeeDocuments.filter(doc => doc.employeeId === id);
-    return {
-      id,
-      name: `Mitarbeiter ${id}`,
-      documents: docs,
-      valid: docs.filter(d => d.status === 'valid').length,
-      expiring: docs.filter(d => d.status === 'expiring').length,
-      expired: docs.filter(d => d.status === 'expired').length
-    };
-  });
 
 const VendorDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -132,7 +154,7 @@ const VendorDashboard = () => {
               const expiredDocs = docs.filter(d => d.status === 'expired').length;
               
               // Skip empty categories
-              if (docs.length === 0) return null;
+              if (docs.length === 0 && category !== "Kundenspezifisch") return null;
               
               return (
                 <Accordion type="single" collapsible key={category}>
@@ -171,7 +193,6 @@ const VendorDashboard = () => {
                               <DialogTitle>Neues Dokument hochladen</DialogTitle>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
-                              {/* Upload form would go here */}
                               <p>Upload-Formular für {category}</p>
                               <p className="text-sm text-muted-foreground">
                                 Wählen Sie aus, ob dieses Dokument für das gesamte Unternehmen oder 
@@ -232,7 +253,6 @@ const VendorDashboard = () => {
                     <DialogTitle>Neuen Mitarbeiter anlegen</DialogTitle>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
-                    {/* New employee form would go here */}
                     <p>Formular für neuen Mitarbeiter und Unternehmenszuweisung</p>
                   </div>
                 </DialogContent>
@@ -246,6 +266,7 @@ const VendorDashboard = () => {
                     <CardTitle>{employee.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
+                    <p className="text-muted-foreground text-sm mb-2">{employee.position}</p>
                     <div className="flex gap-3 mb-3">
                       <Badge variant="outline" className="bg-green-50">
                         <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
@@ -260,9 +281,77 @@ const VendorDashboard = () => {
                         {employee.expired}
                       </Badge>
                     </div>
-                    <Button size="sm" variant="outline" className="w-full">
-                      Dokumente verwalten
-                    </Button>
+                    <div className="space-y-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button size="sm" variant="outline" className="w-full">
+                            Dokumente verwalten
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl">
+                          <DialogHeader>
+                            <DialogTitle>{employee.name} - Dokumente</DialogTitle>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <div className="space-y-2">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <h4 className="font-medium mb-1">Personendaten</h4>
+                                  <div className="space-y-2">
+                                    <div className="p-2 border rounded">
+                                      <p className="text-sm font-medium">Name</p>
+                                      <p>{employee.name}</p>
+                                    </div>
+                                    <div className="p-2 border rounded">
+                                      <p className="text-sm font-medium">Position</p>
+                                      <p>{employee.position}</p>
+                                    </div>
+                                    <div className="p-2 border rounded">
+                                      <p className="text-sm font-medium">Personalausweis</p>
+                                      <div className="flex justify-between">
+                                        <p className="text-muted-foreground">Gültig bis 12.06.2027</p>
+                                        <Button size="sm" variant="outline">Anzeigen</Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                  <h4 className="font-medium mb-1">Dokumente</h4>
+                                  <div className="space-y-2">
+                                    {["A1-Bescheinigung", "Arbeitsvertrag", "Qualifikationsnachweise"].map((doc, i) => (
+                                      <div key={i} className="p-2 border rounded flex justify-between items-center">
+                                        <div className="flex items-center">
+                                          {i === 0 ? <CheckCircle className="h-4 w-4 text-green-600 mr-2" /> : 
+                                           i === 1 ? <Clock className="h-4 w-4 text-amber-500 mr-2" /> :
+                                           <AlertTriangle className="h-4 w-4 text-red-500 mr-2" />}
+                                          <span>{doc}</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                          <Button variant="ghost" size="sm">
+                                            <Upload className="h-3 w-3 mr-1" />
+                                            Hochladen
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <h4 className="font-medium my-2">Einsätze</h4>
+                                <div className="border rounded p-2">
+                                  <div className="flex justify-between">
+                                    <p>Bauunternehmen Müller GmbH</p>
+                                    <p className="text-muted-foreground">01.01.2025 - 30.06.2025</p>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">Projekt: Neubau Fachmarktzentrum</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -277,7 +366,23 @@ const VendorDashboard = () => {
               <Accordion type="single" collapsible key={customer.id}>
                 <AccordionItem value={customer.id}>
                   <AccordionTrigger className="hover:bg-slate-50 px-4 py-2 rounded-md">
-                    {customer.name}
+                    <div className="flex justify-between items-center w-full pr-4">
+                      <span>{customer.name}</span>
+                      <div className="flex gap-3">
+                        <Badge variant="outline" className="bg-green-50">
+                          <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
+                          {customer.documents.filter(d => d.status === "valid").length}
+                        </Badge>
+                        <Badge variant="outline" className="bg-amber-50">
+                          <Clock className="h-4 w-4 text-amber-500 mr-1" />
+                          {customer.documents.filter(d => d.status === "expiring").length}
+                        </Badge>
+                        <Badge variant="outline" className="bg-red-50">
+                          <AlertTriangle className="h-4 w-4 text-red-500 mr-1" />
+                          {customer.documents.filter(d => d.status === "expired").length}
+                        </Badge>
+                      </div>
+                    </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pt-2">
                     <div className="mb-3 flex justify-between">
@@ -287,11 +392,24 @@ const VendorDashboard = () => {
                         Dokument hochladen
                       </Button>
                     </div>
-                    <div className="p-4 text-center text-muted-foreground">
-                      <p>Keine spezifischen Dokumente für diesen Kunden vorhanden.</p>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        Dokument hochladen
-                      </Button>
+                    <div className="space-y-2">
+                      {customer.documents.map((doc, i) => (
+                        <div key={i} className="flex items-center justify-between p-2 border rounded-md">
+                          <div className="flex items-center">
+                            {doc.status === 'valid' && <CheckCircle className="h-4 w-4 text-green-600 mr-2" />}
+                            {doc.status === 'expiring' && <Clock className="h-4 w-4 text-amber-500 mr-2" />}
+                            {doc.status === 'expired' && <AlertTriangle className="h-4 w-4 text-red-500 mr-2" />}
+                            <span>{doc.name}</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm">Anzeigen</Button>
+                            <Button variant="ghost" size="sm">
+                              <Upload className="h-3 w-3 mr-1" />
+                              Hochladen
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -328,7 +446,7 @@ const VendorDashboard = () => {
                           <span>{docName}</span>
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-5 text-xs">
+                              <Button variant="secondary" size="sm" className="h-6 text-xs">
                                 <Upload className="h-3 w-3 mr-1" />
                                 Hochladen
                               </Button>
@@ -346,8 +464,7 @@ const VendorDashboard = () => {
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm">Später erledigen</Button>
+                  <div className="flex justify-end">
                     <Button size="sm">Alle hochladen</Button>
                   </div>
                 </div>
