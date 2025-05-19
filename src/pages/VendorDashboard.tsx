@@ -162,36 +162,52 @@ const VendorDashboard = () => {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {employees.map((employee) => (
-              <Card key={employee.id} className="bg-white">
-                <CardContent className="pt-6">
-                  <div className="flex flex-col items-center mb-4">
-                    <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xl font-bold mb-2">
-                      {employee.name.split(' ').map(n => n[0]).join('')}
+              <Card key={employee.id} className="overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">{employee.name}</h3>
+                      <p className="text-sm text-muted-foreground">{employee.position}</p>
                     </div>
-                    <h3 className="font-medium">{employee.name}</h3>
-                    <p className="text-sm text-muted-foreground">{employee.position}</p>
+                    <div className="flex items-center gap-1">
+                      {employee.documents.missing > 0 ? (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-medium">
+                          Fehlend
+                        </span>
+                      ) : employee.documents.expiring > 0 ? (
+                        <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full font-medium">
+                          Ablaufend
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                          Gültig
+                        </span>
+                      )}
+                    </div>
                   </div>
                   
-                  <div className="flex justify-center gap-3 mb-3">
-                    <div className="text-center">
-                      <span className="text-green-600 font-bold">{employee.documents.valid}</span>
-                      <span className="text-xs block">Gültig</span>
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <div className="flex items-center gap-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span>{employee.documents.valid}</span>
                     </div>
-                    <div className="text-center">
-                      <span className="text-amber-500 font-bold">{employee.documents.expiring}</span>
-                      <span className="text-xs block">Ablaufend</span>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-amber-500" />
+                      <span>{employee.documents.expiring}</span>
                     </div>
-                    <div className="text-center">
-                      <span className="text-red-600 font-bold">{employee.documents.missing}</span>
-                      <span className="text-xs block">Fehlend</span>
+                    <div className="flex items-center gap-1">
+                      <AlertTriangle className="h-4 w-4 text-red-600" />
+                      <span>{employee.documents.missing}</span>
                     </div>
                   </div>
                   
-                  <Button variant="outline" size="sm" className="w-full" asChild>
-                    <Link to={`/person/vendor-1/${employee.id}`}>Verwalten</Link>
-                  </Button>
+                  <div className="flex justify-end">
+                    <Link to={`/person/${employee.id}`}>
+                      <Button variant="outline" size="sm">Details</Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             ))}

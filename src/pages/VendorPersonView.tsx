@@ -1,29 +1,31 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { FileText, Eye, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { FileText, Eye, AlertTriangle, CheckCircle, Clock, Building } from "lucide-react";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const PersonView = () => {
-  const { providerId, employeeId } = useParams<{ providerId: string; employeeId: string }>();
+const VendorPersonView = () => {
+  const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [assignedCompany, setAssignedCompany] = useState<string>("company-1");
   
   const employee = employees.find(e => e.id === employeeId);
-  const provider = providers.find(p => p.id === providerId);
+  const availableCompanies = providers.filter(p => p.type === "nachunternehmer");
   
-  if (!employee || !provider) {
+  if (!employee) {
     return <div>Mitarbeiter nicht gefunden</div>;
   }
-  
+
   // Function to determine if a document should be missing based on employee and document type
   const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
     // Mark some documents as missing for specific employees
@@ -70,7 +72,7 @@ const PersonView = () => {
     citizenship = "Japan";
   }
 
-  // Tatsächliche Dokumente des Mitarbeiters
+  // Actual documents for this employee
   const employeeDocuments = documents.filter(doc => doc.employeeId === employeeId);
 
   // Determine the worst document status for the employee
@@ -80,11 +82,9 @@ const PersonView = () => {
   
   const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
   
-  // Alle Dokumenttypen, die für Mitarbeiter dieses Dienstleisters relevant sein könnten
+  // All document types that might be relevant for employees of this provider
   const relevantDocTypes = documentTypes.filter(dt => {
-    // Filter by provider type
-    if (dt.providerType !== provider.type) return false;
-    
+    // Filter by provider type - for vendor app, show all types
     // Filter by employee relevance
     if (!dt.isPerEmployee) return false;
     
@@ -97,6 +97,12 @@ const PersonView = () => {
   // Handle document selection for showing history
   const handleShowDocumentHistory = (docId: string) => {
     setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
+  };
+
+  // Handle company assignment
+  const handleCompanyAssignment = (company: string) => {
+    setAssignedCompany(company);
+    toast.success(`${employeeName} wurde erfolgreich zum Unternehmen zugewiesen`);
   };
 
   // Function to get randomly distributed status (used for existing documents)
@@ -115,8 +121,8 @@ const PersonView = () => {
           <StatusBadge status={worstStatus} />
         </div>
         <div className="flex gap-2">
-          <Link to={`/provider/${providerId}`}>
-            <Button variant="outline">Zurück zum Unternehmen</Button>
+          <Link to="/">
+            <Button variant="outline">Zurück zur Übersicht</Button>
           </Link>
         </div>
       </div>
@@ -136,12 +142,24 @@ const PersonView = () => {
               <p>{citizenship}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Unternehmen</p>
-              <p>{provider.name}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Unternehmenstyp</p>
-              <p>{provider.type === "personaldienstleister" ? "Personaldienstleister" : "Subunternehmer"}</p>
+              <p className="text-sm text-muted-foreground">Zugewiesenes Unternehmen</p>
+              <div className="flex items-center gap-2 mt-1">
+                <Select value={assignedCompany} onValueChange={handleCompanyAssignment}>
+                  <SelectTrigger className="w-full max-w-xs">
+                    <SelectValue placeholder="Unternehmen auswählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCompanies.map(company => (
+                      <SelectItem key={company.id} value={company.id}>
+                        <div className="flex items-center gap-2">
+                          <Building className="h-4 w-4" />
+                          <span>{company.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>
@@ -156,9 +174,7 @@ const PersonView = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Dokumente</CardTitle>
-          <Link to={`/submission-review/${providerId}/new?employeeId=${employeeId}`}>
-            <Button size="sm">Dokument hochladen</Button>
-          </Link>
+          <Button size="sm">Dokument hochladen</Button>
         </CardHeader>
         <CardContent>
           <Table>
@@ -223,7 +239,7 @@ const PersonView = () => {
                         <div className="flex items-center space-x-2">
                           <Switch 
                             id={`relevance-${docType.id}`} 
-                            checked={isRequired}
+                            checked={isRequired} 
                           />
                           <Label htmlFor={`relevance-${docType.id}`}>
                             {isA1Doc && citizenship !== "Deutschland" 
@@ -257,17 +273,9 @@ const PersonView = () => {
                           
                           {/* Upload/Check button for non-valid or missing documents */}
                           {(isMissing || (doc && randomStatus !== "valid")) && (
-                            isMissing ? (
-                              <Button variant="outline" size="sm">
-                                Hochladen
-                              </Button>
-                            ) : (
-                              <Link to={`/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`}>
-                                <Button variant="outline" size="sm">
-                                  Prüfen
-                                </Button>
-                              </Link>
-                            )
+                            <Button variant="outline" size="sm">
+                              {isMissing ? "Hochladen" : "Prüfen"}
+                            </Button>
                           )}
                         </div>
                       </TableCell>
@@ -292,4 +300,4 @@ const PersonView = () => {
   );
 };
 
-export default PersonView;
+export default VendorPersonView;
