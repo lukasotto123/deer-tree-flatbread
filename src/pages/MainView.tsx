@@ -115,12 +115,12 @@ const MainView = () => {
               <h3 className="text-lg font-medium text-center">Nachunternehmer Compliance</h3>
               <div className="flex justify-center items-center gap-4 mt-3">
                 <div className="text-center">
-                  <span className="text-green-600 font-bold text-2xl">{compliantNachunternehmer.length}</span>
-                  <span className="text-xs block">compliant</span>
+                  <span className="text-green-600 font-bold text-4xl">{compliantNachunternehmer.length}</span>
+                  <span className="text-sm block text-muted-foreground mt-1">Compliant</span>
                 </div>
                 <div className="text-center">
-                  <span className="text-red-600 font-bold text-2xl">{nonCompliantNachunternehmer.length}</span>
-                  <span className="text-xs block">nicht compliant</span>
+                  <span className="text-red-600 font-bold text-4xl">{nonCompliantNachunternehmer.length}</span>
+                  <span className="text-sm block text-muted-foreground mt-1">Nicht Compliant</span>
                 </div>
               </div>
             </div>
