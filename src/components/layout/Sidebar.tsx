@@ -23,7 +23,7 @@ const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
   };
   
   return (
-    <div className="w-[26rem] h-screen bg-[#002626] text-white flex flex-col fixed">
+    <div className="w-64 h-screen bg-[#002626] text-white flex flex-col fixed">
       <div className="p-6 border-b border-[#00414141]">
         <Link to="/" className="flex items-center gap-2">
           <img src="/lovable-uploads/6690430b-aa6f-4db0-b6fc-7116c43b37f2.png" alt="Pactos Logo" className="h-8 w-8" />
