@@ -1,3 +1,4 @@
+
 import { Link, Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -33,7 +34,7 @@ const AppLayout = ({ userMode, onModeChange }: AppLayoutProps) => {
   return (
     <div className="min-h-screen bg-background flex">
       <Sidebar activeMode={userMode} onModeChange={onModeChange} />
-      <div className="flex-1 ml-[76.8px]">
+      <div className="flex-1 ml-[240px]">
         <div className="flex flex-col min-h-screen">
           <Header mode={userMode} />
           <div className="py-1 px-6 border-b border-border bg-white">
