@@ -112,14 +112,17 @@ const MainView = () => {
         <Card>
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
-              <div className="flex justify-center items-center mb-2">
-                <Users className="h-5 w-5 text-blue-600 mr-2" />
-                <h3 className="text-lg font-medium">Nachunternehmer Compliance</h3>
+              <h3 className="text-lg font-medium text-center">Nachunternehmer Compliance</h3>
+              <div className="flex justify-center items-center gap-4 mt-3">
+                <div className="text-center">
+                  <span className="text-green-600 font-bold text-2xl">{compliantNachunternehmer.length}</span>
+                  <span className="text-xs block">compliant</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-red-600 font-bold text-2xl">{nonCompliantNachunternehmer.length}</span>
+                  <span className="text-xs block">nicht compliant</span>
+                </div>
               </div>
-              <p className="text-4xl font-bold">{nachunternehmer.length}</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                {compliantNachunternehmer.length} compliant, {nonCompliantNachunternehmer.length} nicht compliant
-              </p>
             </div>
             <div className="mt-6">
               <Button className="w-full">
