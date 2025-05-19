@@ -5,8 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Clock, CheckCircle, FileText, Euro, Plus, ChevronDown, ChevronUp, Users } from "lucide-react";
-import { documents, documentTypes } from "@/data/dummy-data";
-import StatusBadge from "@/components/ui/StatusBadge";
+import { documents } from "@/data/dummy-data";
 
 const VendorDashboard = () => {
   // Fake employees data
@@ -24,7 +23,7 @@ const VendorDashboard = () => {
     { id: "customer-3", name: "Bau & Technik Fischer KG" },
   ];
 
-  // Document categories for vendor - using the same structure as ProviderView
+  // Document categories for vendor
   const documentCategories = [
     {
       title: "Sozial- & Versicherungsnachweise",
@@ -54,7 +53,9 @@ const VendorDashboard = () => {
     {
       title: "Bonitäts- & Risikoprüfung",
       documents: [
-        { id: "doc-11", name: "Creditreform-Selbstauskunft über Liquidität", status: "valid", expiryDate: "2025-09-30" }
+        { id: "doc-11", name: "Creditreform-Selbstauskunft über Liquidität", status: "valid", expiryDate: "2025-09-30" },
+        { id: "doc-12", name: "Bilanz des letzten Geschäftsjahres", status: "expired", expiryDate: "2025-03-31" },
+        { id: "doc-13", name: "Bankauskunft", status: "expiring", expiryDate: "2025-06-30" }
       ]
     }
   ];
