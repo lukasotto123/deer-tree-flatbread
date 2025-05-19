@@ -1,4 +1,3 @@
-
 import { FileText, AlertTriangle, Clock, CheckCircle, Building, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -48,12 +47,10 @@ const Index = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow">
           <div className="p-6">
-            <h3 className="flex items-center gap-2 text-lg font-medium">
-              <Users className="h-5 w-5 text-blue-600" />
+            <h3 className="text-lg font-medium text-center">
               Partner Compliance
             </h3>
-            <div className="text-3xl font-bold text-center mt-3">{allPartners.length}</div>
-            <div className="flex justify-center items-center gap-4 mt-2">
+            <div className="flex justify-center items-center gap-4 mt-3">
               <div className="text-center">
                 <span className="text-green-600 font-bold text-2xl">{compliantPartners.length}</span>
                 <span className="text-xs block">compliant</span>
