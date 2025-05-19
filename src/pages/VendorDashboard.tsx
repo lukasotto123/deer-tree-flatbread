@@ -1,8 +1,8 @@
 
-import React, { useState, useEffect, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Clock, CheckCircle, FileText, Euro, Plus, ChevronDown, ChevronUp, Users } from "lucide-react";
 import { documents, documentTypes } from "@/data/dummy-data";
@@ -24,41 +24,37 @@ const VendorDashboard = () => {
     { id: "customer-3", name: "Bau & Technik Fischer KG" },
   ];
 
-  // Define document categories matching the ProviderView categorization
+  // Document categories for vendor - using the same structure as ProviderView
   const documentCategories = [
     {
       title: "Sozial- & Versicherungsnachweise",
       documents: [
-        { id: "doc-1", name: "Unbedenklichkeitsbescheinigung Berufsgenossenschaft", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-2", name: "Unbedenklichkeitsbescheinigung der SOKA Bau", status: "expiring", expiryDate: "2025-06-30" },
-        { id: "doc-3", name: "Betriebshaftpflichtversicherung", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-1", name: "Unbedenklichkeitsbescheinigung Finanzamt", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-2", name: "Unbedenklichkeitsbescheinigung Berufsgenossenschaft", status: "expiring", expiryDate: "2025-06-30" },
+        { id: "doc-3", name: "Unbedenklichkeitsbescheinigung Krankenkasse", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-4", name: "Unbedenklichkeitsbescheinigung Rentenversicherung", status: "expired", expiryDate: "2025-03-31" }
       ]
     },
     {
       title: "Arbeits- & Mindestlohn-compliance",
       documents: [
-        { id: "doc-5", name: "Bescheinigung für Tätigkeiten im Baugewerbe § 13b UStG", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-6", name: "Mitteilung des Steuerberaters (Mitarbeiter u. Mindestlöhne)", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-7", name: "Eidesstattliche Erklärung zur Zahlung von Mindestlöhnen", status: "expiring", expiryDate: "2025-06-15" }
+        { id: "doc-5", name: "Eidesstattliche Erklärung zur Zahlung von Mindestlöhnen", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-6", name: "AEntG-Bestätigung", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-7", name: "Arbeitsverträge", status: "expiring", expiryDate: "2025-06-15" }
       ]
     },
     {
       title: "Behördliche & steuerliche Nachweise",
       documents: [
-        { id: "doc-8", name: "Testergebnis Scheinselbstständigkeit", status: "valid", expiryDate: "2026-01-31" },
-        { id: "doc-9", name: "Freistellungsbescheinigung der Finanzverwaltung § 48b EStG", status: "valid", expiryDate: null },
-        { id: "doc-10", name: "Gewerbeanmeldung", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-11", name: "Unbedenklichkeitsbescheinigung Finanzamt", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-12", name: "Handelsregisterauszug", status: "valid", expiryDate: "2026-01-31" },
-        { id: "doc-13", name: "Handwerkskarte bzw. Eintragung in die Handwerksrolle", status: "valid", expiryDate: "2025-11-30" },
-        { id: "doc-14", name: "Unternehmerbescheinigung vom Finanzamt", status: "expiring", expiryDate: "2025-06-15" },
-        { id: "doc-15", name: "Gewerbezentralregisterauszug", status: "valid", expiryDate: "2025-10-31" }
+        { id: "doc-8", name: "Handelsregisterauszug", status: "valid", expiryDate: "2026-01-31" },
+        { id: "doc-9", name: "Gewerbeanmeldung", status: "valid", expiryDate: null },
+        { id: "doc-10", name: "Freistellungsbescheinigung § 48b EStG", status: "valid", expiryDate: "2025-12-31" }
       ]
     },
     {
       title: "Bonitäts- & Risikoprüfung",
       documents: [
-        { id: "doc-16", name: "Creditreform-Selbstauskunft über Liquidität", status: "valid", expiryDate: "2025-09-30" }
+        { id: "doc-11", name: "Creditreform-Selbstauskunft über Liquidität", status: "valid", expiryDate: "2025-09-30" }
       ]
     }
   ];
@@ -207,7 +203,7 @@ const VendorDashboard = () => {
                   </div>
                   
                   <div className="flex justify-end">
-                    <Link to={`/vendor-person/${employee.id}`}>
+                    <Link to={`/person/${employee.id}`}>
                       <Button variant="outline" size="sm">Details</Button>
                     </Link>
                   </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,52 +69,21 @@ const ProviderView = () => {
     );
   };
 
-  // Custom document categories with specific documents according to requirements
-  const customDocumentCategories = [
-    {
-      id: "cat-1",
-      category: "sozial_versicherungsnachweise",
-      label: "Sozial- & Versicherungsnachweise",
-      documents: [
-        { id: "doc-1", name: "Unbedenklichkeitsbescheinigung Berufsgenossenschaft", type: "doc-type-1" },
-        { id: "doc-2", name: "Unbedenklichkeitsbescheinigung der SOKA Bau", type: "doc-type-2" },
-        { id: "doc-3", name: "Betriebshaftpflichtversicherung", type: "doc-type-3" }
-      ]
-    },
-    {
-      id: "cat-2",
-      category: "arbeits_mindestlohn_compliance", 
-      label: "Arbeits- & Mindestlohn-Compliance",
-      documents: [
-        { id: "doc-4", name: "Bescheinigung für Tätigkeiten im Baugewerbe § 13b UStG", type: "doc-type-4" },
-        { id: "doc-5", name: "Mitteilung des Steuerberaters (Mitarbeiter u. Mindestlöhne)", type: "doc-type-5" },
-        { id: "doc-6", name: "Eidesstattliche Erklärung zur Zahlung von Mindestlöhnen", type: "doc-type-6" }
-      ]
-    },
-    {
-      id: "cat-3",
-      category: "behördliche_steuerliche_nachweise",
-      label: "Behördliche & steuerliche Nachweise", 
-      documents: [
-        { id: "doc-7", name: "Testergebnis Scheinselbstständigkeit", type: "doc-type-7" },
-        { id: "doc-8", name: "Freistellungsbescheinigung der Finanzverwaltung § 48b EStG", type: "doc-type-8" },
-        { id: "doc-9", name: "Gewerbeanmeldung", type: "doc-type-9" },
-        { id: "doc-10", name: "Unbedenklichkeitsbescheinigung Finanzamt", type: "doc-type-10" },
-        { id: "doc-11", name: "Handelsregisterauszug", type: "doc-type-11" },
-        { id: "doc-12", name: "Handwerkskarte bzw. Eintragung in die Handwerksrolle (IHK, wenn nicht Handwerk)", type: "doc-type-12" },
-        { id: "doc-13", name: "Unternehmerbescheinigung vom Finanzamt", type: "doc-type-13" },
-        { id: "doc-14", name: "Gewerbezentralregisterauszug", type: "doc-type-14" }
-      ]
-    },
-    {
-      id: "cat-4",
-      category: "bonitäts_risikoprüfung",
-      label: "Bonitäts- & Risikoprüfung",
-      documents: [
-        { id: "doc-15", name: "Creditreform-Selbstauskunft über Liquidität", type: "doc-type-15" }
-      ]
+  // Group document types by category
+  const docTypesByCategory = relevantDocTypes.reduce((acc, docType) => {
+    const category = docType.category || 'kundenspezifisch';
+    const categoryLabel = docType.categoryLabel || 'Kundenspezifisch';
+    
+    if (!acc[category]) {
+      acc[category] = {
+        label: categoryLabel,
+        docTypes: []
+      };
     }
-  ];
+    
+    acc[category].docTypes.push(docType);
+    return acc;
+  }, {} as Record<string, { label: string, docTypes: typeof relevantDocTypes }>);
 
   return (
     <div className="space-y-6">
@@ -274,9 +242,9 @@ const ProviderView = () => {
           <CardTitle>Unternehmensdokumente</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
-          {customDocumentCategories.map((category) => (
-            <div key={category.id}>
-              <h3 className="text-lg font-semibold mb-4">{category.label}</h3>
+          {Object.entries(docTypesByCategory).map(([category, { label, docTypes }]) => (
+            <div key={category}>
+              <h3 className="text-lg font-semibold mb-4">{label}</h3>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -290,10 +258,10 @@ const ProviderView = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {category.documents.map((docType) => {
+                  {docTypes.map((docType) => {
                     // Check if this document should be missing for this provider
-                    const forceMissing = shouldDocumentBeMissing(provider.id, docType.type);
-                    const doc = forceMissing ? null : providerDocuments.find(d => d.type === docType.type);
+                    const forceMissing = shouldDocumentBeMissing(provider.id, docType.id);
+                    const doc = forceMissing ? null : providerDocuments.find(d => d.type === docType.id);
                     
                     const randomStatus = getRandomStatus(); // Generate random status
                     const isRelevant = true; // Default to true, would come from API
