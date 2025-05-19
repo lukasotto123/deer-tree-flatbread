@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { FileText, Eye, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { FileText, Eye, AlertTriangle, CheckCircle, Clock, UserX, UserCheck } from "lucide-react";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
@@ -16,6 +16,7 @@ const PersonView = () => {
   const { providerId, employeeId } = useParams<{ providerId: string; employeeId: string }>();
   const navigate = useNavigate();
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState<boolean>(true); // Default to active
   
   const employee = employees.find(e => e.id === employeeId);
   const provider = providers.find(p => p.id === providerId);
@@ -23,6 +24,16 @@ const PersonView = () => {
   if (!employee || !provider) {
     return <div>Mitarbeiter nicht gefunden</div>;
   }
+
+  // Funktion zur Handhabung der Aktivierung/Deaktivierung
+  const handleToggleActivation = () => {
+    setIsActive(!isActive);
+    toast.success(
+      isActive 
+        ? `Mitarbeiter wurde deaktiviert` 
+        : `Mitarbeiter wurde aktiviert`
+    );
+  };
   
   // Function to determine if a document should be missing based on employee and document type
   const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
@@ -112,9 +123,26 @@ const PersonView = () => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold">{employeeName}</h1>
-          <StatusBadge status={worstStatus} />
+          <StatusBadge status={isActive ? worstStatus : "expired"} />
         </div>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={handleToggleActivation}
+          >
+            {isActive ? (
+              <>
+                <UserX className="h-5 w-5 text-red-600" />
+                Deaktivieren
+              </>
+            ) : (
+              <>
+                <UserCheck className="h-5 w-5 text-green-600" />
+                Aktivieren
+              </>
+            )}
+          </Button>
           <Link to={`/provider/${providerId}`}>
             <Button variant="outline">Zurück zum Unternehmen</Button>
           </Link>
@@ -145,19 +173,19 @@ const PersonView = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>
-              <span className="rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-800">
-                Aktiv
+              <span className={`rounded-full px-2 py-1 text-xs font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {isActive ? 'Aktiv' : 'Inaktiv'}
               </span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className={!isActive ? 'opacity-60' : ''}>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Dokumente</CardTitle>
           <Link to={`/submission-review/${providerId}/new?employeeId=${employeeId}`}>
-            <Button size="sm">Dokument hochladen</Button>
+            <Button size="sm" disabled={!isActive}>Dokument hochladen</Button>
           </Link>
         </CardHeader>
         <CardContent>
@@ -223,7 +251,8 @@ const PersonView = () => {
                         <div className="flex items-center space-x-2">
                           <Switch 
                             id={`relevance-${docType.id}`} 
-                            checked={isRequired}
+                            checked={isRequired} 
+                            disabled={!isActive}
                           />
                           <Label htmlFor={`relevance-${docType.id}`}>
                             {isA1Doc && citizenship !== "Deutschland" 
@@ -239,6 +268,7 @@ const PersonView = () => {
                             variant="outline" 
                             size="sm"
                             onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
+                            disabled={!isActive}
                           >
                             <FileText className="h-4 w-4 mr-1" />
                             Historie
@@ -249,6 +279,7 @@ const PersonView = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
+                              disabled={!isActive}
                             >
                               <Eye className="h-4 w-4 mr-1" />
                               Anzeigen
@@ -258,12 +289,12 @@ const PersonView = () => {
                           {/* Upload/Check button for non-valid or missing documents */}
                           {(isMissing || (doc && randomStatus !== "valid")) && (
                             isMissing ? (
-                              <Button variant="outline" size="sm">
+                              <Button variant="outline" size="sm" disabled={!isActive}>
                                 Hochladen
                               </Button>
                             ) : (
                               <Link to={`/submission-review/${providerId}/${doc.id}?employeeId=${employeeId}`}>
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" disabled={!isActive}>
                                   Prüfen
                                 </Button>
                               </Link>
