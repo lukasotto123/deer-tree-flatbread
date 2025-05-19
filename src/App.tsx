@@ -35,9 +35,9 @@ const App = () => {
               <Route path="/document-requirements" element={<DocumentRequirements />} />
               <Route path="/document/:id" element={<SingleDocumentView />} />
               <Route path="/requests" element={<RequestView />} />
-              
-              {/* Shared routes based on user mode */}
               <Route path="/person/:providerId/:employeeId" element={<PersonView />} />
+              
+              {/* Vendor (Lieferant) routes */}
               <Route path="/person/:employeeId" element={<VendorPersonView />} />
             </Route>
             <Route path="*" element={<NotFound />} />

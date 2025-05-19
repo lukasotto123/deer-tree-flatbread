@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,12 +9,12 @@ import { documents, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 
 const VendorDashboard = () => {
-  // Fake employees data - modified to match the IDs used in the VendorPersonView
+  // Fake employees data
   const employees = [
-    { id: "employee-1", name: "Hans Schmidt", position: "Bauleiter", documents: { valid: 4, expiring: 1, missing: 0 } },
-    { id: "employee-2", name: "Maria Wagner", position: "Elektrikerin", documents: { valid: 3, expiring: 0, missing: 2 } },
-    { id: "employee-3", name: "Pierre Dubois", position: "Maurer", documents: { valid: 5, expiring: 0, missing: 0 } },
-    { id: "employee-4", name: "Isabella Romano", position: "Installateur", documents: { valid: 2, expiring: 2, missing: 1 } },
+    { id: "emp-1", name: "Thomas Schmidt", position: "Bauleiter", documents: { valid: 4, expiring: 1, missing: 0 } },
+    { id: "emp-2", name: "Anna Müller", position: "Elektrikerin", documents: { valid: 3, expiring: 0, missing: 2 } },
+    { id: "emp-3", name: "Michael Weber", position: "Maurer", documents: { valid: 5, expiring: 0, missing: 0 } },
+    { id: "emp-4", name: "Julia Fischer", position: "Installateur", documents: { valid: 2, expiring: 2, missing: 1 } },
   ];
 
   // Customer data
@@ -206,7 +207,7 @@ const VendorDashboard = () => {
                   </div>
                   
                   <div className="flex justify-end">
-                    <Link to={`/person/${employee.id}`}>
+                    <Link to={`/vendor-person/${employee.id}`}>
                       <Button variant="outline" size="sm">Details</Button>
                     </Link>
                   </div>
