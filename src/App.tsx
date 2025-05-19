@@ -11,6 +11,7 @@ import DocumentRequirements from "./pages/DocumentRequirements";
 import SingleDocumentView from "./pages/SingleDocumentView";
 import RequestView from "./pages/RequestView";
 import PersonView from "./pages/PersonView";
+import VendorPersonView from "./pages/VendorPersonView";
 import NotFound from "./pages/NotFound";
 import { useState } from "react";
 
@@ -35,6 +36,9 @@ const App = () => {
               <Route path="/document/:id" element={<SingleDocumentView />} />
               <Route path="/requests" element={<RequestView />} />
               <Route path="/person/:providerId/:employeeId" element={<PersonView />} />
+              
+              {/* Vendor (Lieferant) routes */}
+              <Route path="/person/:employeeId" element={<VendorPersonView />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
