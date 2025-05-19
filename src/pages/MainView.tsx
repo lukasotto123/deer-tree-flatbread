@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Euro, Clock, Hourglass, AlertTriangle, CheckCircle, Users } from "lucide-react";
+import { Plus, Euro, Clock, Hourglass, AlertTriangle, CheckCircle, Users, ShieldCheck } from "lucide-react";
 import { providers, documents } from "@/data/dummy-data";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -112,7 +111,10 @@ const MainView = () => {
         <Card>
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
-              <h3 className="text-lg font-medium text-center">Nachunternehmer Compliance</h3>
+              <div className="flex justify-center items-center mb-2">
+                <ShieldCheck className="h-5 w-5 text-black mr-2" />
+                <h3 className="text-lg font-medium text-center">Nachunternehmer Compliance</h3>
+              </div>
               <div className="flex justify-center items-center gap-4 mt-3">
                 <div className="text-center">
                   <span className="text-green-600 font-bold text-4xl">{compliantNachunternehmer.length}</span>

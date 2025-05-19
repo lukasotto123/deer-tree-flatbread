@@ -170,6 +170,72 @@ const ProviderView = () => {
         </CardContent>
       </Card>
 
+      {/* Mitarbeiter as Card Grid */}
+      <Card className={!isActive ? 'opacity-60' : ''}>
+        <CardHeader>
+          <CardTitle>Mitarbeiter</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {providerEmployees.map((employee) => {
+              // Get documents for this employee
+              const employeeDocuments = documents.filter(doc => doc.employeeId === employee.id);
+              
+              // Calculate document status counts
+              const validDocs = employeeDocuments.filter(d => d.status === 'valid').length;
+              const expiringDocs = employeeDocuments.filter(d => d.status === 'expiring').length;
+              const expiredDocs = employeeDocuments.filter(d => d.status === 'expired').length;
+              const missingDocs = employeeDocuments.filter(d => d.status === 'missing').length;
+              
+              // Determine overall status
+              const hasExpired = expiredDocs > 0;
+              const hasMissing = missingDocs > 0;
+              const hasExpiring = expiringDocs > 0;
+              const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+
+              return (
+                <Card key={employee.id} className="overflow-hidden">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold">{employee.name}</h3>
+                        <p className="text-sm text-muted-foreground">{employee.position}</p>
+                      </div>
+                      <StatusBadge status={worstStatus} />
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span>{validDocs}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4 text-amber-500" />
+                        <span>{expiringDocs}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        <span>{expiredDocs}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        <span>{missingDocs}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <Link to={`/person/${provider.id}/${employee.id}`}>
+                        <Button variant="outline" size="sm">Details</Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Dokumente des Unternehmens nach Kategorien */}
       <Card className={!isActive ? 'opacity-60' : ''}>
         <CardHeader>
@@ -302,82 +368,6 @@ const ProviderView = () => {
               </Table>
             </div>
           ))}
-        </CardContent>
-      </Card>
-
-      {/* Mitarbeiter des Unternehmens mit ihren Dokumenten */}
-      <Card className={!isActive ? 'opacity-60' : ''}>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Mitarbeiter</CardTitle>
-          <Button size="sm" disabled={!isActive}>Mitarbeiter hinzufügen</Button>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Position</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Dokumente</TableHead>
-                <TableHead className="text-right">Aktionen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {providerEmployees.map((employee) => {
-                // Get documents for this employee
-                const employeeDocuments = documents.filter(doc => doc.employeeId === employee.id);
-                
-                // Calculate document status counts
-                const validDocs = employeeDocuments.filter(d => d.status === 'valid').length;
-                const expiringDocs = employeeDocuments.filter(d => d.status === 'expiring').length;
-                const expiredDocs = employeeDocuments.filter(d => d.status === 'expired').length;
-                const missingDocs = employeeDocuments.filter(d => d.status === 'missing').length;
-                
-                // Determine overall status
-                const hasExpired = expiredDocs > 0;
-                const hasMissing = missingDocs > 0;
-                const hasExpiring = expiringDocs > 0;
-                const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
-
-                return (
-                  <TableRow key={employee.id}>
-                    <TableCell className="font-medium">
-                      {employee.name}
-                    </TableCell>
-                    <TableCell>{employee.position}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={worstStatus} />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          <span>{validDocs}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 text-amber-500" />
-                          <span>{expiringDocs}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4 text-amber-600" />
-                          <span>{expiredDocs}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4 text-amber-600" />
-                          <span>{missingDocs}</span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Link to={`/provider/${provider.id}/employee/${employee.id}`}>
-                        <Button variant="outline" size="sm">Details</Button>
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
         </CardContent>
       </Card>
     </div>

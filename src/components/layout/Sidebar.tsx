@@ -1,5 +1,5 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { FileText, User, Zap } from "lucide-react";
 
@@ -10,10 +10,16 @@ interface SidebarProps {
 
 const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   const navigationItems = [
     { name: "Bewerbungen", path: "#", icon: Zap },
   ];
+  
+  const handleModeChange = (mode: "kunde" | "lieferant") => {
+    onModeChange(mode);
+    navigate("/");
+  };
   
   return (
     <div className="w-64 h-screen bg-[#002626] text-white flex flex-col fixed">
@@ -46,7 +52,7 @@ const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
                 "flex items-center w-full px-4 py-3 rounded-md hover:bg-[#00414141] transition-colors",
                 activeMode === "kunde" && "bg-[#00414141]",
               )}
-              onClick={() => onModeChange("kunde")}
+              onClick={() => handleModeChange("kunde")}
             >
               <FileText className="h-5 w-5 mr-3" />
               <span>CompliancePro Kunde</span>
@@ -59,7 +65,7 @@ const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
                 "flex items-center w-full px-4 py-3 rounded-md hover:bg-[#00414141] transition-colors",
                 activeMode === "lieferant" && "bg-[#00414141]",
               )}
-              onClick={() => onModeChange("lieferant")}
+              onClick={() => handleModeChange("lieferant")}
             >
               <FileText className="h-5 w-5 mr-3" />
               <span>CompliancePro Lieferant</span>
