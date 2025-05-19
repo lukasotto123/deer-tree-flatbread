@@ -1,77 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Clock, CheckCircle, FileText } from "lucide-react";
+import { AlertTriangle, Clock, CheckCircle, FileText, Euro, Plus, ChevronDown, ChevronUp, Users } from "lucide-react";
 import { documents } from "@/data/dummy-data";
 
 const VendorDashboard = () => {
-  // Group documents by customer
-  const documentsByCustomer = documents.reduce((acc, doc) => {
-    if (!acc[doc.providerId]) {
-      acc[doc.providerId] = [];
-    }
-    acc[doc.providerId].push(doc);
-    return acc;
-  }, {} as Record<string, typeof documents>);
-
-  const customerIds = ["customer-1", "customer-2", "customer-3"];
-  const customerNames = {
-    "customer-1": "Bauunternehmen Müller GmbH",
-    "customer-2": "Schmidt Industriebau AG",
-    "customer-3": "Bau & Technik Fischer KG",
-  };
-
-  // Customer-specific documents required
-  const customerSpecificDocuments = [
-    "Meldung an die Generalzolldirektion nach § 18 AEntG",
-    "Werkverträge",
-    "Auftragsverarbeitungsvereinbarung",
-    "Onboarding Selbstauskunft",
-    "Erklärung Subunternehmer"
-  ];
-
-  // Document categories for vendor
-  const documentCategories = [
-    {
-      title: "Unternehmensdokumente",
-      documents: [
-        "Handelsregisterauszug",
-        "Gewerbeanmeldung",
-        "Freistellungsbescheinigung",
-        "Versicherungsnachweis"
-      ]
-    },
-    {
-      title: "Bonitäts- & Risikoprüfung",
-      documents: [
-        "Creditreform-Selbstauskunft über Liquidität",
-        "Bilanz des letzten Geschäftsjahres",
-        "Bankauskunft",
-        "SCHUFA-Auskunft"
-      ]
-    },
-    {
-      title: "Arbeitsschutz & Qualitätssicherung",
-      documents: [
-        "Arbeitsschutzorganisation",
-        "Gefährdungsbeurteilung",
-        "Qualitätsmanagement-Zertifikat",
-        "Umweltmanagement-Nachweis"
-      ]
-    },
-    {
-      title: "Compliance & Ethik",
-      documents: [
-        "Verhaltenskodex",
-        "Anti-Korruptionsrichtlinie",
-        "Datenschutzerklärung",
-        "Nachhaltigkeitsbericht"
-      ]
-    }
-  ];
-
   // Fake employees data
   const employees = [
     { id: "emp-1", name: "Thomas Schmidt", position: "Bauleiter", documents: { valid: 4, expiring: 1, missing: 0 } },
@@ -79,6 +15,78 @@ const VendorDashboard = () => {
     { id: "emp-3", name: "Michael Weber", position: "Maurer", documents: { valid: 5, expiring: 0, missing: 0 } },
     { id: "emp-4", name: "Julia Fischer", position: "Installateur", documents: { valid: 2, expiring: 2, missing: 1 } },
   ];
+
+  // Customer data
+  const customers = [
+    { id: "customer-1", name: "Bauunternehmen Müller GmbH" },
+    { id: "customer-2", name: "Schmidt Industriebau AG" },
+    { id: "customer-3", name: "Bau & Technik Fischer KG" },
+  ];
+
+  // Document categories for vendor
+  const documentCategories = [
+    {
+      title: "Sozial- & Versicherungsnachweise",
+      documents: [
+        { id: "doc-1", name: "Unbedenklichkeitsbescheinigung Finanzamt", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-2", name: "Unbedenklichkeitsbescheinigung Berufsgenossenschaft", status: "expiring", expiryDate: "2025-06-30" },
+        { id: "doc-3", name: "Unbedenklichkeitsbescheinigung Krankenkasse", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-4", name: "Unbedenklichkeitsbescheinigung Rentenversicherung", status: "expired", expiryDate: "2025-03-31" }
+      ]
+    },
+    {
+      title: "Arbeits- & Mindestlohn-compliance",
+      documents: [
+        { id: "doc-5", name: "Eidesstattliche Erklärung zur Zahlung von Mindestlöhnen", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-6", name: "AEntG-Bestätigung", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-7", name: "Arbeitsverträge", status: "expiring", expiryDate: "2025-06-15" }
+      ]
+    },
+    {
+      title: "Behördliche & steuerliche Nachweise",
+      documents: [
+        { id: "doc-8", name: "Handelsregisterauszug", status: "valid", expiryDate: "2026-01-31" },
+        { id: "doc-9", name: "Gewerbeanmeldung", status: "valid", expiryDate: null },
+        { id: "doc-10", name: "Freistellungsbescheinigung § 48b EStG", status: "valid", expiryDate: "2025-12-31" }
+      ]
+    },
+    {
+      title: "Bonitäts- & Risikoprüfung",
+      documents: [
+        { id: "doc-11", name: "Creditreform-Selbstauskunft über Liquidität", status: "valid", expiryDate: "2025-09-30" },
+        { id: "doc-12", name: "Bilanz des letzten Geschäftsjahres", status: "expired", expiryDate: "2025-03-31" },
+        { id: "doc-13", name: "Bankauskunft", status: "expiring", expiryDate: "2025-06-30" }
+      ]
+    }
+  ];
+
+  // Stats
+  const documentStats = {
+    beitragsrückstände: 3,
+    fehlendOderAbgelaufen: documents.filter(d => d.status === 'expired').length,
+    ablaufend: documents.filter(d => d.status === 'expiring').length,
+  };
+
+  // State for collapsible sections
+  const [expandedCustomers, setExpandedCustomers] = useState<Record<string, boolean>>({});
+
+  const toggleCustomer = (customerId: string) => {
+    setExpandedCustomers(prev => ({
+      ...prev,
+      [customerId]: !prev[customerId]
+    }));
+  };
+
+  const getStatusIcon = (status: string) => {
+    if (status === 'valid') return <CheckCircle className="h-5 w-5 text-green-600" />;
+    if (status === 'expiring') return <Clock className="h-5 w-5 text-amber-500" />;
+    return <AlertTriangle className="h-5 w-5 text-red-600" />;
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('de-DE');
+  };
 
   return (
     <div className="space-y-6">
@@ -89,128 +97,69 @@ const VendorDashboard = () => {
         </p>
       </div>
 
-      {/* Document Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-lg font-medium mb-2">
-              <FileText className="h-5 w-5 text-blue-600" />
-              <span>Gesamt Dokumente</span>
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="pt-6 flex flex-col h-full">
+            <div className="text-center flex-grow">
+              <div className="flex justify-center items-center mb-2">
+                <Euro className="h-5 w-5 text-red-600 mr-2" />
+                <h3 className="text-lg font-medium">Beitragsrückstände</h3>
+              </div>
+              <p className="text-4xl font-bold">{documentStats.beitragsrückstände}</p>
             </div>
-            <div className="text-3xl font-bold text-center">{documents.length}</div>
+            <div className="mt-6">
+              <Button className="w-full">
+                Anzeigen
+              </Button>
+            </div>
           </CardContent>
         </Card>
-        <Card className="bg-white">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-lg font-medium mb-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <span>Gültige Dokumente</span>
+        
+        <Card>
+          <CardContent className="pt-6 flex flex-col h-full">
+            <div className="text-center flex-grow">
+              <div className="flex justify-center items-center mb-2">
+                <AlertTriangle className="h-5 w-5 text-amber-600 mr-2" />
+                <h3 className="text-lg font-medium">Fehlende oder abgelaufene Dokumente</h3>
+              </div>
+              <p className="text-4xl font-bold">{documentStats.fehlendOderAbgelaufen}</p>
             </div>
-            <div className="text-3xl font-bold text-center">{documents.filter(d => d.status === 'valid').length}</div>
+            <div className="mt-6">
+              <Button className="w-full">
+                Anzeigen
+              </Button>
+            </div>
           </CardContent>
         </Card>
-        <Card className="bg-white">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-lg font-medium mb-2">
-              <Clock className="h-5 w-5 text-amber-500" />
-              <span>Bald ablaufend</span>
+        
+        <Card>
+          <CardContent className="pt-6 flex flex-col h-full">
+            <div className="text-center flex-grow">
+              <div className="flex justify-center items-center mb-2">
+                <Clock className="h-5 w-5 text-amber-500 mr-2" />
+                <h3 className="text-lg font-medium">Ablaufende Dokumente</h3>
+              </div>
+              <p className="text-4xl font-bold">{documentStats.ablaufend}</p>
+              <p className="text-sm text-muted-foreground mt-1">in den nächsten 30 Tagen</p>
             </div>
-            <div className="text-3xl font-bold text-center">{documents.filter(d => d.status === 'expiring').length}</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-lg font-medium mb-2">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <span>Fehlende/Abgelaufen</span>
+            <div className="mt-6">
+              <Button className="w-full">
+                Anzeigen
+              </Button>
             </div>
-            <div className="text-3xl font-bold text-center">{documents.filter(d => d.status === 'expired').length}</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Customer-specific Documents */}
-      {customerIds.map((customerId) => (
-        <Card key={customerId} className="mt-6">
-          <CardHeader>
-            <CardTitle>Kundenspezifische Dokumente: {customerNames[customerId as keyof typeof customerNames]}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              {customerSpecificDocuments.map((docName, index) => {
-                // Randomly determine document status for demo
-                const statusNum = (index + customerId.charCodeAt(0)) % 3;
-                const status = statusNum === 0 ? 'valid' : statusNum === 1 ? 'expiring' : 'expired';
-                
-                const statusIcon = 
-                  status === 'valid' ? <CheckCircle className="h-5 w-5 text-green-600" /> :
-                  status === 'expiring' ? <Clock className="h-5 w-5 text-amber-500" /> :
-                  <AlertTriangle className="h-5 w-5 text-red-600" />;
-                
-                return (
-                  <Card key={docName} className="bg-white">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-2 mb-3">
-                        {statusIcon}
-                        <span className="text-sm font-medium">{docName}</span>
-                      </div>
-                      <div className="mt-auto">
-                        <Button variant="outline" size="sm" className="w-full">
-                          {status === 'valid' ? 'Anzeigen' : 'Hochladen'}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-
-      {/* Document Categories */}
-      {documentCategories.map(category => (
-        <Card key={category.title} className="mt-6">
-          <CardHeader>
-            <CardTitle>{category.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {category.documents.map((docName, index) => {
-                // Randomly determine document status for demo
-                const statusNum = (index + category.title.charCodeAt(0)) % 3;
-                const status = statusNum === 0 ? 'valid' : statusNum === 1 ? 'expiring' : 'expired';
-                
-                const statusIcon = 
-                  status === 'valid' ? <CheckCircle className="h-5 w-5 text-green-600" /> :
-                  status === 'expiring' ? <Clock className="h-5 w-5 text-amber-500" /> :
-                  <AlertTriangle className="h-5 w-5 text-red-600" />;
-                
-                return (
-                  <Card key={docName} className="bg-white">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-2 mb-3">
-                        {statusIcon}
-                        <span className="text-sm font-medium">{docName}</span>
-                      </div>
-                      <div className="mt-auto">
-                        <Button variant="outline" size="sm" className="w-full">
-                          {status === 'valid' ? 'Anzeigen' : 'Hochladen'}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-
       {/* Employees Section */}
       <Card className="mt-6">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Mitarbeiter</CardTitle>
+          <Button variant="outline" size="sm">
+            <Plus className="h-4 w-4 mr-1" />
+            Mitarbeiter hinzufügen
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -249,6 +198,117 @@ const VendorDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Customer-specific Documents */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Kundenspezifische Dokumente</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {customers.map((customer) => (
+              <Card key={customer.id} className="bg-white">
+                <div 
+                  className="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+                  onClick={() => toggleCustomer(customer.id)}
+                >
+                  <h3 className="font-medium">{customer.name}</h3>
+                  {expandedCustomers[customer.id] ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </div>
+                
+                {expandedCustomers[customer.id] && (
+                  <div className="p-4 pt-0 border-t">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Dokument</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Ablaufdatum</TableHead>
+                          <TableHead className="text-right">Aktion</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {/* Just showing random documents for each customer */}
+                        {documentCategories[0].documents.slice(0, 3).map(doc => (
+                          <TableRow key={`${customer.id}-${doc.id}`}>
+                            <TableCell className="font-medium">
+                              <div className="flex items-center">
+                                <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
+                                {doc.name}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                {getStatusIcon(doc.status)}
+                                <span className="ml-2 capitalize">{doc.status}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{formatDate(doc.expiryDate)}</TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="outline" size="sm">
+                                {doc.status !== "valid" ? "Hochladen" : "Anzeigen"}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Document Categories */}
+      {documentCategories.map(category => (
+        <Card key={category.title} className="mt-6">
+          <CardHeader>
+            <CardTitle>{category.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Dokument</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Ablaufdatum</TableHead>
+                  <TableHead className="text-right">Aktion</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {category.documents.map((doc) => (
+                  <TableRow key={doc.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center">
+                        <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
+                        {doc.name}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        {getStatusIcon(doc.status)}
+                        <span className="ml-2 capitalize">{doc.status}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{formatDate(doc.expiryDate)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm">
+                        {doc.status !== "valid" ? "Hochladen" : "Anzeigen"}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };
