@@ -11,6 +11,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { getDocumentStatusIcon } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Separator } from "@/components/ui/separator";
 
 // Updated historical data with meaningful percentage values that sum to 100%
 const modifiedHistoricalData = [
@@ -106,22 +107,23 @@ const MainView = () => {
         </p>
       </div>
 
-      {/* Übersichtskarten basierend auf dem Screenshot */}
+      {/* Redesigned Übersichtskarten */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6 flex flex-col h-full">
+        <Card className="overflow-hidden border-muted-foreground/20">
+          <CardContent className="pt-6 pb-4 flex flex-col h-full">
             <div className="text-center flex-grow">
               <div className="flex justify-center items-center mb-2">
-                <ShieldCheck className="h-5 w-5 text-black mr-2" />
+                <ShieldCheck className="h-5 w-5 text-primary mr-2" />
                 <h3 className="text-lg font-medium text-center">Nachunternehmer Compliance</h3>
               </div>
-              <div className="flex justify-center items-center gap-4 mt-3">
-                <div className="text-center">
-                  <span className="text-green-600 font-bold text-4xl">{compliantNachunternehmer.length}</span>
+              
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="flex flex-col items-center p-3 rounded-md bg-green-50">
+                  <span className="text-green-600 font-bold text-3xl">{compliantNachunternehmer.length}</span>
                   <span className="text-sm block text-muted-foreground mt-1">Compliant</span>
                 </div>
-                <div className="text-center">
-                  <span className="text-red-600 font-bold text-4xl">{nonCompliantNachunternehmer.length}</span>
+                <div className="flex flex-col items-center p-3 rounded-md bg-red-50">
+                  <span className="text-red-600 font-bold text-3xl">{nonCompliantNachunternehmer.length}</span>
                   <span className="text-sm block text-muted-foreground mt-1">Nicht Compliant</span>
                 </div>
               </div>
@@ -134,14 +136,14 @@ const MainView = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-muted-foreground/20">
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
               <div className="flex justify-center items-center mb-2">
                 <Euro className="h-5 w-5 text-red-600 mr-2" />
                 <h3 className="text-lg font-medium">Beitragsrückstände</h3>
               </div>
-              <p className="text-4xl font-bold">{beitragsrückstände}</p>
+              <p className="text-4xl font-bold text-red-600">{beitragsrückstände}</p>
             </div>
             <div className="mt-6">
               <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled>
@@ -151,14 +153,14 @@ const MainView = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-muted-foreground/20">
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
               <div className="flex justify-center items-center mb-2">
                 <AlertTriangle className="h-5 w-5 text-amber-600 mr-2" />
                 <h3 className="text-lg font-medium">Fehlende oder abgelaufene Dokumente</h3>
               </div>
-              <p className="text-4xl font-bold">{fehlendeDokumente}</p>
+              <p className="text-4xl font-bold text-amber-600">{fehlendeDokumente}</p>
             </div>
             <div className="mt-6">
               <Button className="w-full" asChild>
@@ -168,14 +170,14 @@ const MainView = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-muted-foreground/20">
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
               <div className="flex justify-center items-center mb-2">
                 <Clock className="h-5 w-5 text-amber-500 mr-2" />
                 <h3 className="text-lg font-medium">Ablaufende Dokumente</h3>
               </div>
-              <p className="text-4xl font-bold">{ablaufendeDokumente}</p>
+              <p className="text-4xl font-bold text-amber-500">{ablaufendeDokumente}</p>
               <p className="text-sm text-muted-foreground mt-1">in den nächsten 30 Tagen</p>
             </div>
             <div className="mt-6">
