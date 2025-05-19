@@ -1,7 +1,7 @@
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { FileText, User, Zap, CheckCircle } from "lucide-react";
+import { ShieldCheck, User } from "lucide-react";
 
 interface SidebarProps {
   activeMode: "kunde" | "lieferant";
@@ -12,10 +12,7 @@ const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  const navigationItems = [
-    { name: "Bewerbungen", path: "#", icon: Zap },
-    { name: "Nachunternehmer Compliance", path: "#", icon: CheckCircle },
-  ];
+  // Removed the navigationItems array that contained Bewerbungen and Nachunternehmer Compliance
   
   const handleModeChange = (mode: "kunde" | "lieferant") => {
     onModeChange(mode);
@@ -23,7 +20,7 @@ const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
   };
   
   return (
-    <div className="w-64 h-screen bg-[#002626] text-white flex flex-col fixed">
+    <div className="w-[76.8px] h-screen bg-[#002626] text-white flex flex-col fixed">
       <div className="p-6 border-b border-[#00414141]">
         <Link to="/" className="flex items-center gap-2">
           <img src="/lovable-uploads/6690430b-aa6f-4db0-b6fc-7116c43b37f2.png" alt="Pactos Logo" className="h-8 w-8" />
@@ -33,20 +30,6 @@ const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
       
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
-          {navigationItems.map((item) => (
-            <li key={item.path}>
-              <div
-                className={cn(
-                  "flex items-center px-4 py-3 rounded-md hover:bg-[#00414141] transition-colors cursor-default",
-                  (location.pathname === item.path) && "bg-[#00414141]"
-                )}
-              >
-                <item.icon className="h-5 w-5 mr-3" />
-                <span>{item.name}</span>
-              </div>
-            </li>
-          ))}
-          
           <li className="pt-2">
             <button
               className={cn(
@@ -55,7 +38,7 @@ const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
               )}
               onClick={() => handleModeChange("kunde")}
             >
-              <FileText className="h-5 w-5 mr-3" />
+              <ShieldCheck className="h-5 w-5 mr-3" />
               <span>CompliancePro Kunde</span>
             </button>
           </li>
@@ -68,7 +51,7 @@ const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
               )}
               onClick={() => handleModeChange("lieferant")}
             >
-              <FileText className="h-5 w-5 mr-3" />
+              <ShieldCheck className="h-5 w-5 mr-3" />
               <span>CompliancePro Lieferant</span>
             </button>
           </li>
