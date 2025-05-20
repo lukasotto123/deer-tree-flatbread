@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -28,36 +29,36 @@ const VendorDashboard = () => {
     {
       title: "Sozial- & Versicherungsnachweise",
       documents: [
-        { id: "doc-1", name: "Unbedenklichkeitsbescheinigung Berufsgenossenschaft", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-2", name: "Unbedenklichkeitsbescheinigung der SOKA Bau", status: "expiring", expiryDate: "2025-06-30" },
-        { id: "doc-3", name: "Betriebshaftpflichtversicherung", status: "valid", expiryDate: "2025-12-31" },
+        { id: "doc-1", name: "Unbedenklichkeitsbescheinigung Berufsgenossenschaft", status: "valid" as const, expiryDate: "2025-12-31" },
+        { id: "doc-2", name: "Unbedenklichkeitsbescheinigung der SOKA Bau", status: "expiring" as const, expiryDate: "2025-06-30" },
+        { id: "doc-3", name: "Betriebshaftpflichtversicherung", status: "valid" as const, expiryDate: "2025-12-31" },
       ]
     },
     {
       title: "Arbeits- & Mindestlohn-compliance",
       documents: [
-        { id: "doc-5", name: "Bescheinigung für Tätigkeiten im Baugewerbe § 13b UStG", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-6", name: "Mitteilung des Steuerberaters (Mitarbeiter u. Mindestlöhne)", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-7", name: "Eidesstattliche Erklärung zur Zahlung von Mindestlöhnen", status: "expiring", expiryDate: "2025-06-15" }
+        { id: "doc-5", name: "Bescheinigung für Tätigkeiten im Baugewerbe § 13b UStG", status: "valid" as const, expiryDate: "2025-12-31" },
+        { id: "doc-6", name: "Mitteilung des Steuerberaters (Mitarbeiter u. Mindestlöhne)", status: "valid" as const, expiryDate: "2025-12-31" },
+        { id: "doc-7", name: "Eidesstattliche Erklärung zur Zahlung von Mindestlöhnen", status: "expiring" as const, expiryDate: "2025-06-15" }
       ]
     },
     {
       title: "Behördliche & steuerliche Nachweise",
       documents: [
-        { id: "doc-8", name: "Testergebnis Scheinselbstständigkeit", status: "valid", expiryDate: "2026-01-31" },
-        { id: "doc-9", name: "Freistellungsbescheinigung der Finanzverwaltung § 48b EStG", status: "valid", expiryDate: null },
-        { id: "doc-10", name: "Gewerbeanmeldung", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-11", name: "Unbedenklichkeitsbescheinigung Finanzamt", status: "valid", expiryDate: "2025-12-31" },
-        { id: "doc-12", name: "Handelsregisterauszug", status: "valid", expiryDate: "2026-01-31" },
-        { id: "doc-13", name: "Handwerkskarte bzw. Eintragung in die Handwerksrolle", status: "valid", expiryDate: "2025-11-30" },
-        { id: "doc-14", name: "Unternehmerbescheinigung vom Finanzamt", status: "expiring", expiryDate: "2025-06-15" },
-        { id: "doc-15", name: "Gewerbezentralregisterauszug", status: "valid", expiryDate: "2025-10-31" }
+        { id: "doc-8", name: "Testergebnis Scheinselbstständigkeit", status: "valid" as const, expiryDate: "2026-01-31" },
+        { id: "doc-9", name: "Freistellungsbescheinigung der Finanzverwaltung § 48b EStG", status: "valid" as const, expiryDate: null },
+        { id: "doc-10", name: "Gewerbeanmeldung", status: "valid" as const, expiryDate: "2025-12-31" },
+        { id: "doc-11", name: "Unbedenklichkeitsbescheinigung Finanzamt", status: "valid" as const, expiryDate: "2025-12-31" },
+        { id: "doc-12", name: "Handelsregisterauszug", status: "valid" as const, expiryDate: "2026-01-31" },
+        { id: "doc-13", name: "Handwerkskarte bzw. Eintragung in die Handwerksrolle", status: "valid" as const, expiryDate: "2025-11-30" },
+        { id: "doc-14", name: "Unternehmerbescheinigung vom Finanzamt", status: "expiring" as const, expiryDate: "2025-06-15" },
+        { id: "doc-15", name: "Gewerbezentralregisterauszug", status: "valid" as const, expiryDate: "2025-10-31" }
       ]
     },
     {
       title: "Bonitäts- & Risikoprüfung",
       documents: [
-        { id: "doc-16", name: "Creditreform-Selbstauskunft über Liquidität", status: "valid", expiryDate: "2025-09-30" }
+        { id: "doc-16", name: "Creditreform-Selbstauskunft über Liquidität", status: "valid" as const, expiryDate: "2025-09-30" }
       ]
     }
   ];
