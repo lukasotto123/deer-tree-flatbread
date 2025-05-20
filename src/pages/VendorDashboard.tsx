@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Clock, CheckCircle, FileText, Euro, Plus, ChevronDown, ChevronUp, Users } from "lucide-react";
+import { AlertTriangle, Clock, CheckCircle, FileText, Euro, Plus, ChevronDown, ChevronUp, Users, History } from "lucide-react";
 import { documents, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
 
@@ -88,6 +88,19 @@ const VendorDashboard = () => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('de-DE');
+  };
+
+  // Function to generate a random issuance date for each document
+  const getRandomIssuanceDate = (expiryDate: string | null) => {
+    if (!expiryDate) return '-';
+    
+    const expiry = new Date(expiryDate);
+    // Generate a random date between 1-3 years before expiry
+    const yearsBack = Math.floor(Math.random() * 3) + 1;
+    const issuanceDate = new Date(expiry);
+    issuanceDate.setFullYear(expiry.getFullYear() - yearsBack);
+    
+    return issuanceDate.toLocaleDateString('de-DE');
   };
 
   return (
@@ -245,6 +258,7 @@ const VendorDashboard = () => {
                         <TableRow>
                           <TableHead>Dokument</TableHead>
                           <TableHead>Status</TableHead>
+                          <TableHead>Ausstellungsdatum</TableHead>
                           <TableHead>Ablaufdatum</TableHead>
                           <TableHead className="text-right">Aktion</TableHead>
                         </TableRow>
@@ -265,10 +279,15 @@ const VendorDashboard = () => {
                                 <span className="ml-2 capitalize">{doc.status}</span>
                               </div>
                             </TableCell>
+                            <TableCell>{getRandomIssuanceDate(doc.expiryDate)}</TableCell>
                             <TableCell>{formatDate(doc.expiryDate)}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-right space-x-2">
                               <Button variant="outline" size="sm">
                                 {doc.status !== "valid" ? "Hochladen" : "Anzeigen"}
+                              </Button>
+                              <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                                <History className="h-4 w-4" />
+                                Historie
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -295,6 +314,7 @@ const VendorDashboard = () => {
                 <TableRow>
                   <TableHead>Dokument</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Ausstellungsdatum</TableHead>
                   <TableHead>Ablaufdatum</TableHead>
                   <TableHead className="text-right">Aktion</TableHead>
                 </TableRow>
@@ -314,10 +334,15 @@ const VendorDashboard = () => {
                         <span className="ml-2 capitalize">{doc.status}</span>
                       </div>
                     </TableCell>
+                    <TableCell>{getRandomIssuanceDate(doc.expiryDate)}</TableCell>
                     <TableCell>{formatDate(doc.expiryDate)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right space-x-2">
                       <Button variant="outline" size="sm">
                         {doc.status !== "valid" ? "Hochladen" : "Anzeigen"}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                        <History className="h-4 w-4" />
+                        Historie
                       </Button>
                     </TableCell>
                   </TableRow>
