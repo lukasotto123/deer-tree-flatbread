@@ -5,9 +5,10 @@ import { Clock, AlertTriangle, CheckCircle } from "lucide-react";
 interface StatusBadgeProps {
   status: "valid" | "expiring" | "expired" | "missing";
   className?: string;
+  useIcon?: boolean;
 }
 
-const StatusBadge = ({ status, className }: StatusBadgeProps) => {
+const StatusBadge = ({ status, className, useIcon = true }: StatusBadgeProps) => {
   const baseClasses = "rounded-full px-2 py-1 text-xs font-medium";
   
   const statusClasses = {
@@ -25,6 +26,8 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
   };
 
   const renderStatusIcon = () => {
+    if (!useIcon) return null;
+    
     switch(status) {
       case 'valid':
         return <CheckCircle className="h-5 w-5 mr-1 text-green-600" />;

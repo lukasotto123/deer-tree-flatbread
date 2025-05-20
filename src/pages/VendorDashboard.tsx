@@ -274,21 +274,20 @@ const VendorDashboard = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center">
-                                {getStatusIcon(doc.status)}
-                                <span className="ml-2 capitalize">{doc.status}</span>
-                              </div>
+                              <StatusBadge status={doc.status} />
                             </TableCell>
                             <TableCell>{getRandomIssuanceDate(doc.expiryDate)}</TableCell>
                             <TableCell>{formatDate(doc.expiryDate)}</TableCell>
-                            <TableCell className="text-right space-x-2">
-                              <Button variant="outline" size="sm">
-                                {doc.status !== "valid" ? "Hochladen" : "Anzeigen"}
-                              </Button>
-                              <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                                <History className="h-4 w-4" />
-                                Historie
-                              </Button>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" size="sm">
+                                  {doc.status !== "valid" ? "Hochladen" : "Anzeigen"}
+                                </Button>
+                                <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                  <History className="h-4 w-4" />
+                                  Historie
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -329,21 +328,20 @@ const VendorDashboard = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center">
-                        {getStatusIcon(doc.status)}
-                        <span className="ml-2 capitalize">{doc.status}</span>
-                      </div>
+                      <StatusBadge status={doc.status} />
                     </TableCell>
                     <TableCell>{getRandomIssuanceDate(doc.expiryDate)}</TableCell>
                     <TableCell>{formatDate(doc.expiryDate)}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm">
-                        {doc.status !== "valid" ? "Hochladen" : "Anzeigen"}
-                      </Button>
-                      <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                        <History className="h-4 w-4" />
-                        Historie
-                      </Button>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm">
+                          {doc.status !== "valid" ? "Hochladen" : "Anzeigen"}
+                        </Button>
+                        <Button variant="outline" size="sm" className="flex items-center gap-1">
+                          <History className="h-4 w-4" />
+                          Historie
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
