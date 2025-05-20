@@ -1,6 +1,5 @@
 
 import { Link, Outlet, useLocation } from "react-router-dom";
-import Header from "./Header";
 import Sidebar from "./Sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -36,7 +35,6 @@ const AppLayout = ({ userMode, onModeChange }: AppLayoutProps) => {
       <Sidebar activeMode={userMode} onModeChange={onModeChange} />
       <div className="flex-1 ml-[240px]">
         <div className="flex flex-col min-h-screen">
-          <Header mode={userMode} />
           <div className="py-1 px-6 border-b border-border bg-white">
             <div className="flex gap-2">
               {navigationLinks.map((link) => (
