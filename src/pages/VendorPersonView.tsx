@@ -1,22 +1,16 @@
 
 import React, { useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { FileText, Eye, AlertTriangle, CheckCircle, Clock, Building } from "lucide-react";
 import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
 import StatusBadge from "@/components/ui/StatusBadge";
-import DocumentHistory from "@/components/ui/DocumentHistory";
-import { toast } from "sonner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import VendorEmployeeInformation from "@/components/person/VendorEmployeeInformation";
+import CompanyAssignment from "@/components/person/CompanyAssignment";
+import VendorDocumentsTable from "@/components/person/VendorDocumentsTable";
+import { getEmployeeNameAndCitizenship, determineWorstStatus } from "@/components/person/documentStatusUtils";
 
 const VendorPersonView = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
-  const navigate = useNavigate();
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [assignedCompany, setAssignedCompany] = useState<string>("company-1");
   
   const employee = employees.find(e => e.id === employeeId);
@@ -26,70 +20,13 @@ const VendorPersonView = () => {
     return <div>Mitarbeiter nicht gefunden</div>;
   }
 
-  // Function to determine if a document should be missing based on employee and document type
-  const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
-    // Mark specific documents as missing for Jan Kowalski (employee-15)
-    if (employeeId === "employee-15") {
-      if (documentTypeId === "doc-type-5") return true; // Unbedenklichkeitsbescheinigung Krankenkasse
-      if (documentTypeId === "doc-type-6") return true; // Meldebescheinigung Sozialversicherung
-    }
-    
-    // Mark some documents as missing for other specific employees
-    if (employeeId === "employee-1" && documentTypeId === "doc-type-5") return true;
-    if (employeeId === "employee-2" && documentTypeId === "doc-type-6") return true;
-    if (employeeId === "employee-3" && documentTypeId === "doc-type-7") return true;
-    if (employeeId === "employee-4" && documentTypeId === "doc-type-8") return true;
-    return false;
-  };
-
-  // Assign nationality-appropriate names and citizenships
-  let employeeName = employee.name;
-  let citizenship = "Deutschland"; // Default
-  
-  if (employee.id === "employee-1") {
-    employeeName = "Hans Schmidt";
-    citizenship = "Deutschland";
-  } else if (employee.id === "employee-2") {
-    employeeName = "Maria Wagner";
-    citizenship = "Deutschland";
-  } else if (employee.id === "employee-3") {
-    employeeName = "Pierre Dubois";
-    citizenship = "Frankreich";
-  } else if (employee.id === "employee-4") {
-    employeeName = "Isabella Romano";
-    citizenship = "Italien";
-  } else if (employee.id === "employee-5") {
-    employeeName = "Miguel González";
-    citizenship = "Spanien";
-  } else if (employee.id === "employee-15") {
-    employeeName = "Jan Kowalski";
-    citizenship = "Polen";
-  } else if (employee.id === "employee-6") {
-    employeeName = "Sophia Müller";
-    citizenship = "Deutschland";
-  } else if (employee.id === "employee-7") {
-    employeeName = "Jan Kowalski";
-    citizenship = "Polen";
-  } else if (employee.id === "employee-8") {
-    employeeName = "Anna Hofer";
-    citizenship = "Österreich";
-  } else if (employee.id === "employee-9") {
-    employeeName = "Erik Johansson";
-    citizenship = "Schweden";
-  } else if (employee.id === "employee-10") {
-    employeeName = "Yuki Tanaka";
-    citizenship = "Japan";
-  }
+  const { employeeName, citizenship } = getEmployeeNameAndCitizenship(employee);
 
   // Actual documents for this employee
   const employeeDocuments = documents.filter(doc => doc.employeeId === employeeId);
 
   // Determine the worst document status for the employee
-  const hasExpired = employeeDocuments.some(doc => doc.status === "expired");
-  const hasExpiring = employeeDocuments.some(doc => doc.status === "expiring");
-  const hasMissing = employeeDocuments.some(doc => doc.status === "missing");
-  
-  const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+  const worstStatus = determineWorstStatus(employeeDocuments);
   
   // All document types that might be relevant for employees of this provider
   const relevantDocTypes = documentTypes.filter(dt => {
@@ -102,34 +39,9 @@ const VendorPersonView = () => {
     return true;
   });
 
-  // Handle document selection for showing history
-  const handleShowDocumentHistory = (docId: string) => {
-    setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
-  };
-
   // Handle company assignment
   const handleCompanyAssignment = (company: string) => {
     setAssignedCompany(company);
-    toast.success(`${employeeName} wurde erfolgreich zum Unternehmen zugewiesen`);
-  };
-
-  // Function to get status for specific documents
-  const getDocumentStatus = (employeeId: string, docTypeId: string) => {
-    // Check if document should be missing
-    if (shouldDocumentBeMissing(employeeId, docTypeId)) {
-      return "missing";
-    }
-    
-    // Special handling for Jan Kowalski's A1-Bescheinigung - should be expired, not valid
-    if (employeeId === "employee-15" && docTypeId === "doc-type-11") {
-      return "expired";
-    }
-    
-    // Default random distribution
-    const rand = Math.random();
-    if (rand < 0.7) return "valid";
-    else if (rand < 0.85) return "expiring";
-    else return "expired";
   };
 
   return (
@@ -146,174 +58,25 @@ const VendorPersonView = () => {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Mitarbeiterinformationen</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Position</p>
-              <p>{employee.position}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Staatsbürgerschaft</p>
-              <p>{citizenship}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Zugewiesenes Unternehmen</p>
-              <div className="flex items-center gap-2 mt-1">
-                <Select value={assignedCompany} onValueChange={handleCompanyAssignment}>
-                  <SelectTrigger className="w-full max-w-xs">
-                    <SelectValue placeholder="Unternehmen auswählen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableCompanies.map(company => (
-                      <SelectItem key={company.id} value={company.id}>
-                        <div className="flex items-center gap-2">
-                          <Building className="h-4 w-4" />
-                          <span>{company.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Status</p>
-              <span className="rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-800">
-                Aktiv
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <VendorEmployeeInformation 
+        employee={employee}
+        employeeName={employeeName}
+        citizenship={citizenship}
+      />
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Dokumente</CardTitle>
-          <Button size="sm">Dokument hochladen</Button>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Dokument</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ausstellungsdatum</TableHead>
-                <TableHead>Ablaufdatum</TableHead>
-                <TableHead>Erinnerungen</TableHead>
-                <TableHead>Relevanz</TableHead>
-                <TableHead className="text-right">Aktionen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {relevantDocTypes.map((docType) => {
-                // Check if this document should be missing for this employee
-                const forceMissing = shouldDocumentBeMissing(employeeId, docType.id);
-                const doc = forceMissing ? null : employeeDocuments.find(d => d.type === docType.id);
-                
-                const documentStatus = getDocumentStatus(employeeId, docType.id);
-                const isRelevant = true;
-                
-                // Special case for A1-Bescheinigung - only relevant for non-Germans
-                const isA1Doc = docType.id === "doc-type-11";
-                const isRequired = isA1Doc ? citizenship !== "Deutschland" : true;
+      <CompanyAssignment
+        assignedCompany={assignedCompany}
+        availableCompanies={availableCompanies}
+        employeeName={employeeName}
+        onCompanyAssignment={handleCompanyAssignment}
+      />
 
-                const hasHistory = doc && selectedDocumentId === doc.id;
-                const isMissing = !doc;
-
-                return (
-                  <React.Fragment key={docType.id}>
-                    <TableRow>
-                      <TableCell>{docType.name}</TableCell>
-                      <TableCell>
-                        {isMissing ? (
-                          <StatusBadge status="missing" />
-                        ) : (
-                          <StatusBadge status={documentStatus} />
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {!isMissing && (documentStatus === "expiring" || documentStatus === "expired")
-                          ? new Date(new Date().setMonth(new Date().getMonth() + (documentStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
-                          : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {(isMissing || documentStatus === "expired") && (
-                          <div className="text-sm">
-                            <div>{Math.floor(Math.random() * 3)} gesendet</div>
-                            <div className="text-xs text-muted-foreground">
-                              Nächste: {new Date().toLocaleDateString('de-DE')}
-                            </div>
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Switch 
-                            id={`relevance-${docType.id}`} 
-                            checked={isRequired} 
-                          />
-                          <Label htmlFor={`relevance-${docType.id}`}>
-                            {isA1Doc && citizenship !== "Deutschland" 
-                              ? "Verpflichtend (A1)" 
-                              : (isRequired ? "Relevant" : "Nicht relevant")}
-                          </Label>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          {/* Only show History button */}
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
-                          >
-                            <FileText className="h-4 w-4 mr-1" />
-                            Historie
-                          </Button>
-                          
-                          {/* Only show View button for existing documents */}
-                          {doc && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Anzeigen
-                            </Button>
-                          )}
-                          
-                          {/* Upload/Check button for non-valid or missing documents */}
-                          {(isMissing || (doc && documentStatus !== "valid")) && (
-                            <Button variant="outline" size="sm">
-                              {isMissing ? "Hochladen" : "Prüfen"}
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                    {hasHistory && (
-                      <TableRow>
-                        <TableCell colSpan={7} className="p-0 border-b-0">
-                          <div className="py-3">
-                            <DocumentHistory documentId={doc.id} />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <VendorDocumentsTable 
+        relevantDocTypes={relevantDocTypes}
+        employeeDocuments={employeeDocuments}
+        employeeId={employeeId!}
+        citizenship={citizenship}
+      />
     </div>
   );
 };
