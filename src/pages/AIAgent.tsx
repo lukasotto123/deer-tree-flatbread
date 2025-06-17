@@ -8,22 +8,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import CompanyDocumentView from "@/components/documents/CompanyDocumentView";
 import { 
-  Brain, 
+  Sparkles, 
   Mail, 
   FileCheck, 
   Clock, 
-  Users, 
   MoreHorizontal, 
   Eye, 
   Download,
-  CheckCircle,
   XCircle,
   AlertTriangle,
-  Search,
-  Filter,
-  Calendar,
-  Globe
+  Globe,
+  Building
 } from "lucide-react";
 
 // Mock data for AI Agent
@@ -81,7 +78,8 @@ const receivedDocuments = [
       issuingCountry: "Polen",
       employeeName: "Jan Kowalski"
     },
-    aiComment: "Dokument vollständig und gültig. Alle erforderlichen Informationen vorhanden."
+    aiComment: "Dokument vollständig und gültig. Alle erforderlichen Informationen vorhanden.",
+    documentLevel: "employee"
   },
   {
     id: "doc-2",
@@ -96,7 +94,8 @@ const receivedDocuments = [
       validUntil: "2024-05-31",
       issuingAuthority: "Krankenkasse ABC"
     },
-    aiComment: "Dokument ist abgelaufen. Gültigkeitsdatum liegt in der Vergangenheit."
+    aiComment: "Dokument ist abgelaufen. Gültigkeitsdatum liegt in der Vergangenheit.",
+    documentLevel: "employee"
   },
   {
     id: "doc-3",
@@ -111,14 +110,68 @@ const receivedDocuments = [
       nationality: "Französisch",
       passportNumber: "12AB34567"
     },
-    aiComment: "Bildqualität unzureichend für vollständige Verifikation. Manuelle Prüfung empfohlen."
+    aiComment: "Bildqualität unzureichend für vollständige Verifikation. Manuelle Prüfung empfohlen.",
+    documentLevel: "employee"
+  },
+  {
+    id: "comp-doc-1",
+    sender: "Bauunternehmen Schmidt GmbH",
+    email: "info@bauunternehmen-schmidt.de",
+    documentType: "Gewerbeanmeldung",
+    receivedDate: "2024-06-12T14:20:00Z",
+    status: "pending",
+    aiConfidence: 91,
+    extractedData: {
+      validFrom: "2024-01-15",
+      validUntil: "Unbefristet",
+      registrationNumber: "GEW-2024-15892",
+      companyName: "Bauunternehmen Schmidt GmbH"
+    },
+    aiComment: "Gewerbeanmeldung vollständig. Alle erforderlichen Angaben vorhanden.",
+    documentLevel: "company"
+  },
+  {
+    id: "comp-doc-2",
+    sender: "Polish Construction Ltd.",
+    email: "office@polishconstruction.pl",
+    documentType: "Handelsregisterauszug",
+    receivedDate: "2024-06-11T09:15:00Z",
+    status: "accepted",
+    aiConfidence: 94,
+    extractedData: {
+      validFrom: "2024-02-03",
+      validUntil: "2024-12-31",
+      registrationNumber: "HRB 245891",
+      companyName: "Polish Construction Ltd."
+    },
+    aiComment: "Handelsregisterauszug aktuell und gültig.",
+    documentLevel: "company"
+  },
+  {
+    id: "comp-doc-3",
+    sender: "French Services SARL",
+    email: "contact@frenchservices.fr",
+    documentType: "Betriebshaftpflichtversicherung",
+    receivedDate: "2024-06-10T16:30:00Z",
+    status: "rejected",
+    aiConfidence: 67,
+    extractedData: {
+      validFrom: "2024-01-01",
+      validUntil: "2024-12-31",
+      registrationNumber: "BHV-2024-78321",
+      companyName: "French Services SARL"
+    },
+    aiComment: "Versicherungspolice unvollständig. Deckungssumme nicht erkennbar.",
+    documentLevel: "company"
   }
 ];
 
 const AIAgent = () => {
-  const [selectedTab, setSelectedTab] = useState("overview");
+  const [selectedTab, setSelectedTab] = useState("reminders");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [viewMode, setViewMode] = useState<"list" | "document">("list");
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string>("");
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -139,12 +192,31 @@ const AIAgent = () => {
     return "text-red-600";
   };
 
+  const handleDocumentClick = (documentId: string) => {
+    setSelectedDocumentId(documentId);
+    setViewMode("document");
+  };
+
+  const handleBackToList = () => {
+    setViewMode("list");
+    setSelectedDocumentId("");
+  };
+
+  if (viewMode === "document" && selectedDocumentId) {
+    return (
+      <CompanyDocumentView 
+        documentId={selectedDocumentId}
+        onBack={handleBackToList}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Brain className="h-8 w-8 text-primary" />
+            <Sparkles className="h-8 w-8 text-primary" />
             KI-Agent
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -152,13 +224,13 @@ const AIAgent = () => {
           </p>
         </div>
         <Button>
-          <Brain className="h-4 w-4 mr-2" />
+          <Sparkles className="h-4 w-4 mr-2" />
           KI-Einstellungen
         </Button>
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Versendete Erinnerungen</CardTitle>
@@ -183,17 +255,6 @@ const AIAgent = () => {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">KI-Akzeptanzrate</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">87%</div>
-            <p className="text-xs text-muted-foreground">+5% vs. letzter Monat</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Offene Anfragen</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -206,76 +267,10 @@ const AIAgent = () => {
 
       {/* Main Content Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Übersicht</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="reminders">Email-Erinnerungen</TabsTrigger>
           <TabsTrigger value="documents">Erhaltene Dokumente</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Mail className="h-5 w-5" />
-                  Letzte Erinnerungen
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {emailReminders.slice(0, 3).map((reminder) => (
-                    <div key={reminder.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{reminder.recipient}</div>
-                        <div className="text-sm text-muted-foreground">{reminder.documentType}</div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Globe className="h-3 w-3" />
-                          <span className="text-xs">{reminder.language.toUpperCase()}</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        {getStatusBadge(reminder.status)}
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {new Date(reminder.sentDate).toLocaleDateString('de-DE')}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileCheck className="h-5 w-5" />
-                  Neueste Dokumente
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {receivedDocuments.slice(0, 3).map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{doc.sender}</div>
-                        <div className="text-sm text-muted-foreground">{doc.documentType}</div>
-                        <div className={`text-xs font-medium ${getConfidenceColor(doc.aiConfidence)} mt-1`}>
-                          KI-Vertrauen: {doc.aiConfidence}%
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        {getStatusBadge(doc.status)}
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {new Date(doc.receivedDate).toLocaleDateString('de-DE')}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
 
         <TabsContent value="reminders" className="space-y-4">
           <div className="flex gap-4 items-center">
@@ -389,6 +384,7 @@ const AIAgent = () => {
                   <TableRow>
                     <TableHead>Absender</TableHead>
                     <TableHead>Dokumenttyp</TableHead>
+                    <TableHead>Ebene</TableHead>
                     <TableHead>Empfangen</TableHead>
                     <TableHead>KI-Vertrauen</TableHead>
                     <TableHead>Status</TableHead>
@@ -404,6 +400,18 @@ const AIAgent = () => {
                         <div className="text-xs text-muted-foreground">{doc.email}</div>
                       </TableCell>
                       <TableCell>{doc.documentType}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          {doc.documentLevel === "company" ? (
+                            <Building className="h-3 w-3" />
+                          ) : (
+                            <Globe className="h-3 w-3" />
+                          )}
+                          <span className="text-xs">
+                            {doc.documentLevel === "company" ? "Unternehmen" : "Mitarbeiter"}
+                          </span>
+                        </div>
+                      </TableCell>
                       <TableCell>{new Date(doc.receivedDate).toLocaleDateString('de-DE')}</TableCell>
                       <TableCell>
                         <div className={`font-medium ${getConfidenceColor(doc.aiConfidence)}`}>
@@ -413,7 +421,7 @@ const AIAgent = () => {
                       <TableCell>{getStatusBadge(doc.status)}</TableCell>
                       <TableCell>
                         <div className="text-xs space-y-1">
-                          {Object.entries(doc.extractedData).map(([key, value]) => (
+                          {Object.entries(doc.extractedData).slice(0, 2).map(([key, value]) => (
                             <div key={key} className="flex gap-1">
                               <span className="font-medium">{key}:</span>
                               <span>{value}</span>
@@ -429,7 +437,7 @@ const AIAgent = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDocumentClick(doc.id)}>
                               <Eye className="h-4 w-4 mr-2" />
                               Dokument anzeigen
                             </DropdownMenuItem>
@@ -438,7 +446,7 @@ const AIAgent = () => {
                               Herunterladen
                             </DropdownMenuItem>
                             <DropdownMenuItem>
-                              <Brain className="h-4 w-4 mr-2" />
+                              <Sparkles className="h-4 w-4 mr-2" />
                               KI-Analyse anzeigen
                             </DropdownMenuItem>
                           </DropdownMenuContent>
