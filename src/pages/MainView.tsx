@@ -147,8 +147,8 @@ const MainView = () => {
               <p className="text-4xl font-bold">{beitragsrückstände}</p>
             </div>
             <div className="mt-6">
-              <Button className="w-full" disabled>
-                Anzeigen
+              <Button className="w-full" asChild>
+                <Link to="/requests">Anzeigen</Link>
               </Button>
             </div>
           </CardContent>
