@@ -204,36 +204,56 @@ const AIAgent = () => {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Hidden Nachunternehmer Compliance Card - kept for easy restoration */}
+        <Card style={{ display: 'none' }}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Nachunternehmer Compliance</CardTitle>
+            <Building className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="flex flex-col items-center p-3 rounded-md bg-green-50">
+                <span className="text-green-600 font-bold text-3xl">0</span>
+                <span className="text-sm block text-muted-foreground mt-1">Compliant</span>
+              </div>
+              <div className="flex flex-col items-center p-3 rounded-md bg-red-50">
+                <span className="text-red-600 font-bold text-3xl">3</span>
+                <span className="text-sm block text-muted-foreground mt-1">Nicht Compliant</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Versendete Erinnerungen</CardTitle>
+            <CardTitle className="text-sm font-medium">Beitragsrückstände</CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">+3 diese Woche</p>
+            <div className="text-2xl font-bold">1</div>
+            <p className="text-xs text-muted-foreground">+0 diese Woche</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Erhaltene Dokumente</CardTitle>
+            <CardTitle className="text-sm font-medium">Fehlende oder abgelaufene Dokumente</CardTitle>
             <FileCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
-            <p className="text-xs text-muted-foreground">+7 diese Woche</p>
+            <div className="text-2xl font-bold">9</div>
+            <p className="text-xs text-muted-foreground">+2 diese Woche</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Offene Anfragen</CardTitle>
+            <CardTitle className="text-sm font-medium">Ablaufende Dokumente</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">6</div>
-            <p className="text-xs text-muted-foreground">2 überfällig</p>
+            <div className="text-2xl font-bold">4</div>
+            <p className="text-xs text-muted-foreground">in den nächsten 30 Tagen</p>
           </CardContent>
         </Card>
       </div>
