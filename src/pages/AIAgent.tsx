@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,9 +37,9 @@ const emailReminders = [
   },
   {
     id: "rem-2", 
-    recipient: "Polish Construction Ltd.",
+    recipient: "Bau Meister & Co. KG",
     contact: "Jan Kowalski",
-    email: "j.kowalski@polishconstruction.pl",
+    email: "j.kowalski@baumeister.de",
     documentType: "A1-Bescheinigung",
     sentDate: "2024-06-14T14:15:00Z",
     status: "responded",
@@ -65,13 +64,12 @@ const emailReminders = [
 const receivedDocuments = [
   {
     id: "doc-1",
-    sender: "Polish Construction Ltd.",
+    sender: "Bau Meister & Co. KG",
     contact: "Jan Kowalski",
-    email: "j.kowalski@polishconstruction.pl",
+    email: "j.kowalski@baumeister.de",
     documentType: "A1-Bescheinigung",
     receivedDate: "2024-06-15T16:20:00Z",
     status: "accepted",
-    aiComment: "Dokument vollständig und gültig. Alle erforderlichen Informationen vorhanden.",
     documentLevel: "employee",
     receptionMethod: "email"
   },
@@ -83,7 +81,6 @@ const receivedDocuments = [
     documentType: "Unbedenklichkeitsbescheinigung",
     receivedDate: "2024-06-14T11:30:00Z",
     status: "rejected",
-    aiComment: "Dokument ist abgelaufen. Gültigkeitsdatum liegt in der Vergangenheit.",
     documentLevel: "employee",
     receptionMethod: "app"
   },
@@ -95,7 +92,6 @@ const receivedDocuments = [
     documentType: "Reisepass",
     receivedDate: "2024-06-16T08:45:00Z",
     status: "pending",
-    aiComment: "Bildqualität unzureichend für vollständige Verifikation. Manuelle Prüfung empfohlen.",
     documentLevel: "employee",
     receptionMethod: "email"
   },
@@ -107,19 +103,17 @@ const receivedDocuments = [
     documentType: "Gewerbeanmeldung",
     receivedDate: "2024-06-12T14:20:00Z",
     status: "pending",
-    aiComment: "Gewerbeanmeldung vollständig. Alle erforderlichen Angaben vorhanden.",
     documentLevel: "company",
     receptionMethod: "app"
   },
   {
     id: "comp-doc-2",
-    sender: "Polish Construction Ltd.",
+    sender: "Bau Meister & Co. KG",
     contact: "Jan Kowalski",
-    email: "office@polishconstruction.pl",
+    email: "office@baumeister.de",
     documentType: "Handelsregisterauszug",
     receivedDate: "2024-06-11T09:15:00Z",
     status: "accepted",
-    aiComment: "Handelsregisterauszug aktuell und gültig.",
     documentLevel: "company",
     receptionMethod: "email"
   },
@@ -131,7 +125,6 @@ const receivedDocuments = [
     documentType: "Betriebshaftpflichtversicherung",
     receivedDate: "2024-06-10T16:30:00Z",
     status: "rejected",
-    aiComment: "Versicherungspolice unvollständig. Deckungssumme nicht erkennbar.",
     documentLevel: "company",
     receptionMethod: "app"
   }
