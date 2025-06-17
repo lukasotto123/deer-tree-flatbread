@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -15,6 +14,7 @@ const VendorDashboard = () => {
     { id: "employee-2", name: "Maria Wagner", position: "Elektrikerin", documents: { valid: 3, expiring: 0, missing: 2 } },
     { id: "employee-3", name: "Pierre Dubois", position: "Maurer", documents: { valid: 5, expiring: 0, missing: 0 } },
     { id: "employee-4", name: "Isabella Romano", position: "Installateur", documents: { valid: 2, expiring: 2, missing: 1 } },
+    { id: "employee-15", name: "Jan Kowalski", position: "Maurer", documents: { valid: 3, expiring: 0, missing: 1 } },
   ];
 
   // Customer data

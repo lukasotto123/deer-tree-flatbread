@@ -55,6 +55,9 @@ const VendorPersonView = () => {
   } else if (employee.id === "employee-5") {
     employeeName = "Miguel González";
     citizenship = "Spanien";
+  } else if (employee.id === "employee-15") {
+    employeeName = "Jan Kowalski";
+    citizenship = "Polen";
   } else if (employee.id === "employee-6") {
     employeeName = "Sophia Müller";
     citizenship = "Deutschland";
