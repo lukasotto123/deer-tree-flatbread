@@ -1,9 +1,10 @@
 
 export const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
-  // Mark specific documents as missing for Jan Kowalski (employee-15)
+  // Spezielle Behandlung für Jan Kowalski (employee-15) - bestimmte Dokumente ausblenden
   if (employeeId === "employee-15") {
-    if (documentTypeId === "doc-type-5") return true; // Unbedenklichkeitsbescheinigung Krankenkasse
-    if (documentTypeId === "doc-type-6") return true; // Meldebescheinigung Sozialversicherung
+    // Diese Dokumente sollen für Jan nicht in der Tabelle erscheinen
+    if (documentTypeId === "doc-type-5") return true; // Aufenthaltserlaubnis
+    if (documentTypeId === "doc-type-6") return true; // Arbeitserlaubnis
   }
   
   // Mark some documents as missing for other specific employees
@@ -20,12 +21,17 @@ export const getDocumentStatus = (employeeId: string, docTypeId: string) => {
     return "missing";
   }
   
-  // Special handling for Jan Kowalski's A1-Bescheinigung - should be expired, not valid
-  if (employeeId === "employee-15" && docTypeId === "doc-type-11") {
-    return "expired";
+  // Spezielle Behandlung für Jan Kowalski (employee-15)
+  if (employeeId === "employee-15") {
+    // A1-Bescheinigung soll expired sein
+    if (docTypeId === "doc-type-11") return "expired";
+    // Alle anderen gewünschten Dokumente sollen valid sein
+    if (docTypeId === "doc-type-12") return "valid"; // Reisepass
+    if (docTypeId === "doc-type-4") return "valid";  // Unbedenklichkeitsbescheinigung Krankenkasse
+    if (docTypeId === "doc-type-25") return "valid"; // Meldebescheinigung Sozialversicherung
   }
   
-  // Default random distribution
+  // Default random distribution for other employees
   const rand = Math.random();
   if (rand < 0.7) return "valid";
   else if (rand < 0.85) return "expiring";
