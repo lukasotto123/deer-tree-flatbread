@@ -6,7 +6,7 @@ import { employees, documents, providers, documentTypes } from "@/data/dummy-dat
 import StatusBadge from "@/components/ui/StatusBadge";
 import EmployeeInformation from "@/components/person/EmployeeInformation";
 import DocumentsTable from "@/components/person/DocumentsTable";
-import { getEmployeeNameAndCitizenship, determineWorstStatus } from "@/components/person/documentStatusUtils";
+import { getEmployeeNameAndCitizenship, determineWorstStatus, shouldDocumentBeMissing } from "@/components/person/documentStatusUtils";
 
 const PersonView = () => {
   const { providerId, employeeId } = useParams<{ providerId: string; employeeId: string }>();
@@ -36,6 +36,9 @@ const PersonView = () => {
     
     // Filter based on citizenship - A1-Bescheinigung not needed for Germans
     if (dt.id === "doc-type-11" && citizenship === "Deutschland") return false; 
+    
+    // Exclude documents that should be missing/hidden for this employee
+    if (shouldDocumentBeMissing(employeeId!, dt.id)) return false;
     
     return true;
   });
