@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -148,7 +147,7 @@ const MainView = () => {
               <p className="text-4xl font-bold">{beitragsrückstände}</p>
             </div>
             <div className="mt-6">
-              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled>
+              <Button className="w-full" disabled>
                 Anzeigen
               </Button>
             </div>
