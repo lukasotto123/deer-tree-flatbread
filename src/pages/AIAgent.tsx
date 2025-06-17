@@ -17,10 +17,9 @@ import {
   MoreHorizontal, 
   Eye, 
   Download,
-  XCircle,
-  AlertTriangle,
   Globe,
-  Building
+  Building,
+  Smartphone
 } from "lucide-react";
 
 // Mock data for AI Agent
@@ -66,103 +65,75 @@ const emailReminders = [
 const receivedDocuments = [
   {
     id: "doc-1",
-    sender: "Jan Kowalski",
+    sender: "Polish Construction Ltd.",
+    contact: "Jan Kowalski",
     email: "j.kowalski@polishconstruction.pl",
     documentType: "A1-Bescheinigung",
     receivedDate: "2024-06-15T16:20:00Z",
     status: "accepted",
-    aiConfidence: 95,
-    extractedData: {
-      validFrom: "2024-01-01",
-      validUntil: "2024-12-31",
-      issuingCountry: "Polen",
-      employeeName: "Jan Kowalski"
-    },
     aiComment: "Dokument vollständig und gültig. Alle erforderlichen Informationen vorhanden.",
-    documentLevel: "employee"
+    documentLevel: "employee",
+    receptionMethod: "email"
   },
   {
     id: "doc-2",
-    sender: "Maria Wagner", 
-    email: "m.wagner@services.de",
+    sender: "Bauunternehmen Schmidt GmbH",
+    contact: "Hans Schmidt", 
+    email: "schmidt@bauunternehmen.de",
     documentType: "Unbedenklichkeitsbescheinigung",
     receivedDate: "2024-06-14T11:30:00Z",
     status: "rejected",
-    aiConfidence: 88,
-    extractedData: {
-      validFrom: "2024-01-01",
-      validUntil: "2024-05-31",
-      issuingAuthority: "Krankenkasse ABC"
-    },
     aiComment: "Dokument ist abgelaufen. Gültigkeitsdatum liegt in der Vergangenheit.",
-    documentLevel: "employee"
+    documentLevel: "employee",
+    receptionMethod: "app"
   },
   {
     id: "doc-3",
-    sender: "Pierre Dubois",
+    sender: "French Services SARL",
+    contact: "Pierre Dubois",
     email: "p.dubois@frenchservices.fr", 
     documentType: "Reisepass",
     receivedDate: "2024-06-16T08:45:00Z",
     status: "pending",
-    aiConfidence: 72,
-    extractedData: {
-      validUntil: "2026-03-15",
-      nationality: "Französisch",
-      passportNumber: "12AB34567"
-    },
     aiComment: "Bildqualität unzureichend für vollständige Verifikation. Manuelle Prüfung empfohlen.",
-    documentLevel: "employee"
+    documentLevel: "employee",
+    receptionMethod: "email"
   },
   {
     id: "comp-doc-1",
     sender: "Bauunternehmen Schmidt GmbH",
+    contact: "Hans Schmidt",
     email: "info@bauunternehmen-schmidt.de",
     documentType: "Gewerbeanmeldung",
     receivedDate: "2024-06-12T14:20:00Z",
     status: "pending",
-    aiConfidence: 91,
-    extractedData: {
-      validFrom: "2024-01-15",
-      validUntil: "Unbefristet",
-      registrationNumber: "GEW-2024-15892",
-      companyName: "Bauunternehmen Schmidt GmbH"
-    },
     aiComment: "Gewerbeanmeldung vollständig. Alle erforderlichen Angaben vorhanden.",
-    documentLevel: "company"
+    documentLevel: "company",
+    receptionMethod: "app"
   },
   {
     id: "comp-doc-2",
     sender: "Polish Construction Ltd.",
+    contact: "Jan Kowalski",
     email: "office@polishconstruction.pl",
     documentType: "Handelsregisterauszug",
     receivedDate: "2024-06-11T09:15:00Z",
     status: "accepted",
-    aiConfidence: 94,
-    extractedData: {
-      validFrom: "2024-02-03",
-      validUntil: "2024-12-31",
-      registrationNumber: "HRB 245891",
-      companyName: "Polish Construction Ltd."
-    },
     aiComment: "Handelsregisterauszug aktuell und gültig.",
-    documentLevel: "company"
+    documentLevel: "company",
+    receptionMethod: "email"
   },
   {
     id: "comp-doc-3",
     sender: "French Services SARL",
+    contact: "Pierre Dubois",
     email: "contact@frenchservices.fr",
     documentType: "Betriebshaftpflichtversicherung",
     receivedDate: "2024-06-10T16:30:00Z",
     status: "rejected",
-    aiConfidence: 67,
-    extractedData: {
-      validFrom: "2024-01-01",
-      validUntil: "2024-12-31",
-      registrationNumber: "BHV-2024-78321",
-      companyName: "French Services SARL"
-    },
     aiComment: "Versicherungspolice unvollständig. Deckungssumme nicht erkennbar.",
-    documentLevel: "company"
+    documentLevel: "company",
+    receptionMethod: "app"
   }
 ];
 
@@ -186,10 +157,19 @@ const AIAgent = () => {
     return <Badge variant={config.variant}>{config.text}</Badge>;
   };
 
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 90) return "text-green-600";
-    if (confidence >= 75) return "text-yellow-600";
-    return "text-red-600";
+  const getReceptionMethodBadge = (method: string) => {
+    const methodConfig = {
+      email: { text: "E-Mail", variant: "outline" as const, icon: Mail },
+      app: { text: "Pactos-App", variant: "secondary" as const, icon: Smartphone }
+    };
+    const config = methodConfig[method as keyof typeof methodConfig];
+    const IconComponent = config.icon;
+    return (
+      <Badge variant={config.variant} className="flex items-center gap-1">
+        <IconComponent className="h-3 w-3" />
+        {config.text}
+      </Badge>
+    );
   };
 
   const handleDocumentClick = (documentId: string) => {
@@ -386,9 +366,9 @@ const AIAgent = () => {
                     <TableHead>Dokumenttyp</TableHead>
                     <TableHead>Ebene</TableHead>
                     <TableHead>Empfangen</TableHead>
-                    <TableHead>KI-Vertrauen</TableHead>
+                    <TableHead>Empfangsmethode</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Extrahierte Daten</TableHead>
+                    <TableHead>KI-Kommentar</TableHead>
                     <TableHead className="text-right">Aktionen</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -413,20 +393,11 @@ const AIAgent = () => {
                         </div>
                       </TableCell>
                       <TableCell>{new Date(doc.receivedDate).toLocaleDateString('de-DE')}</TableCell>
-                      <TableCell>
-                        <div className={`font-medium ${getConfidenceColor(doc.aiConfidence)}`}>
-                          {doc.aiConfidence}%
-                        </div>
-                      </TableCell>
+                      <TableCell>{getReceptionMethodBadge(doc.receptionMethod)}</TableCell>
                       <TableCell>{getStatusBadge(doc.status)}</TableCell>
                       <TableCell>
-                        <div className="text-xs space-y-1">
-                          {Object.entries(doc.extractedData).slice(0, 2).map(([key, value]) => (
-                            <div key={key} className="flex gap-1">
-                              <span className="font-medium">{key}:</span>
-                              <span>{value}</span>
-                            </div>
-                          ))}
+                        <div className="text-xs max-w-xs truncate" title={doc.aiComment}>
+                          {doc.aiComment}
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
