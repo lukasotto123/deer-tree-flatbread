@@ -1,390 +1,455 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, FileText, CheckCircle, AlertTriangle, Bot, Search } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Brain, 
+  Mail, 
+  FileCheck, 
+  Clock, 
+  Users, 
+  MoreHorizontal, 
+  Eye, 
+  Download,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Search,
+  Filter,
+  Calendar,
+  Globe
+} from "lucide-react";
+
+// Mock data for AI Agent
+const emailReminders = [
+  {
+    id: "rem-1",
+    recipient: "Bauunternehmen Schmidt GmbH",
+    contact: "Hans Schmidt",
+    email: "schmidt@bauunternehmen.de",
+    documentType: "Unbedenklichkeitsbescheinigung Krankenkasse",
+    sentDate: "2024-06-15T10:30:00Z",
+    status: "sent",
+    language: "de",
+    dueDate: "2024-06-20",
+    reminderCount: 1
+  },
+  {
+    id: "rem-2", 
+    recipient: "Polish Construction Ltd.",
+    contact: "Jan Kowalski",
+    email: "j.kowalski@polishconstruction.pl",
+    documentType: "A1-Bescheinigung",
+    sentDate: "2024-06-14T14:15:00Z",
+    status: "responded",
+    language: "pl",
+    dueDate: "2024-06-18",
+    reminderCount: 2
+  },
+  {
+    id: "rem-3",
+    recipient: "French Services SARL",
+    contact: "Pierre Dubois", 
+    email: "p.dubois@frenchservices.fr",
+    documentType: "Reisepass",
+    sentDate: "2024-06-13T09:45:00Z",
+    status: "overdue",
+    language: "fr",
+    dueDate: "2024-06-17",
+    reminderCount: 3
+  }
+];
+
+const receivedDocuments = [
+  {
+    id: "doc-1",
+    sender: "Jan Kowalski",
+    email: "j.kowalski@polishconstruction.pl",
+    documentType: "A1-Bescheinigung",
+    receivedDate: "2024-06-15T16:20:00Z",
+    status: "accepted",
+    aiConfidence: 95,
+    extractedData: {
+      validFrom: "2024-01-01",
+      validUntil: "2024-12-31",
+      issuingCountry: "Polen",
+      employeeName: "Jan Kowalski"
+    },
+    aiComment: "Dokument vollständig und gültig. Alle erforderlichen Informationen vorhanden."
+  },
+  {
+    id: "doc-2",
+    sender: "Maria Wagner", 
+    email: "m.wagner@services.de",
+    documentType: "Unbedenklichkeitsbescheinigung",
+    receivedDate: "2024-06-14T11:30:00Z",
+    status: "rejected",
+    aiConfidence: 88,
+    extractedData: {
+      validFrom: "2024-01-01",
+      validUntil: "2024-05-31",
+      issuingAuthority: "Krankenkasse ABC"
+    },
+    aiComment: "Dokument ist abgelaufen. Gültigkeitsdatum liegt in der Vergangenheit."
+  },
+  {
+    id: "doc-3",
+    sender: "Pierre Dubois",
+    email: "p.dubois@frenchservices.fr", 
+    documentType: "Reisepass",
+    receivedDate: "2024-06-16T08:45:00Z",
+    status: "pending",
+    aiConfidence: 72,
+    extractedData: {
+      validUntil: "2026-03-15",
+      nationality: "Französisch",
+      passportNumber: "12AB34567"
+    },
+    aiComment: "Bildqualität unzureichend für vollständige Verifikation. Manuelle Prüfung empfohlen."
+  }
+];
 
 const AIAgent = () => {
-  const [message, setMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<Array<{type: "user" | "bot", content: string}>>([
-    {
-      type: "bot",
-      content: "Hallo! Ich bin Ihr DocGuardian KI-Assistent. Wie kann ich Ihnen heute helfen?"
-    }
-  ]);
-  const [activeTab, setActiveTab] = useState("chat");
+  const [selectedTab, setSelectedTab] = useState("overview");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim()) return;
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      sent: { text: "Versendet", variant: "secondary" as const },
+      responded: { text: "Beantwortet", variant: "default" as const },
+      overdue: { text: "Überfällig", variant: "destructive" as const },
+      accepted: { text: "Akzeptiert", variant: "default" as const },
+      rejected: { text: "Abgelehnt", variant: "destructive" as const },
+      pending: { text: "Prüfung", variant: "secondary" as const }
+    };
+    const config = statusConfig[status as keyof typeof statusConfig];
+    return <Badge variant={config.variant}>{config.text}</Badge>;
+  };
 
-    // Add user message to chat
-    setChatHistory(prev => [...prev, { type: "user", content: message }]);
-
-    // Simulate AI response based on content
-    setTimeout(() => {
-      let response = "Ich verstehe Ihre Anfrage. Wie kann ich Ihnen weiterhelfen?";
-      
-      if (message.toLowerCase().includes("dokument")) {
-        response = "Ich kann Ihnen bei der Dokumentenanalyse helfen. Möchten Sie ein Dokument prüfen lassen oder eine neue Anfrage stellen?";
-      } else if (message.toLowerCase().includes("dienstleister")) {
-        response = "Ich kann Ihnen Informationen zu Ihren Dienstleistern geben. Welchen Dienstleister möchten Sie überprüfen?";
-      } else if (message.toLowerCase().includes("prüf") || message.toLowerCase().includes("validi")) {
-        response = "Unsere KI-Validierung kann Dokumente auf Echtheit prüfen und potenzielle Fälschungen erkennen. Möchten Sie ein bestimmtes Dokument validieren?";
-      }
-      
-      setChatHistory(prev => [...prev, { type: "bot", content: response }]);
-    }, 1000);
-
-    setMessage("");
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 90) return "text-green-600";
+    if (confidence >= 75) return "text-yellow-600";
+    return "text-red-600";
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">KI-Assistent</h1>
-        <p className="text-muted-foreground mt-1">
-          Ihr intelligenter Helfer für Dokumentenverwaltung und -prüfung
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Brain className="h-8 w-8 text-primary" />
+            KI-Agent
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Automatische Dokumenten-Erinnerungen und intelligente Verarbeitung
+          </p>
+        </div>
+        <Button>
+          <Brain className="h-4 w-4 mr-2" />
+          KI-Einstellungen
+        </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-3 w-full md:w-[400px]">
-          <TabsTrigger value="chat">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Chat
-          </TabsTrigger>
-          <TabsTrigger value="verify">
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Dokumente prüfen
-          </TabsTrigger>
-          <TabsTrigger value="features">
-            <Bot className="h-4 w-4 mr-2" />
-            Funktionen
-          </TabsTrigger>
-        </TabsList>
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Versendete Erinnerungen</CardTitle>
+            <Mail className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">24</div>
+            <p className="text-xs text-muted-foreground">+3 diese Woche</p>
+          </CardContent>
+        </Card>
         
-        <TabsContent value="chat" className="mt-0">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="h-[600px] flex flex-col lg:col-span-2">
-              <CardHeader className="border-b">
-                <CardTitle className="flex items-center">
-                  <Bot className="h-5 w-5 mr-2 text-primary" />
-                  DocGuardian KI-Assistent
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Erhaltene Dokumente</CardTitle>
+            <FileCheck className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">18</div>
+            <p className="text-xs text-muted-foreground">+7 diese Woche</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">KI-Akzeptanzrate</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">87%</div>
+            <p className="text-xs text-muted-foreground">+5% vs. letzter Monat</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Offene Anfragen</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">6</div>
+            <p className="text-xs text-muted-foreground">2 überfällig</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview">Übersicht</TabsTrigger>
+          <TabsTrigger value="reminders">Email-Erinnerungen</TabsTrigger>
+          <TabsTrigger value="documents">Erhaltene Dokumente</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Letzte Erinnerungen
                 </CardTitle>
-                <CardDescription>
-                  Stellen Sie Fragen zu Dokumenten, Dienstleistern oder lassen Sie Dokumente automatisch prüfen
-                </CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow flex flex-col p-0">
-                <div className="flex-grow overflow-y-auto p-6 space-y-4">
-                  {chatHistory.map((msg, index) => (
-                    <div 
-                      key={index} 
-                      className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      <div className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                        msg.type === "user" 
-                          ? "bg-primary text-white" 
-                          : "bg-muted"
-                      }`}>
-                        {msg.content}
+              <CardContent>
+                <div className="space-y-3">
+                  {emailReminders.slice(0, 3).map((reminder) => (
+                    <div key={reminder.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex-1">
+                        <div className="font-medium">{reminder.recipient}</div>
+                        <div className="text-sm text-muted-foreground">{reminder.documentType}</div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Globe className="h-3 w-3" />
+                          <span className="text-xs">{reminder.language.toUpperCase()}</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {getStatusBadge(reminder.status)}
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {new Date(reminder.sentDate).toLocaleDateString('de-DE')}
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="border-t p-4">
-                  <form onSubmit={handleSendMessage} className="flex gap-2">
-                    <Input
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Nachricht eingeben..."
-                      className="flex-grow"
-                    />
-                    <Button type="submit">Senden</Button>
-                  </form>
-                </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Vorschläge</CardTitle>
-                <CardDescription>Mögliche Fragen an den KI-Assistenten</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <FileCheck className="h-5 w-5" />
+                  Neueste Dokumente
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start text-left h-auto py-3" 
-                  onClick={() => {
-                    setMessage("Welche Dokumente laufen bald ab?");
-                    document.querySelector("form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-                  }}
-                >
-                  <Search className="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span>Welche Dokumente laufen bald ab?</span>
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start text-left h-auto py-3" 
-                  onClick={() => {
-                    setMessage("Erstelle eine Dokumentenanfrage für den Dienstleister XYZ");
-                    document.querySelector("form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-                  }}
-                >
-                  <FileText className="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span>Erstelle eine Dokumentenanfrage für den Dienstleister XYZ</span>
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start text-left h-auto py-3" 
-                  onClick={() => {
-                    setMessage("Überprüfe die Echtheit des Dokuments 'AÜG-Bescheinigung.pdf'");
-                    document.querySelector("form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-                  }}
-                >
-                  <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span>Überprüfe die Echtheit des Dokuments 'AÜG-Bescheinigung.pdf'</span>
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start text-left h-auto py-3" 
-                  onClick={() => {
-                    setMessage("Zeige mir alle verdächtigen Dokumente");
-                    document.querySelector("form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-                  }}
-                >
-                  <AlertTriangle className="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span>Zeige mir alle verdächtigen Dokumente</span>
-                </Button>
+              <CardContent>
+                <div className="space-y-3">
+                  {receivedDocuments.slice(0, 3).map((doc) => (
+                    <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex-1">
+                        <div className="font-medium">{doc.sender}</div>
+                        <div className="text-sm text-muted-foreground">{doc.documentType}</div>
+                        <div className={`text-xs font-medium ${getConfidenceColor(doc.aiConfidence)} mt-1`}>
+                          KI-Vertrauen: {doc.aiConfidence}%
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {getStatusBadge(doc.status)}
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {new Date(doc.receivedDate).toLocaleDateString('de-DE')}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
-        
-        <TabsContent value="verify" className="mt-0">
-          <Card className="border border-dashed border-primary/50">
-            <CardContent className="pt-6">
-              <div className="text-center py-12">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <FileText className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-medium mb-2">Dokument zur KI-Prüfung hochladen</h3>
-                <p className="text-muted-foreground mb-6">
-                  Laden Sie ein Dokument hoch, um es auf Echtheit und Gültigkeit zu überprüfen
-                </p>
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <Button>Dokument auswählen</Button>
-                  <p className="text-xs text-muted-foreground">oder per Drag & Drop</p>
-                </div>
-              </div>
+
+        <TabsContent value="reminders" className="space-y-4">
+          <div className="flex gap-4 items-center">
+            <div className="flex-1">
+              <Input
+                placeholder="Suche nach Empfänger oder Dokumenttyp..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Status</SelectItem>
+                <SelectItem value="sent">Versendet</SelectItem>
+                <SelectItem value="responded">Beantwortet</SelectItem>
+                <SelectItem value="overdue">Überfällig</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Empfänger</TableHead>
+                    <TableHead>Kontakt</TableHead>
+                    <TableHead>Dokumenttyp</TableHead>
+                    <TableHead>Sprache</TableHead>
+                    <TableHead>Gesendet</TableHead>
+                    <TableHead>Fälligkeitsdatum</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Erinnerungen</TableHead>
+                    <TableHead className="text-right">Aktionen</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {emailReminders.map((reminder) => (
+                    <TableRow key={reminder.id}>
+                      <TableCell className="font-medium">{reminder.recipient}</TableCell>
+                      <TableCell>
+                        <div>{reminder.contact}</div>
+                        <div className="text-xs text-muted-foreground">{reminder.email}</div>
+                      </TableCell>
+                      <TableCell>{reminder.documentType}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{reminder.language.toUpperCase()}</Badge>
+                      </TableCell>
+                      <TableCell>{new Date(reminder.sentDate).toLocaleDateString('de-DE')}</TableCell>
+                      <TableCell>{new Date(reminder.dueDate).toLocaleDateString('de-DE')}</TableCell>
+                      <TableCell>{getStatusBadge(reminder.status)}</TableCell>
+                      <TableCell>{reminder.reminderCount}x</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Email anzeigen
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Mail className="h-4 w-4 mr-2" />
+                              Erneut senden
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Letzte Prüfungen</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between py-2 border-b">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-success" />
-                    <span>AÜG-Bescheinigung.pdf</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">Vor 2 Stunden</span>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-destructive" />
-                    <span>DGUV-Nachweis.pdf</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">Gestern</span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-success" />
-                    <span>ISO-Zertifikat.pdf</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">Vor 3 Tagen</span>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Automatische Erkennung</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-primary/10 p-2 rounded-lg">
-                      <Bot className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Dokumenttyperkennung</h3>
-                      <p className="text-sm text-muted-foreground">
-                        KI erkennt automatisch den Typ des Dokuments
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-primary/10 p-2 rounded-lg">
-                      <CheckCircle className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Datumserkennung</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Automatisches Auslesen von Ausstellungs- und Ablaufdaten
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-primary/10 p-2 rounded-lg">
-                      <AlertTriangle className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Fälschungserkennung</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Identifizierung von verdächtigen Merkmalen oder Manipulationen
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
-        
-        <TabsContent value="features" className="mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="h-5 w-5 mr-2 text-primary" />
-                  Dokumentenerkennung
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Automatische Erkennung von Dokumenttypen und Extraktion von Daten aus hochgeladenen Dokumenten.
-                </p>
-                <ul className="space-y-2 list-disc pl-4">
-                  <li>Erkennung von Dokumenttypen</li>
-                  <li>Extraktion von Ausstellungs- und Ablaufdaten</li>
-                  <li>Erkennung von Ausstellern und Dienstleistern</li>
-                  <li>Automatische Kategorisierung</li>
-                </ul>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CheckCircle className="h-5 w-5 mr-2 text-primary" />
-                  Dokumentvalidierung
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Überprüfung der Echtheit und Gültigkeit von Dokumenten durch fortschrittliche KI-Analysen.
-                </p>
-                <ul className="space-y-2 list-disc pl-4">
-                  <li>Validierung von Dokumenteninhalten</li>
-                  <li>Überprüfung von Unterschriften</li>
-                  <li>Verifikation von Stempeln und Siegeln</li>
-                  <li>Echtheitszertifikat für geprüfte Dokumente</li>
-                </ul>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <AlertTriangle className="h-5 w-5 mr-2 text-primary" />
-                  Fälschungserkennung
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Erkennung von potenziell gefälschten oder manipulierten Dokumenten mit modernsten KI-Algorithmen.
-                </p>
-                <ul className="space-y-2 list-disc pl-4">
-                  <li>Erkennung von manipulierten Bildern</li>
-                  <li>Identifikation von veränderten Texten</li>
-                  <li>Prüfung auf inkonsistente Formatierungen</li>
-                  <li>Echtzeitmeldungen bei verdächtigen Merkmalen</li>
-                </ul>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <MessageSquare className="h-5 w-5 mr-2 text-primary" />
-                  Automatisierte Anfragen
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  KI-gestützte Erstellung und Versand von Dokumentenanfragen an Dienstleister mit intelligenten Vorlagen.
-                </p>
-                <ul className="space-y-2 list-disc pl-4">
-                  <li>Automatische Erinnerungen bei ablaufenden Dokumenten</li>
-                  <li>Personalisierte Anfragen für fehlende Dokumente</li>
-                  <li>Nachverfolgung offener Anfragen</li>
-                  <li>Automatische Dokumentenkategorisierung bei Erhalt</li>
-                </ul>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Bot className="h-5 w-5 mr-2 text-primary" />
-                  KI-Assistenz
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Intelligenter Chat-Assistent für alle Fragen rund um Dokumente und Dienstleister.
-                </p>
-                <ul className="space-y-2 list-disc pl-4">
-                  <li>Natürlichsprachige Interaktion</li>
-                  <li>Dokumentensuche durch Spracheingabe</li>
-                  <li>Automatische Vorschläge zur Dokumentenverwaltung</li>
-                  <li>Intelligente Analysen des Dokumentenbestands</li>
-                </ul>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Search className="h-5 w-5 mr-2 text-primary" />
-                  Intelligente Suche
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Durchsuchen Sie Dokumente nach Inhalten, nicht nur nach Metadaten.
-                </p>
-                <ul className="space-y-2 list-disc pl-4">
-                  <li>Volltextsuche in allen Dokumenten</li>
-                  <li>Semantische Suche nach ähnlichen Inhalten</li>
-                  <li>Filterung nach erkannten Entitäten</li>
-                  <li>Suche nach visuell ähnlichen Dokumenten</li>
-                </ul>
-              </CardContent>
-            </Card>
+
+        <TabsContent value="documents" className="space-y-4">
+          <div className="flex gap-4 items-center">
+            <div className="flex-1">
+              <Input
+                placeholder="Suche nach Absender oder Dokumenttyp..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Status</SelectItem>
+                <SelectItem value="accepted">Akzeptiert</SelectItem>
+                <SelectItem value="rejected">Abgelehnt</SelectItem>
+                <SelectItem value="pending">Prüfung</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Absender</TableHead>
+                    <TableHead>Dokumenttyp</TableHead>
+                    <TableHead>Empfangen</TableHead>
+                    <TableHead>KI-Vertrauen</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Extrahierte Daten</TableHead>
+                    <TableHead className="text-right">Aktionen</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {receivedDocuments.map((doc) => (
+                    <TableRow key={doc.id}>
+                      <TableCell>
+                        <div className="font-medium">{doc.sender}</div>
+                        <div className="text-xs text-muted-foreground">{doc.email}</div>
+                      </TableCell>
+                      <TableCell>{doc.documentType}</TableCell>
+                      <TableCell>{new Date(doc.receivedDate).toLocaleDateString('de-DE')}</TableCell>
+                      <TableCell>
+                        <div className={`font-medium ${getConfidenceColor(doc.aiConfidence)}`}>
+                          {doc.aiConfidence}%
+                        </div>
+                      </TableCell>
+                      <TableCell>{getStatusBadge(doc.status)}</TableCell>
+                      <TableCell>
+                        <div className="text-xs space-y-1">
+                          {Object.entries(doc.extractedData).map(([key, value]) => (
+                            <div key={key} className="flex gap-1">
+                              <span className="font-medium">{key}:</span>
+                              <span>{value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Dokument anzeigen
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Download className="h-4 w-4 mr-2" />
+                              Herunterladen
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Brain className="h-4 w-4 mr-2" />
+                              KI-Analyse anzeigen
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

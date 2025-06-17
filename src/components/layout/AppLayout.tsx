@@ -19,7 +19,8 @@ const AppLayout = ({ userMode, onModeChange }: AppLayoutProps) => {
     { name: "Dashboard", path: "/" },
     { name: "Dokumentenanforderungen", path: "/document-requirements" },
     { name: "Dokumentenprüfung", path: "/document-review/provider-3/new" },
-    { name: "Anfragen", path: "/requests" }
+    { name: "Anfragen", path: "/requests" },
+    { name: "KI-Agent", path: "/ai-agent" }
   ];
   
   // For lieferant view, add Anfragen to the navigation links
