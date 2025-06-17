@@ -40,19 +40,20 @@ const Dashboard = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Hidden Partner Compliance Card - kept for easy restoration */}
+        <div className="bg-white rounded-lg shadow" style={{ display: 'none' }}>
           <div className="p-6">
             <h3 className="text-lg font-medium text-center">
               Partner Compliance
             </h3>
             <div className="flex justify-center items-center gap-4 mt-3">
               <div className="text-center">
-                <span className="text-green-600 font-bold text-2xl">{compliantPartners.length}</span>
+                <span className="font-bold text-2xl">{compliantPartners.length}</span>
                 <span className="text-xs block">compliant</span>
               </div>
               <div className="text-center">
-                <span className="text-red-600 font-bold text-2xl">{nonCompliantPartners.length}</span>
+                <span className="font-bold text-2xl">{nonCompliantPartners.length}</span>
                 <span className="text-xs block">nicht compliant</span>
               </div>
             </div>

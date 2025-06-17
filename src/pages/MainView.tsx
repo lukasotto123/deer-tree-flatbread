@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -108,8 +109,9 @@ const MainView = () => {
       </div>
 
       {/* Redesigned Übersichtskarten */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="overflow-hidden border-muted-foreground/20">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Hidden Nachunternehmer Compliance Card - kept for easy restoration */}
+        <Card className="overflow-hidden border-muted-foreground/20" style={{ display: 'none' }}>
           <CardContent className="pt-6 pb-4 flex flex-col h-full">
             <div className="text-center flex-grow">
               <div className="flex justify-center items-center mb-2">
@@ -118,12 +120,12 @@ const MainView = () => {
               </div>
               
               <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="flex flex-col items-center p-3 rounded-md bg-green-50">
-                  <span className="text-green-600 font-bold text-3xl">{compliantNachunternehmer.length}</span>
+                <div className="flex flex-col items-center p-3 rounded-md">
+                  <span className="font-bold text-3xl">{compliantNachunternehmer.length}</span>
                   <span className="text-sm block text-muted-foreground mt-1">Compliant</span>
                 </div>
-                <div className="flex flex-col items-center p-3 rounded-md bg-red-50">
-                  <span className="text-red-600 font-bold text-3xl">{nonCompliantNachunternehmer.length}</span>
+                <div className="flex flex-col items-center p-3 rounded-md">
+                  <span className="font-bold text-3xl">{nonCompliantNachunternehmer.length}</span>
                   <span className="text-sm block text-muted-foreground mt-1">Nicht Compliant</span>
                 </div>
               </div>
@@ -143,7 +145,7 @@ const MainView = () => {
                 <Euro className="h-5 w-5 text-red-600 mr-2" />
                 <h3 className="text-lg font-medium">Beitragsrückstände</h3>
               </div>
-              <p className="text-4xl font-bold text-red-600">{beitragsrückstände}</p>
+              <p className="text-4xl font-bold">{beitragsrückstände}</p>
             </div>
             <div className="mt-6">
               <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled>
@@ -160,7 +162,7 @@ const MainView = () => {
                 <AlertTriangle className="h-5 w-5 text-amber-600 mr-2" />
                 <h3 className="text-lg font-medium">Fehlende oder abgelaufene Dokumente</h3>
               </div>
-              <p className="text-4xl font-bold text-amber-600">{fehlendeDokumente}</p>
+              <p className="text-4xl font-bold">{fehlendeDokumente}</p>
             </div>
             <div className="mt-6">
               <Button className="w-full" asChild>
@@ -177,7 +179,7 @@ const MainView = () => {
                 <Clock className="h-5 w-5 text-amber-500 mr-2" />
                 <h3 className="text-lg font-medium">Ablaufende Dokumente</h3>
               </div>
-              <p className="text-4xl font-bold text-amber-500">{ablaufendeDokumente}</p>
+              <p className="text-4xl font-bold">{ablaufendeDokumente}</p>
               <p className="text-sm text-muted-foreground mt-1">in den nächsten 30 Tagen</p>
             </div>
             <div className="mt-6">
