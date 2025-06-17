@@ -6,10 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { FileText, Eye } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { FileText, Eye, MoreHorizontal } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
-import { shouldDocumentBeMissing, getDocumentStatus } from "./documentStatusUtils";
+import { shouldDocumentBeMissing, getDocumentStatus, getDocumentExpiryDate } from "./documentStatusUtils";
 
 interface VendorDocumentsTableProps {
   relevantDocTypes: any[];
@@ -41,7 +42,7 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
               <TableHead>Ablaufdatum</TableHead>
               <TableHead>Erinnerungen</TableHead>
               <TableHead>Relevanz</TableHead>
-              <TableHead className="text-right">Aktionen</TableHead>
+              <TableHead className="text-right">Mehr</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -51,6 +52,7 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
               const doc = forceMissing ? null : employeeDocuments.find(d => d.type === docType.id);
               
               const documentStatus = getDocumentStatus(employeeId, docType.id);
+              const expiryDate = getDocumentExpiryDate(employeeId, docType.id);
               
               // Special case for A1-Bescheinigung - only relevant for non-Germans
               const isA1Doc = docType.id === "doc-type-11";
@@ -74,8 +76,8 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
                       {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
                     </TableCell>
                     <TableCell>
-                      {!isMissing && (documentStatus === "expiring" || documentStatus === "expired")
-                        ? new Date(new Date().setMonth(new Date().getMonth() + (documentStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
+                      {!isMissing && expiryDate
+                        ? new Date(expiryDate).toLocaleDateString('de-DE')
                         : '-'}
                     </TableCell>
                     <TableCell>
@@ -102,35 +104,34 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        {/* Only show History button */}
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
-                        >
-                          <FileText className="h-4 w-4 mr-1" />
-                          Historie
-                        </Button>
-                        
-                        {/* Only show View button for existing documents */}
-                        {doc && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
                           >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Anzeigen
-                          </Button>
-                        )}
-                        
-                        {/* Upload/Check button for non-valid or missing documents */}
-                        {(isMissing || (doc && documentStatus !== "valid")) && (
-                          <Button variant="outline" size="sm">
-                            {isMissing ? "Hochladen" : "Prüfen"}
-                          </Button>
-                        )}
-                      </div>
+                            <FileText className="h-4 w-4 mr-2" />
+                            Historie
+                          </DropdownMenuItem>
+                          
+                          {doc && (
+                            <DropdownMenuItem>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Anzeigen
+                            </DropdownMenuItem>
+                          )}
+                          
+                          {(isMissing || (doc && documentStatus !== "valid")) && (
+                            <DropdownMenuItem>
+                              {isMissing ? "Hochladen" : "Prüfen"}
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                   {hasHistory && (

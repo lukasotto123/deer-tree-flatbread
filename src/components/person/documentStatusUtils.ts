@@ -1,4 +1,3 @@
-
 export const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
   // Spezielle Behandlung für Jan Kowalski (employee-15) - bestimmte Dokumente ausblenden
   if (employeeId === "employee-15") {
@@ -36,6 +35,44 @@ export const getDocumentStatus = (employeeId: string, docTypeId: string) => {
   if (rand < 0.7) return "valid";
   else if (rand < 0.85) return "expiring";
   else return "expired";
+};
+
+export const getDocumentExpiryDate = (employeeId: string, docTypeId: string) => {
+  // Spezielle Behandlung für Jan Kowalski (employee-15)
+  if (employeeId === "employee-15") {
+    if (docTypeId === "doc-type-12") { // Reisepass
+      // Reisepass läuft in 2 Jahren ab
+      const expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 2);
+      return expiryDate.toISOString();
+    }
+    if (docTypeId === "doc-type-25") { // Meldebescheinigung Sozialversicherung
+      // Meldebescheinigung läuft in 1 Jahr ab
+      const expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+      return expiryDate.toISOString();
+    }
+    if (docTypeId === "doc-type-11") { // A1-Bescheinigung (expired)
+      // A1-Bescheinigung ist vor 2 Monaten abgelaufen
+      const expiryDate = new Date();
+      expiryDate.setMonth(expiryDate.getMonth() - 2);
+      return expiryDate.toISOString();
+    }
+  }
+  
+  // For other employees, generate random expiry dates based on status
+  const status = getDocumentStatus(employeeId, docTypeId);
+  const expiryDate = new Date();
+  
+  if (status === "expired") {
+    expiryDate.setMonth(expiryDate.getMonth() - Math.floor(Math.random() * 6) - 1);
+  } else if (status === "expiring") {
+    expiryDate.setMonth(expiryDate.getMonth() + Math.floor(Math.random() * 2) + 1);
+  } else if (status === "valid") {
+    expiryDate.setFullYear(expiryDate.getFullYear() + Math.floor(Math.random() * 3) + 1);
+  }
+  
+  return expiryDate.toISOString();
 };
 
 export const getEmployeeNameAndCitizenship = (employee: any) => {
