@@ -28,7 +28,13 @@ const VendorPersonView = () => {
 
   // Function to determine if a document should be missing based on employee and document type
   const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
-    // Mark some documents as missing for specific employees
+    // Mark specific documents as missing for Jan Kowalski (employee-15)
+    if (employeeId === "employee-15") {
+      if (documentTypeId === "doc-type-5") return true; // Unbedenklichkeitsbescheinigung Krankenkasse
+      if (documentTypeId === "doc-type-6") return true; // Meldebescheinigung Sozialversicherung
+    }
+    
+    // Mark some documents as missing for other specific employees
     if (employeeId === "employee-1" && documentTypeId === "doc-type-5") return true;
     if (employeeId === "employee-2" && documentTypeId === "doc-type-6") return true;
     if (employeeId === "employee-3" && documentTypeId === "doc-type-7") return true;
@@ -87,7 +93,6 @@ const VendorPersonView = () => {
   
   // All document types that might be relevant for employees of this provider
   const relevantDocTypes = documentTypes.filter(dt => {
-    // Filter by provider type - for vendor app, show all types
     // Filter by employee relevance
     if (!dt.isPerEmployee) return false;
     
@@ -108,8 +113,19 @@ const VendorPersonView = () => {
     toast.success(`${employeeName} wurde erfolgreich zum Unternehmen zugewiesen`);
   };
 
-  // Function to get randomly distributed status (used for existing documents)
-  const getRandomStatus = () => {
+  // Function to get status for specific documents
+  const getDocumentStatus = (employeeId: string, docTypeId: string) => {
+    // Check if document should be missing
+    if (shouldDocumentBeMissing(employeeId, docTypeId)) {
+      return "missing";
+    }
+    
+    // Special handling for Jan Kowalski's A1-Bescheinigung - should be expired, not valid
+    if (employeeId === "employee-15" && docTypeId === "doc-type-11") {
+      return "expired";
+    }
+    
+    // Default random distribution
     const rand = Math.random();
     if (rand < 0.7) return "valid";
     else if (rand < 0.85) return "expiring";
@@ -198,8 +214,7 @@ const VendorPersonView = () => {
                 const forceMissing = shouldDocumentBeMissing(employeeId, docType.id);
                 const doc = forceMissing ? null : employeeDocuments.find(d => d.type === docType.id);
                 
-                const randomStatus = getRandomStatus(); // Generate random status
-                const docStatus = doc ? randomStatus : "missing";
+                const documentStatus = getDocumentStatus(employeeId, docType.id);
                 const isRelevant = true;
                 
                 // Special case for A1-Bescheinigung - only relevant for non-Germans
@@ -217,19 +232,19 @@ const VendorPersonView = () => {
                         {isMissing ? (
                           <StatusBadge status="missing" />
                         ) : (
-                          <StatusBadge status={randomStatus} />
+                          <StatusBadge status={documentStatus} />
                         )}
                       </TableCell>
                       <TableCell>
                         {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
                       </TableCell>
                       <TableCell>
-                        {!isMissing && (randomStatus === "expiring" || randomStatus === "expired")
-                          ? new Date(new Date().setMonth(new Date().getMonth() + (randomStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
+                        {!isMissing && (documentStatus === "expiring" || documentStatus === "expired")
+                          ? new Date(new Date().setMonth(new Date().getMonth() + (documentStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
                           : '-'}
                       </TableCell>
                       <TableCell>
-                        {(isMissing || randomStatus === "expired") && (
+                        {(isMissing || documentStatus === "expired") && (
                           <div className="text-sm">
                             <div>{Math.floor(Math.random() * 3)} gesendet</div>
                             <div className="text-xs text-muted-foreground">
@@ -275,7 +290,7 @@ const VendorPersonView = () => {
                           )}
                           
                           {/* Upload/Check button for non-valid or missing documents */}
-                          {(isMissing || (doc && randomStatus !== "valid")) && (
+                          {(isMissing || (doc && documentStatus !== "valid")) && (
                             <Button variant="outline" size="sm">
                               {isMissing ? "Hochladen" : "Prüfen"}
                             </Button>
