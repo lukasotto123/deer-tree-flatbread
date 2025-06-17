@@ -1,4 +1,3 @@
-
 import { Document, Provider, Employee, DocumentType } from "@/types";
 
 export const documentTypes: DocumentType[] = [

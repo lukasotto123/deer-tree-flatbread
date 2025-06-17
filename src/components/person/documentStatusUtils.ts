@@ -5,6 +5,7 @@ export const shouldDocumentBeMissing = (employeeId: string, documentTypeId: stri
     // Diese Dokumente sollen für Jan nicht in der Tabelle erscheinen
     if (documentTypeId === "doc-type-5") return true; // Aufenthaltserlaubnis
     if (documentTypeId === "doc-type-6") return true; // Arbeitserlaubnis
+    if (documentTypeId === "doc-type-4") return true; // Unbedenklichkeitsbescheinigung Krankenkasse
   }
   
   // Mark some documents as missing for other specific employees
@@ -27,7 +28,6 @@ export const getDocumentStatus = (employeeId: string, docTypeId: string) => {
     if (docTypeId === "doc-type-11") return "expired";
     // Alle anderen gewünschten Dokumente sollen valid sein
     if (docTypeId === "doc-type-12") return "valid"; // Reisepass
-    if (docTypeId === "doc-type-4") return "valid";  // Unbedenklichkeitsbescheinigung Krankenkasse
     if (docTypeId === "doc-type-25") return "valid"; // Meldebescheinigung Sozialversicherung
   }
   
