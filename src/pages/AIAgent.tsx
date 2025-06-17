@@ -361,7 +361,6 @@ const AIAgent = () => {
                     <TableHead>Empfangen</TableHead>
                     <TableHead>Empfangsmethode</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>KI-Kommentar</TableHead>
                     <TableHead className="text-right">Aktionen</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -388,11 +387,6 @@ const AIAgent = () => {
                       <TableCell>{new Date(doc.receivedDate).toLocaleDateString('de-DE')}</TableCell>
                       <TableCell>{getReceptionMethodBadge(doc.receptionMethod)}</TableCell>
                       <TableCell>{getStatusBadge(doc.status)}</TableCell>
-                      <TableCell>
-                        <div className="text-xs max-w-xs truncate" title={doc.aiComment}>
-                          {doc.aiComment}
-                        </div>
-                      </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
