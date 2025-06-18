@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -37,6 +36,14 @@ interface DocumentData {
   nationality?: string;
   address?: string;
   workAddress?: string;
+  countryCodeResidence?: string;
+  countryCodeStay?: string;
+  memberStateApplicableLegislation?: string;
+  validityStart?: string;
+  validityEnd?: string;
+  validDuringActivity?: boolean;
+  provisionalDetermination?: boolean;
+  transitionalProvisionsApply?: boolean;
 }
 
 interface CompanyDocumentViewProps {
@@ -67,11 +74,19 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
         firstName: "Jan",
         birthDate: "04.12.1987",
         birthPlace: "Warszawa",
-        nationality: "Polska",
+        nationality: "Polen",
         address: "ul. Zielona 15, 00-123 Warszawa, Polska",
         workAddress: "Industriestraße 12, 90441 Nürnberg, DE",
         verificationStatus: "Prüfung ausstehend",
-        isA1Certificate: true
+        isA1Certificate: true,
+        countryCodeResidence: "PL",
+        countryCodeStay: "DE",
+        memberStateApplicableLegislation: "Polen",
+        validityStart: "15.06.2025",
+        validityEnd: "29.12.2025",
+        validDuringActivity: true,
+        provisionalDetermination: false,
+        transitionalProvisionsApply: false
       },
       "comp-doc-1": {
         documentType: "Gewerbeanmeldung",
@@ -242,22 +257,6 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
                           </div>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="grid gap-2">
-                            <Label>Geburtsdatum</Label>
-                            <div className="p-2 bg-gray-50 rounded border">
-                              {extractedData.birthDate}
-                            </div>
-                          </div>
-                          
-                          <div className="grid gap-2">
-                            <Label>Geburtsort</Label>
-                            <div className="p-2 bg-gray-50 rounded border">
-                              {extractedData.birthPlace}
-                            </div>
-                          </div>
-                        </div>
-                        
                         <div className="grid gap-2">
                           <Label>Staatsangehörigkeit</Label>
                           <div className="p-2 bg-gray-50 rounded border">
@@ -265,33 +264,65 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
                           </div>
                         </div>
                         
-                        <div className="grid gap-2">
-                          <Label>Wohnadresse</Label>
-                          <div className="p-2 bg-gray-50 rounded border">
-                            {extractedData.address}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label>Ländercode (Wohnstaat)</Label>
+                            <div className="p-2 bg-gray-50 rounded border">
+                              {extractedData.countryCodeResidence}
+                            </div>
+                          </div>
+                          
+                          <div className="grid gap-2">
+                            <Label>Ländercode (Aufenthaltsstaat)</Label>
+                            <div className="p-2 bg-gray-50 rounded border">
+                              {extractedData.countryCodeStay}
+                            </div>
                           </div>
                         </div>
                         
                         <div className="grid gap-2">
-                          <Label>Arbeitsadresse</Label>
+                          <Label>Mitgliedstaat (auf den sich die Rechtsvorschriften beziehen)</Label>
                           <div className="p-2 bg-gray-50 rounded border">
-                            {extractedData.workAddress}
+                            {extractedData.memberStateApplicableLegislation}
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-4">
                           <div className="grid gap-2">
-                            <Label>Gültig ab</Label>
+                            <Label>Beginn der Gültigkeit</Label>
                             <div className="p-2 bg-gray-50 rounded border">
-                              {extractedData.issuedDate}
+                              {extractedData.validityStart}
                             </div>
                           </div>
                           
                           <div className="grid gap-2">
-                            <Label>Gültig bis</Label>
+                            <Label>Ende der Gültigkeit</Label>
                             <div className="p-2 bg-gray-50 rounded border text-amber-600 font-medium">
-                              {extractedData.expiryDate}
+                              {extractedData.validityEnd}
                             </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
+                            <Label>Bescheinigung gilt während der Tätigkeit</Label>
+                            <span className="text-green-600 font-medium">
+                              {extractedData.validDuringActivity ? "☑️ aktiviert" : "☐ nicht aktiviert"}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
+                            <Label>Vorläufige Feststellung</Label>
+                            <span className="text-gray-600">
+                              {extractedData.provisionalDetermination ? "☑️ aktiviert" : "☐ nicht aktiviert"}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
+                            <Label>Übergangsbestimmungen finden Anwendung</Label>
+                            <span className="text-gray-600">
+                              {extractedData.transitionalProvisionsApply ? "☑️ aktiviert" : "☐ nicht aktiviert"}
+                            </span>
                           </div>
                         </div>
                       </>
