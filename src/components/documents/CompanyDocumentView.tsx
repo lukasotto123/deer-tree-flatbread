@@ -40,6 +40,22 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
   // Mock data based on document ID
   const getDocumentData = (id: string) => {
     const documents = {
+      "doc-2": {
+        documentType: "A1-Bescheinigung",
+        issuer: "Instytucja ubezpieczeniowa w państwie",
+        issuedDate: "15.06.2025",
+        expiryDate: "29.12.2025",
+        registrationNumber: "A1J7J578N",
+        companyName: "Kowalski",
+        firstName: "Jan",
+        birthDate: "04.12.1987",
+        birthPlace: "Warszawa",
+        nationality: "Polska",
+        address: "ul. Zielona 15, 00-123 Warszawa, Polska",
+        workAddress: "Industriestraße 12, 90441 Nürnberg, DE",
+        verificationStatus: "Prüfung ausstehend",
+        isA1Certificate: true
+      },
       "comp-doc-1": {
         documentType: "Gewerbeanmeldung",
         issuer: "Gewerbeamt München",
@@ -76,7 +92,7 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
   // Handle approval
   const handleApprove = () => {
     setIsSubmitting(true);
-    console.log("Company document approved", documentId);
+    console.log("Document approved", documentId);
     
     setTimeout(() => {
       setIsSubmitting(false);
@@ -87,7 +103,7 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
   // Handle rejection
   const handleReject = () => {
     setIsSubmitting(true);
-    console.log("Company document rejected", documentId, form.getValues());
+    console.log("Document rejected", documentId, form.getValues());
     
     setTimeout(() => {
       setIsSubmitting(false);
@@ -95,11 +111,15 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
     }, 1000);
   };
 
+  const isA1Certificate = extractedData.isA1Certificate;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Unternehmens-Dokumentprüfung</h1>
+          <h1 className="text-3xl font-bold">
+            {isA1Certificate ? "A1-Bescheinigung Prüfung" : "Unternehmens-Dokumentprüfung"}
+          </h1>
           <p className="text-muted-foreground mt-1">
             Bitte überprüfen Sie die extrahierten Informationen und bestätigen oder lehnen Sie das Dokument ab
           </p>
@@ -113,41 +133,49 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Document placeholder - Left side */}
+        {/* Document preview - Left side */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Dokumentvorschau</CardTitle>
               <CardDescription>
-                Vorschau des eingereichten Unternehmensdokuments
+                {isA1Certificate ? "Vorschau der eingereichten A1-Bescheinigung" : "Vorschau des eingereichten Unternehmensdokuments"}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center">
               <div className="w-full max-w-2xl border rounded-md overflow-hidden">
                 <AspectRatio ratio={1 / 1.414}>
-                  <div className="h-full w-full bg-muted flex flex-col items-center justify-center p-6">
-                    <FileText className="h-20 w-20 text-muted-foreground mb-4" />
-                    <div className="text-center w-full">
-                      <p className="text-lg font-medium mb-6">
-                        {extractedData.documentType}
-                      </p>
-                      <div className="space-y-4 w-full px-6">
-                        <div className="h-4 bg-gray-200 rounded-full w-full" />
-                        <div className="h-4 bg-gray-200 rounded-full w-5/6 mx-auto" />
-                        <div className="h-4 bg-gray-200 rounded-full w-full" />
-                        <div className="py-2"></div>
-                        <div className="h-4 bg-gray-200 rounded-full w-full" />
-                        <div className="h-4 bg-gray-200 rounded-full w-4/6 mx-auto" />
-                        <div className="py-2"></div>
-                        <div className="h-4 bg-gray-200 rounded-full w-full" />
-                        <div className="h-4 bg-gray-200 rounded-full w-3/4 mx-auto" />
-                        <div className="h-4 bg-gray-200 rounded-full w-full" />
+                  {isA1Certificate ? (
+                    <img 
+                      src="/lovable-uploads/f954e506-57f9-4794-ab78-53210d1a419d.png" 
+                      alt="A1 Bescheinigung"
+                      className="object-contain w-full h-full"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-muted flex flex-col items-center justify-center p-6">
+                      <FileText className="h-20 w-20 text-muted-foreground mb-4" />
+                      <div className="text-center w-full">
+                        <p className="text-lg font-medium mb-6">
+                          {extractedData.documentType}
+                        </p>
+                        <div className="space-y-4 w-full px-6">
+                          <div className="h-4 bg-gray-200 rounded-full w-full" />
+                          <div className="h-4 bg-gray-200 rounded-full w-5/6 mx-auto" />
+                          <div className="h-4 bg-gray-200 rounded-full w-full" />
+                          <div className="py-2"></div>
+                          <div className="h-4 bg-gray-200 rounded-full w-full" />
+                          <div className="h-4 bg-gray-200 rounded-full w-4/6 mx-auto" />
+                          <div className="py-2"></div>
+                          <div className="h-4 bg-gray-200 rounded-full w-full" />
+                          <div className="h-4 bg-gray-200 rounded-full w-3/4 mx-auto" />
+                          <div className="h-4 bg-gray-200 rounded-full w-full" />
+                        </div>
+                        <p className="text-muted-foreground mt-6">
+                          Unternehmensdokument zur Überprüfung
+                        </p>
                       </div>
-                      <p className="text-muted-foreground mt-6">
-                        Unternehmensdokument zur Überprüfung
-                      </p>
                     </div>
-                  </div>
+                  )}
                 </AspectRatio>
               </div>
             </CardContent>
@@ -174,42 +202,122 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
                       </div>
                     </div>
                     
-                    <div className="grid gap-2">
-                      <Label>Aussteller</Label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        {extractedData.issuer}
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="grid gap-2">
-                        <Label>Ausstellungsdatum</Label>
-                        <div className="p-2 bg-gray-50 rounded border">
-                          {extractedData.issuedDate}
+                    {isA1Certificate ? (
+                      <>
+                        <div className="grid gap-2">
+                          <Label>Ausweisnummer</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.registrationNumber}
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <Label>Ablaufdatum</Label>
-                        <div className="p-2 bg-gray-50 rounded border text-amber-600 font-medium">
-                          {extractedData.expiryDate}
+                        
+                        <div className="grid gap-2">
+                          <Label>Name</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.companyName}
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid gap-2">
-                      <Label>Registrierungsnummer</Label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        {extractedData.registrationNumber}
-                      </div>
-                    </div>
-                    
-                    <div className="grid gap-2">
-                      <Label>Unternehmen</Label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        {extractedData.companyName}
-                      </div>
-                    </div>
+                        
+                        <div className="grid gap-2">
+                          <Label>Vorname</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.firstName}
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label>Geburtsdatum</Label>
+                            <div className="p-2 bg-gray-50 rounded border">
+                              {extractedData.birthDate}
+                            </div>
+                          </div>
+                          
+                          <div className="grid gap-2">
+                            <Label>Geburtsort</Label>
+                            <div className="p-2 bg-gray-50 rounded border">
+                              {extractedData.birthPlace}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid gap-2">
+                          <Label>Staatsangehörigkeit</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.nationality}
+                          </div>
+                        </div>
+                        
+                        <div className="grid gap-2">
+                          <Label>Wohnadresse</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.address}
+                          </div>
+                        </div>
+                        
+                        <div className="grid gap-2">
+                          <Label>Arbeitsadresse</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.workAddress}
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label>Gültig ab</Label>
+                            <div className="p-2 bg-gray-50 rounded border">
+                              {extractedData.issuedDate}
+                            </div>
+                          </div>
+                          
+                          <div className="grid gap-2">
+                            <Label>Gültig bis</Label>
+                            <div className="p-2 bg-gray-50 rounded border text-amber-600 font-medium">
+                              {extractedData.expiryDate}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="grid gap-2">
+                          <Label>Aussteller</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.issuer}
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label>Ausstellungsdatum</Label>
+                            <div className="p-2 bg-gray-50 rounded border">
+                              {extractedData.issuedDate}
+                            </div>
+                          </div>
+                          
+                          <div className="grid gap-2">
+                            <Label>Ablaufdatum</Label>
+                            <div className="p-2 bg-gray-50 rounded border text-amber-600 font-medium">
+                              {extractedData.expiryDate}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid gap-2">
+                          <Label>Registrierungsnummer</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.registrationNumber}
+                          </div>
+                        </div>
+                        
+                        <div className="grid gap-2">
+                          <Label>Unternehmen</Label>
+                          <div className="p-2 bg-gray-50 rounded border">
+                            {extractedData.companyName}
+                          </div>
+                        </div>
+                      </>
+                    )}
                     
                     <FormField
                       control={form.control}
