@@ -22,6 +22,23 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+interface DocumentData {
+  documentType: string;
+  issuer: string;
+  issuedDate: string;
+  expiryDate: string;
+  registrationNumber: string;
+  companyName: string;
+  verificationStatus: string;
+  isA1Certificate?: boolean;
+  firstName?: string;
+  birthDate?: string;
+  birthPlace?: string;
+  nationality?: string;
+  address?: string;
+  workAddress?: string;
+}
+
 interface CompanyDocumentViewProps {
   documentId: string;
   onBack: () => void;
@@ -38,8 +55,8 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
   });
   
   // Mock data based on document ID
-  const getDocumentData = (id: string) => {
-    const documents = {
+  const getDocumentData = (id: string): DocumentData => {
+    const documents: Record<string, DocumentData> = {
       "doc-2": {
         documentType: "A1-Bescheinigung",
         issuer: "Instytucja ubezpieczeniowa w państwie",
@@ -84,7 +101,7 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
         verificationStatus: "Prüfung ausstehend"
       }
     };
-    return documents[id as keyof typeof documents] || documents["comp-doc-1"];
+    return documents[id] || documents["comp-doc-1"];
   };
 
   const extractedData = getDocumentData(documentId);
@@ -111,7 +128,7 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
     }, 1000);
   };
 
-  const isA1Certificate = extractedData.isA1Certificate;
+  const isA1Certificate = extractedData.isA1Certificate || false;
 
   return (
     <div className="space-y-6">
