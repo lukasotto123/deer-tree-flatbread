@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,7 +64,7 @@ const emailReminders = [
 
 const receivedDocuments = [
   {
-    id: "doc-1",
+    id: "doc-2",
     sender: "Bau Meister & Co. KG",
     contact: "Jan Kowalski",
     email: "j.kowalski@baumeister.de",
@@ -74,7 +75,7 @@ const receivedDocuments = [
     receptionMethod: "email"
   },
   {
-    id: "doc-2",
+    id: "doc-1",
     sender: "Bauunternehmen Schmidt GmbH",
     contact: "Hans Schmidt", 
     email: "schmidt@bauunternehmen.de",

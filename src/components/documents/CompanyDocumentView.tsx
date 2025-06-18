@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { FileText, Check, X } from "lucide-react";
+import { FileText, Check, X, CheckCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -57,7 +57,7 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      comments: "",
+      comments: "Bescheinigung gilt während der Tätigkeit",
     },
   });
   
@@ -237,13 +237,6 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
                     {isA1Certificate ? (
                       <>
                         <div className="grid gap-2">
-                          <Label>Ausweisnummer</Label>
-                          <div className="p-2 bg-gray-50 rounded border">
-                            {extractedData.registrationNumber}
-                          </div>
-                        </div>
-                        
-                        <div className="grid gap-2">
                           <Label>Name</Label>
                           <div className="p-2 bg-gray-50 rounded border">
                             {extractedData.companyName}
@@ -300,29 +293,6 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
                             <div className="p-2 bg-gray-50 rounded border text-amber-600 font-medium">
                               {extractedData.validityEnd}
                             </div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
-                            <Label>Bescheinigung gilt während der Tätigkeit</Label>
-                            <span className="text-green-600 font-medium">
-                              {extractedData.validDuringActivity ? "☑️ aktiviert" : "☐ nicht aktiviert"}
-                            </span>
-                          </div>
-                          
-                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
-                            <Label>Vorläufige Feststellung</Label>
-                            <span className="text-gray-600">
-                              {extractedData.provisionalDetermination ? "☑️ aktiviert" : "☐ nicht aktiviert"}
-                            </span>
-                          </div>
-                          
-                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
-                            <Label>Übergangsbestimmungen finden Anwendung</Label>
-                            <span className="text-gray-600">
-                              {extractedData.transitionalProvisionsApply ? "☑️ aktiviert" : "☐ nicht aktiviert"}
-                            </span>
                           </div>
                         </div>
                       </>
@@ -401,10 +371,10 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
               <Button 
                 onClick={handleApprove}
                 disabled={isSubmitting}
-                className="flex-1"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white border-2 border-green-700"
               >
-                <Check className="mr-1" />
-                Akzeptieren
+                <CheckCircle className="mr-1" />
+                KI-Empfehlung: Akzeptieren
               </Button>
             </CardFooter>
           </Card>
