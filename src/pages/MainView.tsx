@@ -55,7 +55,7 @@ const MainView = () => {
 
   // Helper function to get modified provider data with correct document counts
   const getModifiedProviderData = (provider: any) => {
-    // Elektro Schaltbau GmbH and Metallbau Schmidt GmbH should have all valid documents
+    // Nowak Construction Group and Elektro Schaltbau GmbH should have all valid documents
     if (provider.id === "provider-3" || provider.id === "provider-4") {
       return {
         ...provider,
@@ -69,7 +69,7 @@ const MainView = () => {
       };
     }
     
-    // Nowak Construction Group should have expired documents but no payment issues
+    // Metallbau Schmidt GmbH should have some expired and expiring documents
     if (provider.id === "provider-6") {
       return {
         ...provider,
@@ -420,12 +420,12 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
 
 // Helper function to determine the worst-case status icon for a provider
 const getProviderStatusIcon = (provider: typeof providers[0]) => {
-  // For Elektro Schaltbau GmbH and Metallbau Schmidt GmbH - show valid status
+  // For Nowak Construction Group and Elektro Schaltbau GmbH - show valid status
   if (provider.id === "provider-3" || provider.id === "provider-4") {
     return <CheckCircle className="h-5 w-5 text-green-600" />;
   }
   
-  // For Nowak Construction Group - show expired documents icon (not payment issues)
+  // For Metallbau Schmidt GmbH - show expired documents icon
   if (provider.id === "provider-6") {
     return <AlertTriangle className="h-5 w-5 text-amber-600" />;
   }
