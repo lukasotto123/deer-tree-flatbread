@@ -70,7 +70,7 @@ const receivedDocuments = [
     email: "kontakt@nowak-construction.de",
     documentType: "A1-Bescheinigung",
     receivedDate: "2025-06-18T16:20:00Z",
-    status: "accepted",
+    status: "pending",
     documentLevel: "employee",
     receptionMethod: "email"
   },
@@ -114,7 +114,7 @@ const receivedDocuments = [
     email: "kontakt@nowak-construction.de",
     documentType: "Handelsregisterauszug",
     receivedDate: "2025-06-11T09:15:00Z",
-    status: "accepted",
+    status: "pending",
     documentLevel: "company",
     receptionMethod: "email"
   },
