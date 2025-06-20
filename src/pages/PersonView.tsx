@@ -2,7 +2,7 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { employees, documents, providers, documentTypes } from "@/data/dummy-data";
+import { useEmployees, useDocuments, useProviders, useDocumentTypes } from "@/hooks/useSupabaseData";
 import StatusBadge from "@/components/ui/StatusBadge";
 import EmployeeInformation from "@/components/person/EmployeeInformation";
 import DocumentsTable from "@/components/person/DocumentsTable";
@@ -10,6 +10,15 @@ import { getEmployeeNameAndCitizenship, determineWorstStatus, shouldDocumentBeMi
 
 const PersonView = () => {
   const { providerId, employeeId } = useParams<{ providerId: string; employeeId: string }>();
+  
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: providers = [], isLoading: providersLoading } = useProviders();
+  const { data: documents = [], isLoading: documentsLoading } = useDocuments();
+  const { data: documentTypes = [], isLoading: documentTypesLoading } = useDocumentTypes();
+
+  if (employeesLoading || providersLoading || documentsLoading || documentTypesLoading) {
+    return <div>Laden...</div>;
+  }
   
   const employee = employees.find(e => e.id === employeeId);
   const provider = providers.find(p => p.id === providerId);

@@ -1,13 +1,20 @@
 
-import { FileText, Euro, Clock, CheckCircle, Users, AlertTriangle } from "lucide-react";
+import { FileText, CheckCircle, Clock } from "lucide-react";
 import StatCard from "./StatCard";
-import ExpiringDocumentsTable from "./ExpiringDocumentsTable";
+import ExpiringDocumentsTable from "./ExpiringDocuments Table";
 import DocumentsOverview from "./DocumentsOverview";
-import { documents, providers } from "@/data/dummy-data";
+import { useProviders, useDocuments } from "@/hooks/useSupabaseData";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
+  const { data: documents = [], isLoading: documentsLoading } = useDocuments();
+  const { data: providers = [], isLoading: providersLoading } = useProviders();
+
+  if (documentsLoading || providersLoading) {
+    return <div>Laden...</div>;
+  }
+
   const documentStats = {
     total: documents.length,
     valid: documents.filter(doc => doc.status === 'valid').length,

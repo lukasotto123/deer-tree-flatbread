@@ -1,14 +1,22 @@
+
 import { FileText, AlertTriangle, Clock, CheckCircle, Building, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatCard from "@/components/dashboard/StatCard";
 import ExpiringDocumentsTable from "@/components/dashboard/ExpiringDocumentsTable";
 import DocumentsOverview from "@/components/dashboard/DocumentsOverview";
-import { documents, providers } from "@/data/dummy-data";
+import { useDocuments, useProviders } from "@/hooks/useSupabaseData";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
+  const { data: documents = [], isLoading: documentsLoading } = useDocuments();
+  const { data: providers = [], isLoading: providersLoading } = useProviders();
+
+  if (documentsLoading || providersLoading) {
+    return <div>Laden...</div>;
+  }
+
   // Adjust the distribution to match 70% valid, 30% others
   const documentStats = {
     total: documents.length,

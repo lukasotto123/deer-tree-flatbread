@@ -1,11 +1,16 @@
 
 import { useState } from "react";
-import { documents } from "@/data/dummy-data";
+import { useDocuments } from "@/hooks/useSupabaseData";
 import DocumentsList from "@/components/documents/DocumentsList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Documents = () => {
   const [activeTab, setActiveTab] = useState<string>("all");
+  const { data: documents = [], isLoading } = useDocuments();
+
+  if (isLoading) {
+    return <div>Laden...</div>;
+  }
 
   return (
     <div className="space-y-6">
