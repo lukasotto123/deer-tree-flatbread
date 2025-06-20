@@ -217,29 +217,29 @@ const AIAgent = () => {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-800">Angeforderte Dokumente</CardTitle>
+            <CardTitle className="text-sm font-medium">Angeforderte Dokumente</CardTitle>
             <div className="bg-blue-500 rounded-full p-2">
               <Send className="h-4 w-4 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-900">17</div>
-            <p className="text-xs text-blue-600 mt-1">im letzten Monat</p>
+            <div className="text-2xl font-bold">17</div>
+            <p className="text-xs text-muted-foreground">im letzten Monat</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-800">Erhaltene Dokumente</CardTitle>
+            <CardTitle className="text-sm font-medium">Erhaltene Dokumente</CardTitle>
             <div className="bg-green-500 rounded-full p-2">
               <Inbox className="h-4 w-4 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-900">16</div>
-            <p className="text-xs text-green-600 mt-1">im letzten Monat</p>
+            <div className="text-2xl font-bold">16</div>
+            <p className="text-xs text-muted-foreground">im letzten Monat</p>
           </CardContent>
         </Card>
       </div>
