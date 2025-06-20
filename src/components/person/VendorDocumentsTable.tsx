@@ -73,6 +73,9 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
               const hasHistory = doc && selectedDocumentId === doc.id;
               const isMissing = !doc;
 
+              // Special handling for Jan Kowalski's A1 certificate - don't show "Nächste" date
+              const isJanA1Doc = employeeId === "employee-15" && docType.id === "doc-type-11";
+
               return (
                 <React.Fragment key={docType.id}>
                   <TableRow>
@@ -96,9 +99,11 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
                       {(isMissing || documentStatus === "expired") && (
                         <div className="text-sm">
                           <div>{remindersCount} gesendet</div>
-                          <div className="text-xs text-muted-foreground">
-                            Nächste: {new Date().toLocaleDateString('de-DE')}
-                          </div>
+                          {!isJanA1Doc && (
+                            <div className="text-xs text-muted-foreground">
+                              Nächste: {new Date().toLocaleDateString('de-DE')}
+                            </div>
+                          )}
                         </div>
                       )}
                     </TableCell>
