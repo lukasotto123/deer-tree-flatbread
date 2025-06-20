@@ -1,4 +1,5 @@
 
+
 export const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
   // Spezielle Behandlung für Jan Kowalski (employee-15) - bestimmte Dokumente ausblenden
   if (employeeId === "employee-15") {
@@ -24,8 +25,8 @@ export const getDocumentStatus = (employeeId: string, docTypeId: string) => {
   
   // Spezielle Behandlung für Jan Kowalski (employee-15)
   if (employeeId === "employee-15") {
-    // A1-Bescheinigung soll valid sein (nicht expired)
-    if (docTypeId === "doc-type-11") return "valid";
+    // A1-Bescheinigung soll expired sein (abgelaufen am 19.06.2025)
+    if (docTypeId === "doc-type-11") return "expired";
     // Alle anderen gewünschten Dokumente sollen valid sein
     if (docTypeId === "doc-type-12") return "valid"; // Reisepass
     if (docTypeId === "doc-type-25") return "valid"; // Meldebescheinigung Sozialversicherung
@@ -54,7 +55,7 @@ export const getDocumentExpiryDate = (employeeId: string, docTypeId: string) => 
       return expiryDate.toISOString();
     }
     if (docTypeId === "doc-type-11") { // A1-Bescheinigung
-      // A1-Bescheinigung läuft am 19.06.2025 ab
+      // A1-Bescheinigung ist am 19.06.2025 abgelaufen (gestern)
       return '2025-06-19T00:00:00.000Z';
     }
   }
@@ -128,9 +129,10 @@ export const determineWorstStatus = (employeeDocuments: any[]) => {
 export const getRemindersCount = (employeeId: string, docTypeId: string) => {
   // Spezielle Behandlung für Jan Kowalski (employee-15) und A1-Bescheinigung
   if (employeeId === "employee-15" && docTypeId === "doc-type-11") {
-    return 1; // Nur eine Erinnerung für Jan's A1-Bescheinigung
+    return 1; // Eine Erinnerung für Jan's abgelaufene A1-Bescheinigung
   }
   
   // Standard random count für andere Dokumente
   return Math.floor(Math.random() * 3);
 };
+
