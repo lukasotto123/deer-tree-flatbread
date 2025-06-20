@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle, Euro, ToggleLeft, ToggleRight, X, Check, Users } from "lucide-react";
-import { providers, employees, documents, documentTypes } from "@/data/dummy-data";
+import { useProviders, useEmployees, useDocuments } from "@/hooks/useSupabaseData";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 import { toast } from "sonner";
@@ -16,22 +16,32 @@ import { DocumentCategory } from "@/types";
 const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const provider = providers.find(p => p.id === id);
+  
+  const { data: providers = [], isLoading: providersLoading } = useProviders();
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: documents = [], isLoading: documentsLoading } = useDocuments();
+  
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
-  const [isActive, setIsActive] = useState<boolean>(provider?.status === 'active');
+  const [isActive, setIsActive] = useState<boolean>(true);
+  
+  if (providersLoading || employeesLoading || documentsLoading) {
+    return <div>Laden...</div>;
+  }
+  
+  const provider = providers.find(p => p.id === id);
   
   if (!provider) {
     return <div>Dienstleister nicht gefunden</div>;
   }
   
+  // Set isActive based on provider status
+  React.useEffect(() => {
+    setIsActive(provider.status === 'active');
+  }, [provider.status]);
+  
   // Dokumente für diesen Dienstleister
   const providerDocuments = documents.filter(doc => 
     doc.providerId === id && !doc.employeeId
-  );
-
-  // Relevante Dokumenttypen für diesen Dienstleister
-  const relevantDocTypes = documentTypes.filter(dt => 
-    dt.providerType === provider.type && !dt.isPerEmployee
   );
   
   // Mitarbeiter dieses Dienstleisters
@@ -122,7 +132,7 @@ const ProviderView = () => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold">{provider.name}</h1>
-          <StatusBadge status={isActive ? "valid" : "expired"} />
+          <StatusBadge status={provider.documentsCount.expired > 0 ? "expired" : "valid"} />
         </div>
         <div className="flex gap-2">
           <Button 
@@ -186,14 +196,6 @@ const ProviderView = () => {
               <p className="text-sm text-muted-foreground">Status</p>
               <StatusBadgeGerman status={isActive ? 'active' : 'inactive'} />
             </div>
-            {provider.type === 'personaldienstleister' && (
-              <div>
-                <p className="text-sm text-muted-foreground">ANÜ Erlaubnis</p>
-                <span className={`${provider.hasANUPermission ? 'text-success' : 'text-destructive'} font-medium`}>
-                  {provider.hasANUPermission ? 'Ja' : 'Nein'}
-                </span>
-              </div>
-            )}
             <div>
               <p className="text-sm text-muted-foreground">Letzte Aktualisierung</p>
               <p>{new Date(provider.lastUpdated).toLocaleDateString('de-DE')}</p>
@@ -225,6 +227,9 @@ const ProviderView = () => {
               const hasExpiring = expiringDocs > 0;
               const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
 
+              // Combine expired and missing counts for display (both use warning icon)
+              const warningCount = expiredDocs + missingDocs;
+
               return (
                 <Card key={employee.id} className="overflow-hidden">
                   <CardContent className="p-4">
@@ -245,14 +250,12 @@ const ProviderView = () => {
                         <Clock className="h-4 w-4 text-amber-500" />
                         <span>{expiringDocs}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
-                        <span>{expiredDocs}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
-                        <span>{missingDocs}</span>
-                      </div>
+                      {warningCount > 0 && (
+                        <div className="flex items-center gap-1">
+                          <AlertTriangle className="h-4 w-4 text-red-600" />
+                          <span>{warningCount}</span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex justify-end">
@@ -295,11 +298,10 @@ const ProviderView = () => {
                     const forceMissing = shouldDocumentBeMissing(provider.id, docType.type);
                     const doc = forceMissing ? null : providerDocuments.find(d => d.type === docType.type);
                     
-                    const randomStatus = getRandomStatus(); // Generate random status
+                    // For Nowak Construction Group (provider-3), all company documents should be valid
+                    const randomStatus = provider.id === 'provider-3' ? 'valid' : getRandomStatus();
                     const isRelevant = true; // Default to true, would come from API
                     const isMissing = !doc;
-                    // Set "Werksverträge" to "Verpflichtend"
-                    const isContractDoc = docType.name === "Werksverträge";
                     const hasHistory = doc && selectedDocumentId === doc.id;
 
                     return (
@@ -339,7 +341,7 @@ const ProviderView = () => {
                                 disabled={!isActive}
                               />
                               <Label htmlFor={`relevance-${docType.id}`}>
-                                {isContractDoc ? "Verpflichtend" : (isRelevant ? "Relevant" : "Nicht relevant")}
+                                {isRelevant ? "Relevant" : "Nicht relevant"}
                               </Label>
                             </div>
                           </TableCell>

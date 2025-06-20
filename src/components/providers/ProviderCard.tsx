@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Provider } from "@/types";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { CheckCircle, Clock, AlertTriangle, XCircle } from "lucide-react";
 
 interface ProviderCardProps {
   provider: Provider;
@@ -84,7 +84,7 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
               <span>{provider.documentsCount.expired}</span>
             </div>
             <div className="flex items-center">
-              <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />
+              <XCircle className="h-4 w-4 mr-1 text-gray-600" />
               <span>{provider.documentsCount.missing}</span>
             </div>
           </div>
