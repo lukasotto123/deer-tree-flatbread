@@ -20,17 +20,24 @@ import AIAgent from '@/pages/AIAgent';
 import RequestView from '@/pages/RequestView';
 import SubmissionReview from '@/pages/SubmissionReview';
 import NotFound from '@/pages/NotFound';
+import { useState } from 'react';
 
 const queryClient = new QueryClient();
 
 function App() {
+  const [userMode, setUserMode] = useState<"kunde" | "lieferant">("kunde");
+
+  const handleModeChange = (mode: "kunde" | "lieferant") => {
+    setUserMode(mode);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <DocumentStateProvider>
           <Router>
             <Routes>
-              <Route path="/" element={<AppLayout />}>
+              <Route path="/" element={<AppLayout userMode={userMode} onModeChange={handleModeChange} />}>
                 <Route index element={<MainView />} />
                 <Route path="dashboard" element={<Index />} />
                 <Route path="providers" element={<Providers />} />
