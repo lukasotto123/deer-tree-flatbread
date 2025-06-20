@@ -15,7 +15,7 @@ import { FileText, Check, X, CheckCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useLocalDocumentState } from "@/hooks/useDocumentState";
+import { useDocumentState } from "@/hooks/useDocumentState";
 
 const formSchema = z.object({
   comments: z.string().optional()
@@ -55,7 +55,7 @@ interface CompanyDocumentViewProps {
 
 const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { isJanKowalskiA1Accepted, toggleJanKowalskiA1 } = useLocalDocumentState();
+  const { isJanKowalskiA1Accepted, toggleJanKowalskiA1 } = useDocumentState();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
