@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,10 +53,12 @@ const ProviderView = () => {
 
   // Function to determine if a document should be missing based on provider and document type
   const shouldDocumentBeMissing = (providerId: string, documentTypeId: string) => {
+    // For Nowak Construction Group (provider-3), no company documents should be missing
+    if (providerId === "provider-3") return false;
+    
     // For specific providers, mark certain documents as missing
     if (providerId === "provider-1" && documentTypeId === "doc-type-1") return true;
     if (providerId === "provider-2" && documentTypeId === "doc-type-2") return true;
-    if (providerId === "provider-3" && documentTypeId === "doc-type-3") return true;
     if (providerId === "provider-4" && documentTypeId === "doc-type-4") return true;
     return false;
   };
@@ -255,12 +256,10 @@ const ProviderView = () => {
                         <Clock className="h-4 w-4 text-amber-500" />
                         <span>{expiringDocs}</span>
                       </div>
-                      {warningCount > 0 && (
-                        <div className="flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4 text-red-600" />
-                          <span>{warningCount}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1">
+                        <AlertTriangle className="h-4 w-4 text-red-600" />
+                        <span>{warningCount}</span>
+                      </div>
                     </div>
                     
                     <div className="flex justify-end">
@@ -306,7 +305,7 @@ const ProviderView = () => {
                     // For Nowak Construction Group (provider-3), all company documents should be valid
                     const randomStatus = provider.id === 'provider-3' ? 'valid' : getRandomStatus();
                     const isRelevant = true; // Default to true, would come from API
-                    const isMissing = !doc;
+                    const isMissing = !doc && forceMissing;
                     const hasHistory = doc && selectedDocumentId === doc.id;
 
                     return (
