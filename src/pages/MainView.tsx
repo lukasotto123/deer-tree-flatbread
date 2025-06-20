@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -55,28 +54,28 @@ const MainView = () => {
 
   // Helper function to get modified provider data with correct document counts
   const getModifiedProviderData = (provider: any) => {
-    // Nowak Construction Group and Elektro Schaltbau GmbH should have all valid documents
-    if (provider.id === "provider-3" || provider.id === "provider-4") {
+    // Nowak Construction Group should have 1 expired document
+    if (provider.id === "provider-3") {
       return {
         ...provider,
         documentsCount: {
-          valid: 12,
+          valid: 11,
           expiring: 0,
-          expired: 0,
+          expired: 1,
           missing: 0
         },
         status: 'active' as const
       };
     }
     
-    // Metallbau Schmidt GmbH should have some expired and expiring documents
-    if (provider.id === "provider-6") {
+    // Elektro Schaltbau GmbH and Metallbau Schmidt GmbH should have all valid documents
+    if (provider.id === "provider-4" || provider.id === "provider-6") {
       return {
         ...provider,
         documentsCount: {
-          valid: 8,
-          expiring: 2,
-          expired: 2,
+          valid: 12,
+          expiring: 0,
+          expired: 0,
           missing: 0
         },
         status: 'active' as const
@@ -420,14 +419,14 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
 
 // Helper function to determine the worst-case status icon for a provider
 const getProviderStatusIcon = (provider: typeof providers[0]) => {
-  // For Nowak Construction Group and Elektro Schaltbau GmbH - show valid status
-  if (provider.id === "provider-3" || provider.id === "provider-4") {
-    return <CheckCircle className="h-5 w-5 text-green-600" />;
+  // For Nowak Construction Group - show expired documents icon (has 1 expired document)
+  if (provider.id === "provider-3") {
+    return <AlertTriangle className="h-5 w-5 text-amber-600" />;
   }
   
-  // For Metallbau Schmidt GmbH - show expired documents icon
-  if (provider.id === "provider-6") {
-    return <AlertTriangle className="h-5 w-5 text-amber-600" />;
+  // For Elektro Schaltbau GmbH and Metallbau Schmidt GmbH - show valid status (all clean)
+  if (provider.id === "provider-4" || provider.id === "provider-6") {
+    return <CheckCircle className="h-5 w-5 text-green-600" />;
   }
 
   const hasBeitragsrückstände = provider.documentsCount.expired > 0 && 
