@@ -38,7 +38,7 @@ const emailReminders = [
   {
     id: "rem-2", 
     recipient: "Nowak Construction Group",
-    contact: "Jan Kowalski",
+    contact: "Tomasz Nowak",
     email: "kontakt@nowak-construction.de",
     documentType: "A1-Bescheinigung",
     sentDate: "2025-06-18T14:15:00Z",
@@ -65,7 +65,7 @@ const receivedDocuments = [
   {
     id: "doc-2",
     sender: "Nowak Construction Group",
-    contact: "Jan Kowalski",
+    contact: "Tomasz Nowak",
     email: "kontakt@nowak-construction.de",
     documentType: "A1-Bescheinigung",
     receivedDate: "2025-06-18T16:20:00Z",
@@ -109,7 +109,7 @@ const receivedDocuments = [
   {
     id: "comp-doc-2",
     sender: "Nowak Construction Group",
-    contact: "Jan Kowalski",
+    contact: "Tomasz Nowak",
     email: "kontakt@nowak-construction.de",
     documentType: "Handelsregisterauszug",
     receivedDate: "2025-06-11T09:15:00Z",
