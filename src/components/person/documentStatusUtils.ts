@@ -1,3 +1,4 @@
+
 export const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
   // Spezielle Behandlung für Jan Kowalski (employee-15) - bestimmte Dokumente ausblenden
   if (employeeId === "employee-15") {
@@ -53,10 +54,8 @@ export const getDocumentExpiryDate = (employeeId: string, docTypeId: string) => 
       return expiryDate.toISOString();
     }
     if (docTypeId === "doc-type-11") { // A1-Bescheinigung (expired)
-      // A1-Bescheinigung ist vor 2 Monaten abgelaufen
-      const expiryDate = new Date();
-      expiryDate.setMonth(expiryDate.getMonth() - 2);
-      return expiryDate.toISOString();
+      // A1-Bescheinigung ist am 20.04.2024 abgelaufen
+      return '2024-04-20T00:00:00.000Z';
     }
   }
   
@@ -118,6 +117,7 @@ export const getEmployeeNameAndCitizenship = (employee: any) => {
 };
 
 export const determineWorstStatus = (employeeDocuments: any[]) => {
+  // Prioritize expired documents first
   const hasExpired = employeeDocuments.some(doc => doc.status === "expired");
   const hasExpiring = employeeDocuments.some(doc => doc.status === "expiring");
   const hasMissing = employeeDocuments.some(doc => doc.status === "missing");

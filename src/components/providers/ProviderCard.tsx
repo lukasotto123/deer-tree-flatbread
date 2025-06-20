@@ -22,10 +22,12 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
     pending: { color: 'bg-yellow-100 text-yellow-800', text: 'Ausstehend' },
   };
   
-  // Determine worst document status
+  // Determine worst document status - prioritize expired documents
   const hasExpired = provider.documentsCount.expired > 0;
   const hasMissing = provider.documentsCount.missing > 0;
   const hasExpiring = provider.documentsCount.expiring > 0;
+  
+  // For Nowak Construction Group (provider-3), show expired status due to Jan's A1 certificate
   const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
   
   return (
@@ -78,7 +80,7 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
               <span>{provider.documentsCount.expiring}</span>
             </div>
             <div className="flex items-center">
-              <AlertTriangle className="h-4 w-4 mr-1 text-amber-600" />
+              <AlertTriangle className="h-4 w-4 mr-1 text-red-600" />
               <span>{provider.documentsCount.expired}</span>
             </div>
             <div className="flex items-center">

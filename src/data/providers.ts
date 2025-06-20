@@ -46,19 +46,19 @@ export const providers: Provider[] = [
     id: "provider-3",
     name: "Nowak Construction Group",
     type: "nachunternehmer",
-    contactEmail: "kontakt@baumeister.de",
+    contactEmail: "kontakt@nowak-construction.de",
     contactPhone: "+49 345 678901",
     address: "Bauweg 12, 70173 Stuttgart",
     billingAddress: "Rechnungsweg 17, 70173 Stuttgart",
-    managingDirector: "Karl Baumeister",
+    managingDirector: "Karl Nowak",
     contactPerson: "Frau Wagner",
     status: "active",
     documentsCount: {
       total: 15,
-      valid: 10,
-      expiring: 3,
+      valid: 14,
+      expiring: 0,
       expired: 1,
-      missing: 1
+      missing: 0
     },
     lastUpdated: "2025-04-15"
   },
