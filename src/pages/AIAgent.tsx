@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,7 +46,7 @@ const emailReminders = [
     status: "responded",
     language: "pl",
     dueDate: "2025-06-18",
-    reminderCount: 2
+    reminderCount: 1
   },
   {
     id: "rem-3",
