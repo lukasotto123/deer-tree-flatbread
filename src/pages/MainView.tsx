@@ -26,7 +26,7 @@ const modifiedHistoricalData = [
   { name: "Sep", beitragsrückstände: 5, fehlend: 8, ablaufend: 7, gültig: 80 },
   { name: "Okt", beitragsrückstände: 4, fehlend: 6, ablaufend: 5, gültig: 85 },
   { name: "Nov", beitragsrückstände: 3, fehlend: 4, ablaufend: 3, gültig: 90 },
-  { name: "Dez", beitragsrückstände: 2, fehlend: 3, ablaufend: 2, gültig: 93 },
+  { name: "Dez", beitragsrückstände: 0, fehlend: 3, ablaufend: 0, gültig: 97 },
 ];
 
 // Chart configuration
