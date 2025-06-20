@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CompanyDocumentView from "@/components/documents/CompanyDocumentView";
+import { useDocumentState } from "@/hooks/useDocumentState";
 import { 
   Sparkles, 
   Mail, 
@@ -62,81 +63,90 @@ const emailReminders = [
   }
 ];
 
-const receivedDocuments = [
-  {
-    id: "doc-2",
-    sender: "Nowak Construction Group",
-    contact: "Tomasz Nowak",
-    email: "kontakt@nowak-construction.de",
-    documentType: "A1-Bescheinigung",
-    receivedDate: "2025-06-18T16:20:00Z",
-    status: "pending",
-    documentLevel: "employee",
-    receptionMethod: "email"
-  },
-  {
-    id: "doc-1",
-    sender: "Bauunternehmen Schmidt GmbH",
-    contact: "Hans Schmidt", 
-    email: "schmidt@bauunternehmen.de",
-    documentType: "Unbedenklichkeitsbescheinigung",
-    receivedDate: "2025-06-14T11:30:00Z",
-    status: "rejected",
-    documentLevel: "employee",
-    receptionMethod: "app"
-  },
-  {
-    id: "doc-3",
-    sender: "French Services SARL",
-    contact: "Pierre Dubois",
-    email: "p.dubois@frenchservices.fr", 
-    documentType: "Reisepass",
-    receivedDate: "2025-06-16T08:45:00Z",
-    status: "pending",
-    documentLevel: "employee",
-    receptionMethod: "email"
-  },
-  {
-    id: "comp-doc-1",
-    sender: "Bauunternehmen Schmidt GmbH",
-    contact: "Hans Schmidt",
-    email: "info@bauunternehmen-schmidt.de",
-    documentType: "Gewerbeanmeldung",
-    receivedDate: "2025-06-12T14:20:00Z",
-    status: "pending",
-    documentLevel: "company",
-    receptionMethod: "app"
-  },
-  {
-    id: "comp-doc-2",
-    sender: "Nowak Construction Group",
-    contact: "Tomasz Nowak",
-    email: "kontakt@nowak-construction.de",
-    documentType: "Handelsregisterauszug",
-    receivedDate: "2025-06-11T09:15:00Z",
-    status: "pending",
-    documentLevel: "company",
-    receptionMethod: "email"
-  },
-  {
-    id: "comp-doc-3",
-    sender: "French Services SARL",
-    contact: "Pierre Dubois",
-    email: "contact@frenchservices.fr",
-    documentType: "Betriebshaftpflichtversicherung",
-    receivedDate: "2025-06-10T16:30:00Z",
-    status: "rejected",
-    documentLevel: "company",
-    receptionMethod: "app"
-  }
-];
-
 const AIAgent = () => {
   const [selectedTab, setSelectedTab] = useState("reminders");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "document">("list");
   const [selectedDocumentId, setSelectedDocumentId] = useState<string>("");
+  const { isJanKowalskiA1Accepted } = useDocumentState();
+
+  // Function to get document status based on global state
+  const getDocumentStatus = (docId: string, originalStatus: string) => {
+    if (docId === "doc-2") {
+      return isJanKowalskiA1Accepted ? "accepted" : "pending";
+    }
+    return originalStatus;
+  };
+
+  const receivedDocuments = [
+    {
+      id: "doc-2",
+      sender: "Nowak Construction Group",
+      contact: "Tomasz Nowak",
+      email: "kontakt@nowak-construction.de",
+      documentType: "A1-Bescheinigung",
+      receivedDate: "2025-06-18T16:20:00Z",
+      status: getDocumentStatus("doc-2", "pending"),
+      documentLevel: "employee",
+      receptionMethod: "email"
+    },
+    {
+      id: "doc-1",
+      sender: "Bauunternehmen Schmidt GmbH",
+      contact: "Hans Schmidt", 
+      email: "schmidt@bauunternehmen.de",
+      documentType: "Unbedenklichkeitsbescheinigung",
+      receivedDate: "2025-06-14T11:30:00Z",
+      status: "rejected",
+      documentLevel: "employee",
+      receptionMethod: "app"
+    },
+    {
+      id: "doc-3",
+      sender: "French Services SARL",
+      contact: "Pierre Dubois",
+      email: "p.dubois@frenchservices.fr", 
+      documentType: "Reisepass",
+      receivedDate: "2025-06-16T08:45:00Z",
+      status: "pending",
+      documentLevel: "employee",
+      receptionMethod: "email"
+    },
+    {
+      id: "comp-doc-1",
+      sender: "Bauunternehmen Schmidt GmbH",
+      contact: "Hans Schmidt",
+      email: "info@bauunternehmen-schmidt.de",
+      documentType: "Gewerbeanmeldung",
+      receivedDate: "2025-06-12T14:20:00Z",
+      status: "pending",
+      documentLevel: "company",
+      receptionMethod: "app"
+    },
+    {
+      id: "comp-doc-2",
+      sender: "Nowak Construction Group",
+      contact: "Tomasz Nowak",
+      email: "kontakt@nowak-construction.de",
+      documentType: "Handelsregisterauszug",
+      receivedDate: "2025-06-11T09:15:00Z",
+      status: "pending",
+      documentLevel: "company",
+      receptionMethod: "email"
+    },
+    {
+      id: "comp-doc-3",
+      sender: "French Services SARL",
+      contact: "Pierre Dubois",
+      email: "contact@frenchservices.fr",
+      documentType: "Betriebshaftpflichtversicherung",
+      receivedDate: "2025-06-10T16:30:00Z",
+      status: "rejected",
+      documentLevel: "company",
+      receptionMethod: "app"
+    }
+  ];
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {

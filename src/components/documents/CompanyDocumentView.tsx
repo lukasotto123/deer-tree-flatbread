@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -383,7 +384,7 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white border-2 border-green-700"
               >
                 <CheckCircle className="mr-1" />
-                KI-Empfehlung: {isJanKowalskiA1 && isJanKowalskiA1Accepted ? "Rückgängig machen" : "Akzeptieren"}
+                {isJanKowalskiA1 && isJanKowalskiA1Accepted ? "Akzeptiert" : "Akzeptieren"}
               </Button>
             </CardFooter>
           </Card>
