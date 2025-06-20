@@ -13,20 +13,20 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Separator } from "@/components/ui/separator";
 
-// Updated historical data with meaningful percentage values that sum to 100%
+// Updated historical data from July to June with more realistic variations
 const modifiedHistoricalData = [
-  { name: "Jan", beitragsrückstände: 15, fehlend: 25, ablaufend: 20, gültig: 40 },
-  { name: "Feb", beitragsrückstände: 14, fehlend: 23, ablaufend: 18, gültig: 45 },
-  { name: "März", beitragsrückstände: 12, fehlend: 20, ablaufend: 18, gültig: 50 },
-  { name: "Apr", beitragsrückstände: 10, fehlend: 18, ablaufend: 17, gültig: 55 },
-  { name: "Mai", beitragsrückstände: 9, fehlend: 16, ablaufend: 15, gültig: 60 },
-  { name: "Jun", beitragsrückstände: 8, fehlend: 14, ablaufend: 13, gültig: 65 },
-  { name: "Jul", beitragsrückstände: 7, fehlend: 12, ablaufend: 11, gültig: 70 },
-  { name: "Aug", beitragsrückstände: 6, fehlend: 10, ablaufend: 9, gültig: 75 },
-  { name: "Sep", beitragsrückstände: 5, fehlend: 8, ablaufend: 7, gültig: 80 },
-  { name: "Okt", beitragsrückstände: 4, fehlend: 6, ablaufend: 5, gültig: 85 },
-  { name: "Nov", beitragsrückstände: 3, fehlend: 4, ablaufend: 3, gültig: 90 },
-  { name: "Dez", beitragsrückstände: 0, fehlend: 3, ablaufend: 0, gültig: 97 },
+  { name: "Jul", beitragsrückstände: 18, fehlend: 28, ablaufend: 22, gültig: 32 },
+  { name: "Aug", beitragsrückstände: 16, fehlend: 26, ablaufend: 19, gültig: 39 },
+  { name: "Sep", beitragsrückstände: 15, fehlend: 24, ablaufend: 21, gültig: 40 },
+  { name: "Okt", beitragsrückstände: 12, fehlend: 22, ablaufend: 18, gültig: 48 },
+  { name: "Nov", beitragsrückstände: 14, fehlend: 20, ablaufend: 16, gültig: 50 },
+  { name: "Dez", beitragsrückstände: 10, fehlend: 19, ablaufend: 14, gültig: 57 },
+  { name: "Jan", beitragsrückstände: 8, fehlend: 17, ablaufend: 15, gültig: 60 },
+  { name: "Feb", beitragsrückstände: 9, fehlend: 15, ablaufend: 13, gültig: 63 },
+  { name: "Mär", beitragsrückstände: 6, fehlend: 14, ablaufend: 12, gültig: 68 },
+  { name: "Apr", beitragsrückstände: 4, fehlend: 12, ablaufend: 9, gültig: 75 },
+  { name: "Mai", beitragsrückstände: 2, fehlend: 8, ablaufend: 5, gültig: 85 },
+  { name: "Jun", beitragsrückstände: 0, fehlend: 3, ablaufend: 0, gültig: 97 },
 ];
 
 // Chart configuration
@@ -225,7 +225,7 @@ const MainView = () => {
         </Card>
       </div>
 
-      {/* Updated historical chart with percentages and vertical margin */}
+      {/* Updated historical chart with new July-June timeframe */}
       <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Compliance Entwicklung</CardTitle>
