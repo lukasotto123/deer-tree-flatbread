@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FileText, Eye, MoreHorizontal } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
-import { shouldDocumentBeMissing, getDocumentStatus, getDocumentExpiryDate } from "./documentStatusUtils";
+import { shouldDocumentBeMissing, getDocumentStatus, getDocumentExpiryDate, getRemindersCount } from "./documentStatusUtils";
 
 interface VendorDocumentsTableProps {
   relevantDocTypes: any[];
@@ -53,10 +53,22 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
               
               const documentStatus = getDocumentStatus(employeeId, docType.id);
               const expiryDate = getDocumentExpiryDate(employeeId, docType.id);
+              const remindersCount = getRemindersCount(employeeId, docType.id);
               
               // Special case for A1-Bescheinigung - only relevant for non-Germans
               const isA1Doc = docType.id === "doc-type-11";
               const isRequired = isA1Doc ? citizenship !== "Deutschland" : true;
+
+              // Spezielle Relevanz-Anzeige für Jan Kowalski's A1-Bescheinigung
+              const getRelevanceLabel = () => {
+                if (isA1Doc && employeeId === "employee-15") {
+                  return "Relevant"; // Für Jan's A1-Bescheinigung "Relevant" anzeigen
+                }
+                if (isA1Doc && citizenship !== "Deutschland") {
+                  return "Verpflichtend (A1)";
+                }
+                return isRequired ? "Relevant" : "Nicht relevant";
+              };
 
               const hasHistory = doc && selectedDocumentId === doc.id;
               const isMissing = !doc;
@@ -83,7 +95,7 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
                     <TableCell>
                       {(isMissing || documentStatus === "expired") && (
                         <div className="text-sm">
-                          <div>{Math.floor(Math.random() * 3)} gesendet</div>
+                          <div>{remindersCount} gesendet</div>
                           <div className="text-xs text-muted-foreground">
                             Nächste: {new Date().toLocaleDateString('de-DE')}
                           </div>
@@ -97,9 +109,7 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
                           checked={isRequired} 
                         />
                         <Label htmlFor={`relevance-${docType.id}`}>
-                          {isA1Doc && citizenship !== "Deutschland" 
-                            ? "Verpflichtend (A1)" 
-                            : (isRequired ? "Relevant" : "Nicht relevant")}
+                          {getRelevanceLabel()}
                         </Label>
                       </div>
                     </TableCell>
