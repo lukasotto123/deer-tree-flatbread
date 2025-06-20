@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { getDocumentStatusIcon } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Separator } from "@/components/ui/separator";
-import { useLocalDocumentState } from "@/hooks/useDocumentState";
+import { useDocumentState } from "@/hooks/useDocumentState";
 
 // Updated historical data from July to June with more realistic variations
 const modifiedHistoricalData = [
@@ -52,7 +52,7 @@ const chartConfig = {
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
-  const { isJanKowalskiA1Accepted } = useLocalDocumentState();
+  const { isJanKowalskiA1Accepted } = useDocumentState();
 
   // Helper function to get modified provider data with correct document counts
   const getModifiedProviderData = (provider: any) => {
@@ -226,12 +226,7 @@ const MainView = () => {
                 <AlertTriangle className="h-5 w-5 text-amber-600 mr-2" />
                 <h3 className="text-lg font-medium">Fehlende oder abgelaufene Dokumente</h3>
               </div>
-              <p className={`text-4xl font-bold ${isJanKowalskiA1Accepted ? 'text-green-600' : ''}`}>
-                {fehlendeDokumente}
-              </p>
-              {isJanKowalskiA1Accepted && (
-                <p className="text-sm text-green-600 mt-1">✓ Jan Kowalski A1 akzeptiert</p>
-              )}
+              <p className="text-4xl font-bold">{fehlendeDokumente}</p>
             </div>
             <div className="mt-6">
               <Button className="w-full" asChild>
@@ -454,6 +449,11 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
 
 // Helper function to determine the worst-case status icon for a provider
 const getProviderStatusIcon = (provider: typeof providers[0]) => {
+  // Nowak Construction Group (provider-3) should show AlertTriangle when not accepted
+  if (provider.id === "provider-3" && provider.documentsCount.expired > 0) {
+    return <AlertTriangle className="h-5 w-5 text-amber-600" />;
+  }
+
   // Dynamic logic based on document counts
   if (provider.documentsCount.expired === 0 && provider.documentsCount.missing === 0) {
     return <CheckCircle className="h-5 w-5 text-green-600" />;

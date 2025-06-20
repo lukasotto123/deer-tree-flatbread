@@ -14,6 +14,7 @@ import PersonView from "./pages/PersonView";
 import VendorPersonView from "./pages/VendorPersonView";
 import AIAgent from "./pages/AIAgent";
 import NotFound from "./pages/NotFound";
+import { DocumentStateProvider } from "./components/providers/DocumentStateProvider";
 import { useState } from "react";
 
 // Create a client
@@ -25,26 +26,28 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<AppLayout userMode={userMode} onModeChange={setUserMode} />}>
-              {/* Customer (Kunde) routes */}
-              <Route path="/" element={userMode === "kunde" ? <MainView /> : <VendorDashboard />} />
-              <Route path="/provider/:id" element={<ProviderView />} />
-              <Route path="/document-review/:providerId/:documentId" element={<SubmissionReview />} />
-              <Route path="/submission-review/:providerId/:documentId" element={<SubmissionReview />} />
-              <Route path="/document-requirements" element={<DocumentRequirements />} />
-              <Route path="/document/:id" element={<SingleDocumentView />} />
-              <Route path="/requests" element={<RequestView />} />
-              <Route path="/ai-agent" element={<AIAgent />} />
-              
-              {/* Shared routes based on user mode */}
-              <Route path="/person/:providerId/:employeeId" element={<PersonView />} />
-              <Route path="/person/:employeeId" element={<VendorPersonView />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <DocumentStateProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<AppLayout userMode={userMode} onModeChange={setUserMode} />}>
+                {/* Customer (Kunde) routes */}
+                <Route path="/" element={userMode === "kunde" ? <MainView /> : <VendorDashboard />} />
+                <Route path="/provider/:id" element={<ProviderView />} />
+                <Route path="/document-review/:providerId/:documentId" element={<SubmissionReview />} />
+                <Route path="/submission-review/:providerId/:documentId" element={<SubmissionReview />} />
+                <Route path="/document-requirements" element={<DocumentRequirements />} />
+                <Route path="/document/:id" element={<SingleDocumentView />} />
+                <Route path="/requests" element={<RequestView />} />
+                <Route path="/ai-agent" element={<AIAgent />} />
+                
+                {/* Shared routes based on user mode */}
+                <Route path="/person/:providerId/:employeeId" element={<PersonView />} />
+                <Route path="/person/:employeeId" element={<VendorPersonView />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </DocumentStateProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
