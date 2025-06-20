@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -121,7 +120,7 @@ const MainView = () => {
     (doc.name.includes("Unbedenklichkeitsbescheinigung") || doc.name.includes("Beitrag"))
   ).length;
   
-  // Dynamische Berechnung basierend auf Jan Kowalski A1 Status
+  // Dynamische Berechnung basierend auf Jan Kowalski A1 Status - ohne visuelle Indikatoren
   const fehlendeDokumente = isJanKowalskiA1Accepted ? 0 : filteredProviders.reduce(
     (total, provider) => total + provider.documentsCount.missing + provider.documentsCount.expired, 0
   );
@@ -175,34 +174,6 @@ const MainView = () => {
 
       {/* Redesigned Übersichtskarten */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Hidden Nachunternehmer Compliance Card - kept for easy restoration */}
-        <Card className="overflow-hidden border-muted-foreground/20" style={{ display: 'none' }}>
-          <CardContent className="pt-6 pb-4 flex flex-col h-full">
-            <div className="text-center flex-grow">
-              <div className="flex justify-center items-center mb-2">
-                <ShieldCheck className="h-5 w-5 text-primary mr-2" />
-                <h3 className="text-lg font-medium text-center">Nachunternehmer Compliance</h3>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="flex flex-col items-center p-3 rounded-md">
-                  <span className="font-bold text-3xl">{compliantNachunternehmer.length}</span>
-                  <span className="text-sm block text-muted-foreground mt-1">Compliant</span>
-                </div>
-                <div className="flex flex-col items-center p-3 rounded-md">
-                  <span className="font-bold text-3xl">{nonCompliantNachunternehmer.length}</span>
-                  <span className="text-sm block text-muted-foreground mt-1">Nicht Compliant</span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-6">
-              <Button className="w-full">
-                Anzeigen
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-        
         <Card className="border-muted-foreground/20">
           <CardContent className="pt-6 flex flex-col h-full">
             <div className="text-center flex-grow">
@@ -227,12 +198,7 @@ const MainView = () => {
                 <AlertTriangle className="h-5 w-5 text-amber-600 mr-2" />
                 <h3 className="text-lg font-medium">Fehlende oder abgelaufene Dokumente</h3>
               </div>
-              <p className={`text-4xl font-bold ${isJanKowalskiA1Accepted ? 'text-green-600' : ''}`}>
-                {fehlendeDokumente}
-              </p>
-              {isJanKowalskiA1Accepted && (
-                <p className="text-sm text-green-600 mt-1">✓ Jan Kowalski A1 akzeptiert</p>
-              )}
+              <p className="text-4xl font-bold">{fehlendeDokumente}</p>
             </div>
             <div className="mt-6">
               <Button className="w-full" asChild>
