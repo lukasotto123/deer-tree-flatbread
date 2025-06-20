@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -52,11 +53,46 @@ const chartConfig = {
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
 
-  const filteredProviders = providers.filter(provider => 
-    provider.type === 'nachunternehmer' && (
-    activeTab === "niederlassung-a" ? ["provider-3", "provider-4", "provider-6"].includes(provider.id) : 
-    ["provider-5", "provider-7", "provider-8"].includes(provider.id))
-  );
+  // Helper function to get modified provider data with correct document counts
+  const getModifiedProviderData = (provider: any) => {
+    // Elektro Schaltbau GmbH and Metallbau Schmidt GmbH should have all valid documents
+    if (provider.id === "provider-3" || provider.id === "provider-4") {
+      return {
+        ...provider,
+        documentsCount: {
+          valid: 12,
+          expiring: 0,
+          expired: 0,
+          missing: 0
+        },
+        status: 'active' as const
+      };
+    }
+    
+    // Nowak Construction Group should have expired documents but no payment issues
+    if (provider.id === "provider-6") {
+      return {
+        ...provider,
+        documentsCount: {
+          valid: 8,
+          expiring: 2,
+          expired: 2,
+          missing: 0
+        },
+        status: 'active' as const
+      };
+    }
+    
+    return provider;
+  };
+
+  const filteredProviders = providers
+    .filter(provider => 
+      provider.type === 'nachunternehmer' && (
+      activeTab === "niederlassung-a" ? ["provider-3", "provider-4", "provider-6"].includes(provider.id) : 
+      ["provider-5", "provider-7", "provider-8"].includes(provider.id))
+    )
+    .map(getModifiedProviderData);
 
   // Calculate totals for the overview
   const allDocuments = documents.filter(doc => 
@@ -144,7 +180,7 @@ const MainView = () => {
                 <Euro className="h-5 w-5 text-red-600 mr-2" />
                 <h3 className="text-lg font-medium">Beitragsrückstände</h3>
               </div>
-              <p className="text-4xl font-bold">{beitragsrückstände}</p>
+              <p className="text-4xl font-bold">0</p>
             </div>
             <div className="mt-6">
               <Button className="w-full" asChild>
@@ -384,6 +420,16 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
 
 // Helper function to determine the worst-case status icon for a provider
 const getProviderStatusIcon = (provider: typeof providers[0]) => {
+  // For Elektro Schaltbau GmbH and Metallbau Schmidt GmbH - show valid status
+  if (provider.id === "provider-3" || provider.id === "provider-4") {
+    return <CheckCircle className="h-5 w-5 text-green-600" />;
+  }
+  
+  // For Nowak Construction Group - show expired documents icon (not payment issues)
+  if (provider.id === "provider-6") {
+    return <AlertTriangle className="h-5 w-5 text-amber-600" />;
+  }
+
   const hasBeitragsrückstände = provider.documentsCount.expired > 0 && 
     documents.some(d => 
       d.providerId === provider.id && 
