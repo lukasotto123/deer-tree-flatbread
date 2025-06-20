@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -14,6 +15,7 @@ import { FileText, Check, X, CheckCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useLocalDocumentState } from "@/hooks/useDocumentState";
 
 const formSchema = z.object({
   comments: z.string().optional()
@@ -53,6 +55,7 @@ interface CompanyDocumentViewProps {
 
 const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isJanKowalskiA1Accepted, toggleJanKowalskiA1 } = useLocalDocumentState();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -121,10 +124,16 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
 
   const extractedData = getDocumentData(documentId);
   
-  // Handle approval
+  // Handle approval - Neue Logik für Jan Kowalski A1
   const handleApprove = () => {
     setIsSubmitting(true);
     console.log("Document approved", documentId);
+    
+    // Spezielle Logik für Jan Kowalski A1-Bescheinigung
+    if (documentId === "doc-2" && extractedData.isA1Certificate && extractedData.firstName === "Jan") {
+      toggleJanKowalskiA1();
+      console.log("Jan Kowalski A1 status toggled. New status:", !isJanKowalskiA1Accepted);
+    }
     
     setTimeout(() => {
       setIsSubmitting(false);
@@ -144,6 +153,7 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
   };
 
   const isA1Certificate = extractedData.isA1Certificate || false;
+  const isJanKowalskiA1 = documentId === "doc-2" && extractedData.firstName === "Jan";
 
   return (
     <div className="space-y-6">
@@ -374,7 +384,7 @@ const CompanyDocumentView = ({ documentId, onBack }: CompanyDocumentViewProps) =
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white border-2 border-green-700"
               >
                 <CheckCircle className="mr-1" />
-                KI-Empfehlung: Akzeptieren
+                KI-Empfehlung: {isJanKowalskiA1 && isJanKowalskiA1Accepted ? "Rückgängig machen" : "Akzeptieren"}
               </Button>
             </CardFooter>
           </Card>

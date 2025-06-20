@@ -12,6 +12,7 @@ import { getDocumentStatusIcon } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Separator } from "@/components/ui/separator";
+import { useLocalDocumentState } from "@/hooks/useDocumentState";
 
 // Updated historical data from July to June with more realistic variations
 const modifiedHistoricalData = [
@@ -51,21 +52,37 @@ const chartConfig = {
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
+  const { isJanKowalskiA1Accepted } = useLocalDocumentState();
 
   // Helper function to get modified provider data with correct document counts
   const getModifiedProviderData = (provider: any) => {
-    // Nowak Construction Group should have 1 expired document
+    // Nowak Construction Group - dynamisch basierend auf Jan Kowalski A1 Status
     if (provider.id === "provider-3") {
-      return {
-        ...provider,
-        documentsCount: {
-          valid: 11,
-          expiring: 0,
-          expired: 1,
-          missing: 0
-        },
-        status: 'active' as const
-      };
+      if (isJanKowalskiA1Accepted) {
+        // Alle Dokumente sind gültig wenn A1 akzeptiert
+        return {
+          ...provider,
+          documentsCount: {
+            valid: 12,
+            expiring: 0,
+            expired: 0,
+            missing: 0
+          },
+          status: 'active' as const
+        };
+      } else {
+        // 1 abgelaufenes Dokument wenn A1 nicht akzeptiert
+        return {
+          ...provider,
+          documentsCount: {
+            valid: 11,
+            expiring: 0,
+            expired: 1,
+            missing: 0
+          },
+          status: 'active' as const
+        };
+      }
     }
     
     // Elektro Schaltbau GmbH and Metallbau Schmidt GmbH should have all valid documents
@@ -103,7 +120,8 @@ const MainView = () => {
     (doc.name.includes("Unbedenklichkeitsbescheinigung") || doc.name.includes("Beitrag"))
   ).length;
   
-  const fehlendeDokumente = filteredProviders.reduce(
+  // Dynamische Berechnung basierend auf Jan Kowalski A1 Status
+  const fehlendeDokumente = isJanKowalskiA1Accepted ? 0 : filteredProviders.reduce(
     (total, provider) => total + provider.documentsCount.missing + provider.documentsCount.expired, 0
   );
   
@@ -123,6 +141,18 @@ const MainView = () => {
     p.documentsCount.missing > 0 || 
     p.status !== 'active'
   );
+
+  // Update chart data based on Jan Kowalski A1 status
+  const dynamicHistoricalData = modifiedHistoricalData.map(item => {
+    if (item.name === "Jun" && isJanKowalskiA1Accepted) {
+      return {
+        ...item,
+        fehlend: 0,
+        gültig: 100
+      };
+    }
+    return item;
+  });
 
   // Helper function to render the icon based on the new utils format
   const renderIcon = (iconData: ReturnType<typeof getDocumentStatusIcon>) => {
@@ -196,7 +226,12 @@ const MainView = () => {
                 <AlertTriangle className="h-5 w-5 text-amber-600 mr-2" />
                 <h3 className="text-lg font-medium">Fehlende oder abgelaufene Dokumente</h3>
               </div>
-              <p className="text-4xl font-bold">{fehlendeDokumente}</p>
+              <p className={`text-4xl font-bold ${isJanKowalskiA1Accepted ? 'text-green-600' : ''}`}>
+                {fehlendeDokumente}
+              </p>
+              {isJanKowalskiA1Accepted && (
+                <p className="text-sm text-green-600 mt-1">✓ Jan Kowalski A1 akzeptiert</p>
+              )}
             </div>
             <div className="mt-6">
               <Button className="w-full" asChild>
@@ -225,7 +260,7 @@ const MainView = () => {
         </Card>
       </div>
 
-      {/* Updated historical chart with new July-June timeframe */}
+      {/* Updated historical chart with dynamic data */}
       <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Compliance Entwicklung</CardTitle>
@@ -234,7 +269,7 @@ const MainView = () => {
           <div className="h-80 my-8">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={modifiedHistoricalData}
+                data={dynamicHistoricalData}
                 margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
                 stackOffset="expand"
               >
@@ -419,13 +454,8 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
 
 // Helper function to determine the worst-case status icon for a provider
 const getProviderStatusIcon = (provider: typeof providers[0]) => {
-  // For Nowak Construction Group - show expired documents icon (has 1 expired document)
-  if (provider.id === "provider-3") {
-    return <AlertTriangle className="h-5 w-5 text-amber-600" />;
-  }
-  
-  // For Elektro Schaltbau GmbH and Metallbau Schmidt GmbH - show valid status (all clean)
-  if (provider.id === "provider-4" || provider.id === "provider-6") {
+  // Dynamic logic based on document counts
+  if (provider.documentsCount.expired === 0 && provider.documentsCount.missing === 0) {
     return <CheckCircle className="h-5 w-5 text-green-600" />;
   }
 
