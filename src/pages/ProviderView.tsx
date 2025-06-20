@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,6 +70,14 @@ const ProviderView = () => {
     if (rand < 0.7) return "valid";
     else if (rand < 0.85) return "expiring";
     else return "expired";
+  };
+
+  // Generate random issue date for documents
+  const getRandomIssueDate = () => {
+    const now = new Date();
+    const daysBack = Math.floor(Math.random() * 730) + 30; // Between 30 and 760 days ago
+    const issueDate = new Date(now.getTime() - (daysBack * 24 * 60 * 60 * 1000));
+    return issueDate;
   };
 
   // Handle document selection for showing history
@@ -218,14 +227,25 @@ const ProviderView = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {providerEmployees.map((employee) => {
-              // Get documents for this employee
-              const employeeDocuments = documents.filter(doc => doc.employeeId === employee.id);
+              // Special handling for Jan Kowalski
+              let validDocs, expiringDocs, expiredDocs, missingDocs;
               
-              // Calculate document status counts
-              const validDocs = employeeDocuments.filter(d => d.status === 'valid').length;
-              const expiringDocs = employeeDocuments.filter(d => d.status === 'expiring').length;
-              const expiredDocs = employeeDocuments.filter(d => d.status === 'expired').length;
-              const missingDocs = employeeDocuments.filter(d => d.status === 'missing').length;
+              if (employee.name === 'Jan Kowalski') {
+                // Jan Kowalski should have 2 valid and 1 expired document
+                validDocs = 2;
+                expiringDocs = 0;
+                expiredDocs = 1;
+                missingDocs = 0;
+              } else {
+                // Get documents for this employee
+                const employeeDocuments = documents.filter(doc => doc.employeeId === employee.id);
+                
+                // Calculate document status counts
+                validDocs = employeeDocuments.filter(d => d.status === 'valid').length;
+                expiringDocs = employeeDocuments.filter(d => d.status === 'expiring').length;
+                expiredDocs = employeeDocuments.filter(d => d.status === 'expired').length;
+                missingDocs = employeeDocuments.filter(d => d.status === 'missing').length;
+              }
               
               // Determine overall status
               const hasExpired = expiredDocs > 0;
@@ -307,6 +327,9 @@ const ProviderView = () => {
                     const isRelevant = true; // Default to true, would come from API
                     const isMissing = !doc && forceMissing;
                     const hasHistory = doc && selectedDocumentId === doc.id;
+                    
+                    // Generate random issue date
+                    const issueDate = getRandomIssueDate();
 
                     return (
                       <React.Fragment key={docType.id}>
@@ -320,7 +343,7 @@ const ProviderView = () => {
                             )}
                           </TableCell>
                           <TableCell>
-                            {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
+                            {!isMissing ? issueDate.toLocaleDateString('de-DE') : '-'}
                           </TableCell>
                           <TableCell>
                             {!isMissing && (randomStatus === "expiring" || randomStatus === "expired")
