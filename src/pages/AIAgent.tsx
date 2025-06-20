@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,9 +37,9 @@ const emailReminders = [
   },
   {
     id: "rem-2", 
-    recipient: "Bau Meister & Co. KG",
+    recipient: "Nowak Construction Group",
     contact: "Jan Kowalski",
-    email: "j.kowalski@baumeister.de",
+    email: "j.kowalski@nowak-construction.de",
     documentType: "A1-Bescheinigung",
     sentDate: "2024-06-14T14:15:00Z",
     status: "responded",
@@ -65,9 +64,9 @@ const emailReminders = [
 const receivedDocuments = [
   {
     id: "doc-2",
-    sender: "Bau Meister & Co. KG",
+    sender: "Nowak Construction Group",
     contact: "Jan Kowalski",
-    email: "j.kowalski@baumeister.de",
+    email: "j.kowalski@nowak-construction.de",
     documentType: "A1-Bescheinigung",
     receivedDate: "2024-06-15T16:20:00Z",
     status: "accepted",
@@ -109,9 +108,9 @@ const receivedDocuments = [
   },
   {
     id: "comp-doc-2",
-    sender: "Bau Meister & Co. KG",
+    sender: "Nowak Construction Group",
     contact: "Jan Kowalski",
-    email: "office@baumeister.de",
+    email: "office@nowak-construction.de",
     documentType: "Handelsregisterauszug",
     receivedDate: "2024-06-11T09:15:00Z",
     status: "accepted",
