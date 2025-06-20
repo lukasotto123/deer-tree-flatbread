@@ -17,6 +17,7 @@ const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
+  // ALL HOOKS MUST BE CALLED FIRST, BEFORE ANY CONDITIONAL LOGIC
   const { data: providers = [], isLoading: providersLoading } = useProviders();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const { data: documents = [], isLoading: documentsLoading } = useDocuments();
@@ -24,20 +25,24 @@ const ProviderView = () => {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [isActive, setIsActive] = useState<boolean>(true);
   
+  // Find provider after hooks are called
+  const provider = useMemo(() => providers.find(p => p.id === id), [providers, id]);
+  
+  // Set isActive based on provider status - using useEffect with proper dependencies
+  useEffect(() => {
+    if (provider) {
+      setIsActive(provider.status === 'active');
+    }
+  }, [provider]);
+  
+  // NOW we can do conditional returns after all hooks are called
   if (providersLoading || employeesLoading || documentsLoading) {
     return <div>Laden...</div>;
   }
   
-  const provider = providers.find(p => p.id === id);
-  
   if (!provider) {
     return <div>Dienstleister nicht gefunden</div>;
   }
-  
-  // Set isActive based on provider status
-  React.useEffect(() => {
-    setIsActive(provider.status === 'active');
-  }, [provider.status]);
   
   // Dokumente für diesen Dienstleister
   const providerDocuments = documents.filter(doc => 
