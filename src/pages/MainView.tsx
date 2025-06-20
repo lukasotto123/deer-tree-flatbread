@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +13,7 @@ import { getDocumentStatusIcon } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Separator } from "@/components/ui/separator";
-import { useLocalDocumentState } from "@/hooks/useDocumentState";
+import { useDocumentState } from "@/hooks/useDocumentState";
 
 // Updated historical data from July to June with more realistic variations
 const modifiedHistoricalData = [
@@ -52,7 +53,7 @@ const chartConfig = {
 
 const MainView = () => {
   const [activeTab, setActiveTab] = useState("niederlassung-a");
-  const { isJanKowalskiA1Accepted } = useLocalDocumentState();
+  const { isJanKowalskiA1Accepted } = useDocumentState();
 
   // Helper function to get modified provider data with correct document counts
   const getModifiedProviderData = (provider: any) => {
@@ -452,9 +453,21 @@ const ComplianceTable = ({ title, providers }: ComplianceTableProps) => {
   );
 };
 
-// Helper function to determine the worst-case status icon for a provider
+// Helper function to determine the correct status icon for a provider - korrigierte Logik für Nowak
 const getProviderStatusIcon = (provider: typeof providers[0]) => {
-  // Dynamic logic based on document counts
+  // Spezielle Behandlung für Nowak Construction Group (provider-3)
+  if (provider.id === "provider-3") {
+    // Wenn alle Dokumente gültig sind (A1 akzeptiert), dann grünes Häkchen
+    if (provider.documentsCount.expired === 0 && provider.documentsCount.missing === 0) {
+      return <CheckCircle className="h-5 w-5 text-green-600" />;
+    }
+    // Wenn es abgelaufene Dokumente gibt (A1 nicht akzeptiert), dann Warnung
+    if (provider.documentsCount.expired > 0) {
+      return <AlertTriangle className="h-5 w-5 text-amber-600" />;
+    }
+  }
+
+  // Allgemeine Logik für alle anderen Provider
   if (provider.documentsCount.expired === 0 && provider.documentsCount.missing === 0) {
     return <CheckCircle className="h-5 w-5 text-green-600" />;
   }
