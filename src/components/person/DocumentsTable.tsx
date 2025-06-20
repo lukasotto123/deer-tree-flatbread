@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FileText, Eye, MoreHorizontal } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
-import { shouldDocumentBeMissing, getDocumentStatus, getDocumentExpiryDate, getReminderCount, isDocumentRelevant } from "./documentStatusUtils";
+import { shouldDocumentBeMissing, getDocumentStatus, getDocumentExpiryDate } from "./documentStatusUtils";
 
 interface DocumentsTableProps {
   relevantDocTypes: any[];
@@ -56,8 +56,10 @@ const DocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId, provi
               
               const documentStatus = getDocumentStatus(employeeId, docType.id);
               const expiryDate = getDocumentExpiryDate(employeeId, docType.id);
-              const reminderCount = getReminderCount(employeeId, docType.id);
-              const relevanceInfo = isDocumentRelevant(employeeId, docType.id, citizenship);
+              
+              // Special case for A1-Bescheinigung - only relevant for non-Germans
+              const isA1Doc = docType.id === "doc-type-11";
+              const isRequired = isA1Doc ? citizenship !== "Deutschland" : true;
 
               const hasHistory = doc && selectedDocumentId === doc.id;
               const isMissing = !doc;
@@ -84,7 +86,7 @@ const DocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId, provi
                     <TableCell>
                       {(isMissing || documentStatus === "expired") && (
                         <div className="text-sm">
-                          <div>{reminderCount} gesendet</div>
+                          <div>{Math.floor(Math.random() * 3)} gesendet</div>
                           <div className="text-xs text-muted-foreground">
                             Nächste: {new Date().toLocaleDateString('de-DE')}
                           </div>
@@ -95,10 +97,12 @@ const DocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId, provi
                       <div className="flex items-center space-x-2">
                         <Switch 
                           id={`relevance-${docType.id}`} 
-                          checked={relevanceInfo.isRequired}
+                          checked={isRequired}
                         />
                         <Label htmlFor={`relevance-${docType.id}`}>
-                          {relevanceInfo.label}
+                          {isA1Doc && citizenship !== "Deutschland" 
+                            ? "Verpflichtend (A1)" 
+                            : (isRequired ? "Relevant" : "Nicht relevant")}
                         </Label>
                       </div>
                     </TableCell>
