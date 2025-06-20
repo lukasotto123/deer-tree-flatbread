@@ -1,7 +1,7 @@
 
 import { FileText, CheckCircle, Clock } from "lucide-react";
 import StatCard from "./StatCard";
-import ExpiringDocumentsTable from "./ExpiringDocuments Table";
+import ExpiringDocumentsTable from "./ExpiringDocumentsTable";
 import DocumentsOverview from "./DocumentsOverview";
 import { useProviders, useDocuments } from "@/hooks/useSupabaseData";
 import { Button } from "@/components/ui/button";

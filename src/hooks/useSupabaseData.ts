@@ -80,7 +80,26 @@ export const useDocuments = () => {
         expiryDate: doc.expiry_date || null,
         employeeId: doc.employee_id || undefined,
         employeeName: doc.employee_name || undefined,
-        fileUrl: doc.file_url || undefined
+        fileUrl: doc.file_url || undefined,
+        // Map additional required properties from Document type
+        lastChecked: doc.last_checked || null,
+        nextCheckDue: doc.next_check_due || null,
+        checkFrequency: doc.check_frequency || '',
+        isRequired: doc.is_required || true,
+        isSecureCheckRequired: doc.is_secure_check_required || false,
+        isBasicCheckRequired: doc.is_basic_check_required || false,
+        isPerEmployee: doc.is_per_employee || false,
+        isClientSpecific: doc.is_client_specific || false,
+        secureCheckFrequency: doc.secure_check_frequency || '',
+        secureCheckRequirement: doc.secure_check_requirement || '',
+        basicCheckFrequency: doc.basic_check_frequency || '',
+        basicCheckRequirement: doc.basic_check_requirement || '',
+        issuanceType: (doc.issuance_type || 'pro Unternehmen') as 'pro Unternehmen' | 'pro Mitarbeiter',
+        // Optional properties that may not be in database
+        category: undefined,
+        categoryLabel: undefined,
+        remindersSent: undefined,
+        nextReminderDate: undefined
       }))
     }
   })
@@ -105,7 +124,7 @@ export const useDocumentTypes = () => {
         categoryLabel: docType.category_label,
         isPerEmployee: docType.is_per_employee || false,
         isClientSpecific: docType.is_client_specific || false,
-        issuanceType: docType.issuance_type || '',
+        issuanceType: (docType.issuance_type || 'pro Unternehmen') as 'pro Unternehmen' | 'pro Mitarbeiter',
         checkFrequency: {
           secure: docType.check_frequency_secure || '',
           basic: docType.check_frequency_basic || ''
