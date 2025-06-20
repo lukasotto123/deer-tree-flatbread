@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,10 +29,10 @@ const emailReminders = [
     contact: "Hans Schmidt",
     email: "schmidt@bauunternehmen.de",
     documentType: "Unbedenklichkeitsbescheinigung Krankenkasse",
-    sentDate: "2024-06-15T10:30:00Z",
+    sentDate: "2025-06-15T10:30:00Z",
     status: "sent",
     language: "de",
-    dueDate: "2024-06-20",
+    dueDate: "2025-06-20",
     reminderCount: 1
   },
   {
@@ -42,10 +41,10 @@ const emailReminders = [
     contact: "Jan Kowalski",
     email: "kontakt@nowak-construction.de",
     documentType: "A1-Bescheinigung",
-    sentDate: "2024-06-14T14:15:00Z",
+    sentDate: "2025-06-14T14:15:00Z",
     status: "responded",
     language: "pl",
-    dueDate: "2024-06-18",
+    dueDate: "2025-06-18",
     reminderCount: 2
   },
   {
@@ -54,10 +53,10 @@ const emailReminders = [
     contact: "Pierre Dubois", 
     email: "p.dubois@frenchservices.fr",
     documentType: "Reisepass",
-    sentDate: "2024-06-13T09:45:00Z",
+    sentDate: "2025-06-13T09:45:00Z",
     status: "overdue",
     language: "fr",
-    dueDate: "2024-06-17",
+    dueDate: "2025-06-17",
     reminderCount: 3
   }
 ];
@@ -69,7 +68,7 @@ const receivedDocuments = [
     contact: "Jan Kowalski",
     email: "kontakt@nowak-construction.de",
     documentType: "A1-Bescheinigung",
-    receivedDate: "2024-06-15T16:20:00Z",
+    receivedDate: "2025-06-15T16:20:00Z",
     status: "accepted",
     documentLevel: "employee",
     receptionMethod: "email"
@@ -80,7 +79,7 @@ const receivedDocuments = [
     contact: "Hans Schmidt", 
     email: "schmidt@bauunternehmen.de",
     documentType: "Unbedenklichkeitsbescheinigung",
-    receivedDate: "2024-06-14T11:30:00Z",
+    receivedDate: "2025-06-14T11:30:00Z",
     status: "rejected",
     documentLevel: "employee",
     receptionMethod: "app"
@@ -91,7 +90,7 @@ const receivedDocuments = [
     contact: "Pierre Dubois",
     email: "p.dubois@frenchservices.fr", 
     documentType: "Reisepass",
-    receivedDate: "2024-06-16T08:45:00Z",
+    receivedDate: "2025-06-16T08:45:00Z",
     status: "pending",
     documentLevel: "employee",
     receptionMethod: "email"
@@ -102,7 +101,7 @@ const receivedDocuments = [
     contact: "Hans Schmidt",
     email: "info@bauunternehmen-schmidt.de",
     documentType: "Gewerbeanmeldung",
-    receivedDate: "2024-06-12T14:20:00Z",
+    receivedDate: "2025-06-12T14:20:00Z",
     status: "pending",
     documentLevel: "company",
     receptionMethod: "app"
@@ -113,7 +112,7 @@ const receivedDocuments = [
     contact: "Jan Kowalski",
     email: "kontakt@nowak-construction.de",
     documentType: "Handelsregisterauszug",
-    receivedDate: "2024-06-11T09:15:00Z",
+    receivedDate: "2025-06-11T09:15:00Z",
     status: "accepted",
     documentLevel: "company",
     receptionMethod: "email"
@@ -124,7 +123,7 @@ const receivedDocuments = [
     contact: "Pierre Dubois",
     email: "contact@frenchservices.fr",
     documentType: "Betriebshaftpflichtversicherung",
-    receivedDate: "2024-06-10T16:30:00Z",
+    receivedDate: "2025-06-10T16:30:00Z",
     status: "rejected",
     documentLevel: "company",
     receptionMethod: "app"
