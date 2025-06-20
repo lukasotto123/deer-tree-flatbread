@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +26,11 @@ const ProviderView = () => {
   
   // Find provider after hooks are called
   const provider = useMemo(() => providers.find(p => p.id === id), [providers, id]);
+  
+  // Scroll to top when component mounts or provider ID changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
   
   // Set isActive based on provider status - using useEffect with proper dependencies
   useEffect(() => {
