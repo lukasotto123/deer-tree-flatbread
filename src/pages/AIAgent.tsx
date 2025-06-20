@@ -41,7 +41,7 @@ const emailReminders = [
     contact: "Jan Kowalski",
     email: "kontakt@nowak-construction.de",
     documentType: "A1-Bescheinigung",
-    sentDate: "2025-06-14T14:15:00Z",
+    sentDate: "2025-06-18T14:15:00Z",
     status: "responded",
     language: "pl",
     dueDate: "2025-06-18",
@@ -68,7 +68,7 @@ const receivedDocuments = [
     contact: "Jan Kowalski",
     email: "kontakt@nowak-construction.de",
     documentType: "A1-Bescheinigung",
-    receivedDate: "2025-06-15T16:20:00Z",
+    receivedDate: "2025-06-18T16:20:00Z",
     status: "accepted",
     documentLevel: "employee",
     receptionMethod: "email"
