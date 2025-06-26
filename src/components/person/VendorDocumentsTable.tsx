@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FileText, Eye, MoreHorizontal } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
-import { shouldDocumentBeMissing, getDocumentStatus, getDocumentExpiryDate, getRemindersCount } from "./documentStatusUtils";
+import { shouldDocumentBeMissing, getDocumentExpiryDate, getRemindersCount } from "./documentStatusUtils";
 
 interface VendorDocumentsTableProps {
   relevantDocTypes: any[];
@@ -51,8 +51,9 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
               const forceMissing = shouldDocumentBeMissing(employeeId, docType.id);
               const doc = forceMissing ? null : employeeDocuments.find(d => d.type === docType.id);
               
-              const documentStatus = getDocumentStatus(employeeId, docType.id);
-              const expiryDate = getDocumentExpiryDate(employeeId, docType.id);
+              // Use actual document status from Supabase data, with fallback
+              const documentStatus = doc ? doc.status : "missing";
+              const expiryDate = doc ? doc.expiryDate : getDocumentExpiryDate(employeeId, docType.id);
               const remindersCount = getRemindersCount(employeeId, docType.id);
               
               // Special case for A1-Bescheinigung - only relevant for non-Germans
@@ -81,11 +82,7 @@ const VendorDocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId,
                   <TableRow>
                     <TableCell>{docType.name}</TableCell>
                     <TableCell>
-                      {isMissing ? (
-                        <StatusBadge status="missing" />
-                      ) : (
-                        <StatusBadge status={documentStatus} />
-                      )}
+                      <StatusBadge status={documentStatus} />
                     </TableCell>
                     <TableCell>
                       {doc ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}

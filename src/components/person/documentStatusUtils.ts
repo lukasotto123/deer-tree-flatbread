@@ -1,3 +1,4 @@
+
 import { useDocumentReminders } from '@/hooks/useSupabaseData';
 
 export const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
@@ -6,10 +7,10 @@ export const shouldDocumentBeMissing = (employeeId: string, documentTypeId: stri
   return false;
 };
 
-export const getDocumentStatus = (employeeId: string, docTypeId: string) => {
+export const getDocumentStatus = (employeeId: string, docTypeId: string): "valid" | "expiring" | "expired" | "missing" => {
   // This function is now deprecated - we use real Supabase data instead
   // The actual status comes from the documents table in Supabase
-  return "valid"; // Default fallback
+  return "valid"; // Default fallback with correct type
 };
 
 export const getDocumentExpiryDate = (employeeId: string, docTypeId: string) => {
@@ -28,7 +29,7 @@ export const getEmployeeNameAndCitizenship = (employee: any) => {
   return { employeeName, citizenship };
 };
 
-export const determineWorstStatus = (employeeDocuments: any[]) => {
+export const determineWorstStatus = (employeeDocuments: any[]): "valid" | "expiring" | "expired" | "missing" => {
   // Prioritize expired documents first, then missing, then expiring
   const hasExpired = employeeDocuments.some(doc => doc.status === "expired");
   const hasMissing = employeeDocuments.some(doc => doc.status === "missing");
