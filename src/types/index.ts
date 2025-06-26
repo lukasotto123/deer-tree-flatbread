@@ -20,6 +20,8 @@ export interface Provider {
   lastUpdated: string;
 }
 
+export type ProviderType = 'personaldienstleister' | 'nachunternehmer';
+
 export interface Employee {
   id: string;
   providerId: string;
@@ -141,7 +143,9 @@ export type DocumentCategory =
   | 'sozial_versicherungsnachweise'
   | 'arbeits_mindestlohn_compliance'
   | 'behördliche_steuerliche_nachweise'
-  | 'bonitäts_risikoprüfung';
+  | 'bonitäts_risikoprüfung'
+  | 'kundenspezifisch'
+  | 'personal_qualifikationsnachweise';
 
 export interface DocumentRequirement {
   documentTypeId: string;

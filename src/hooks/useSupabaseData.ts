@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/integrations/supabase/client'
-import { Provider, Employee, Document, DocumentType } from '@/types'
+import { Provider, Employee, Document, DocumentType, DocumentCategory } from '@/types'
 
 export const useProviders = () => {
   return useQuery({
@@ -125,7 +125,7 @@ export const useDocumentTypes = () => {
         name: docType.name,
         description: docType.description || '',
         providerType: docType.provider_type as 'personaldienstleister' | 'nachunternehmer',
-        category: docType.category,
+        category: docType.category as DocumentCategory,
         categoryLabel: docType.category_label,
         isPerEmployee: docType.is_per_employee || false,
         isClientSpecific: docType.is_client_specific || false,
