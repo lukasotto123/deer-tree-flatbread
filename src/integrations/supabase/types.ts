@@ -9,6 +9,172 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      company_assignments: {
+        Row: {
+          assignment_end_date: string | null
+          assignment_start_date: string | null
+          company_name: string
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          is_active: boolean | null
+          provider_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_end_date?: string | null
+          assignment_start_date?: string | null
+          company_name: string
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          provider_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_end_date?: string | null
+          assignment_start_date?: string | null
+          company_name?: string
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          provider_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_assignments_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_history: {
+        Row: {
+          action: string
+          details: Json | null
+          document_id: string | null
+          employee_id: string | null
+          id: string
+          new_status: string | null
+          old_status: string | null
+          performed_at: string
+          performed_by: string | null
+          provider_id: string | null
+        }
+        Insert: {
+          action: string
+          details?: Json | null
+          document_id?: string | null
+          employee_id?: string | null
+          id?: string
+          new_status?: string | null
+          old_status?: string | null
+          performed_at?: string
+          performed_by?: string | null
+          provider_id?: string | null
+        }
+        Update: {
+          action?: string
+          details?: Json | null
+          document_id?: string | null
+          employee_id?: string | null
+          id?: string
+          new_status?: string | null
+          old_status?: string | null
+          performed_at?: string
+          performed_by?: string | null
+          provider_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_history_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_history_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_reminders: {
+        Row: {
+          created_at: string | null
+          document_id: string | null
+          email_sent: boolean | null
+          employee_id: string | null
+          id: string
+          next_reminder_due: string | null
+          provider_id: string | null
+          reminder_type: string
+          sent_at: string
+          sms_sent: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_id?: string | null
+          email_sent?: boolean | null
+          employee_id?: string | null
+          id?: string
+          next_reminder_due?: string | null
+          provider_id?: string | null
+          reminder_type: string
+          sent_at?: string
+          sms_sent?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          document_id?: string | null
+          email_sent?: boolean | null
+          employee_id?: string | null
+          id?: string
+          next_reminder_due?: string | null
+          provider_id?: string | null
+          reminder_type?: string
+          sent_at?: string
+          sms_sent?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_reminders_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_reminders_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_reminders_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_types: {
         Row: {
           category: Database["public"]["Enums"]["document_category"]
@@ -62,6 +228,50 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      document_validations: {
+        Row: {
+          confidence_score: number | null
+          document_id: string | null
+          id: string
+          notes: string | null
+          result: string
+          validated_at: string
+          validated_by: string | null
+          validation_details: Json | null
+          validation_type: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          document_id?: string | null
+          id?: string
+          notes?: string | null
+          result: string
+          validated_at?: string
+          validated_by?: string | null
+          validation_details?: Json | null
+          validation_type: string
+        }
+        Update: {
+          confidence_score?: number | null
+          document_id?: string | null
+          id?: string
+          notes?: string | null
+          result?: string
+          validated_at?: string
+          validated_by?: string | null
+          validation_details?: Json | null
+          validation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_validations_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       documents: {
         Row: {
@@ -177,30 +387,54 @@ export type Database = {
       }
       employees: {
         Row: {
+          address: string | null
+          citizenship: string | null
           created_at: string | null
+          date_of_birth: string | null
           documents_required: string[] | null
+          email: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
           id: string
           name: string
+          phone: string | null
           position: string | null
           provider_id: string
+          status: string | null
           updated_at: string | null
         }
         Insert: {
+          address?: string | null
+          citizenship?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           documents_required?: string[] | null
+          email?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
           id: string
           name: string
+          phone?: string | null
           position?: string | null
           provider_id: string
+          status?: string | null
           updated_at?: string | null
         }
         Update: {
+          address?: string | null
+          citizenship?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           documents_required?: string[] | null
+          email?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
           id?: string
           name?: string
+          phone?: string | null
           position?: string | null
           provider_id?: string
+          status?: string | null
           updated_at?: string | null
         }
         Relationships: [

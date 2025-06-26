@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useDocumentValidations } from "@/hooks/useSupabaseData";
 
 interface DocumentsListProps {
   documents: Document[];
@@ -22,6 +23,8 @@ const DocumentsList = ({ documents, activeTab = "all" }: DocumentsListProps) => 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [providerTypeFilter, setProviderTypeFilter] = useState<string>("all");
   const [branchFilter, setBranchFilter] = useState<string>("all");
+  
+  const { data: validations = [] } = useDocumentValidations();
 
   const filteredDocuments = documents.filter((doc) => {
     // Status Filter
@@ -45,17 +48,15 @@ const DocumentsList = ({ documents, activeTab = "all" }: DocumentsListProps) => 
     return true;
   });
 
-  // Künstlich einige Dokumente als "verdächtig" markieren für das Beispiel
+  // Enhance documents with validation data from database
   const enhancedDocuments = filteredDocuments.map(doc => {
-    // Jedes 5. Dokument als verdächtig markieren
-    const isSuspicious = doc.id.charCodeAt(0) % 5 === 0;
-    // Jedes 7. Dokument als KI-verifiziert markieren
-    const isAIVerified = doc.id.charCodeAt(0) % 7 === 0;
+    const validation = validations.find(v => v.document_id === doc.id);
     
     return {
       ...doc,
-      isSuspicious,
-      isAIVerified
+      isSuspicious: validation?.result === 'suspicious' || validation?.result === 'invalid',
+      isAIVerified: validation?.result === 'valid' && validation?.validation_type === 'ai_authenticity',
+      confidenceScore: validation?.confidence_score || 0
     };
   });
 
@@ -100,7 +101,7 @@ const DocumentsList = ({ documents, activeTab = "all" }: DocumentsListProps) => 
             <SelectContent>
               <SelectItem value="all">Alle Dienstleister</SelectItem>
               <SelectItem value="personaldienstleister">Personaldienstleister</SelectItem>
-              <SelectItem value="subunternehmer">Subunternehmer</SelectItem>
+              <SelectItem value="nachunternehmer">Nachunternehmer</SelectItem>
             </SelectContent>
           </Select>
           
@@ -153,25 +154,25 @@ const DocumentsList = ({ documents, activeTab = "all" }: DocumentsListProps) => 
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap">{doc.provider}</td>
                     <td className="py-4 px-4 whitespace-nowrap">
-                      {Math.random() > 0.5 ? (
+                      {doc.employeeId ? (
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 text-muted-foreground mr-2" />
-                          <span>Hauptniederlassung</span>
+                          <Users className="h-4 w-4 text-muted-foreground mr-2" />
+                          <span>{doc.employeeName || 'Mitarbeiter'}</span>
                         </div>
                       ) : (
                         <div className="flex items-center">
-                          <Users className="h-4 w-4 text-muted-foreground mr-2" />
-                          <span>Direkter Kunde</span>
+                          <Building className="h-4 w-4 text-muted-foreground mr-2" />
+                          <span>Unternehmen</span>
                         </div>
                       )}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm">
                       {doc.providerType === "personaldienstleister"
                         ? "Personaldienstl."
-                        : "Subunternehmer"}
+                        : "Nachunternehmer"}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap">
-                      {format(new Date(doc.issuedDate), "dd.MM.yyyy", { locale: de })}
+                      {doc.issuedDate && format(new Date(doc.issuedDate), "dd.MM.yyyy", { locale: de })}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap">
                       {doc.expiryDate
@@ -204,7 +205,7 @@ const DocumentsList = ({ documents, activeTab = "all" }: DocumentsListProps) => 
                               </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>KI-Analyse hat die Echtheit bestätigt</p>
+                              <p>KI-Analyse hat die Echtheit bestätigt (Vertrauen: {Math.round(doc.confidenceScore * 100)}%)</p>
                             </TooltipContent>
                           </Tooltip>
                         ) : (

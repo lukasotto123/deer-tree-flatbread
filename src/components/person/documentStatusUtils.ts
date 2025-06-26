@@ -1,4 +1,5 @@
 
+import { useDocumentReminders } from '@/hooks/useSupabaseData';
 
 export const shouldDocumentBeMissing = (employeeId: string, documentTypeId: string) => {
   // Spezielle Behandlung für Jan Kowalski (employee-15) - bestimmte Dokumente ausblenden
@@ -76,44 +77,10 @@ export const getDocumentExpiryDate = (employeeId: string, docTypeId: string) => 
 };
 
 export const getEmployeeNameAndCitizenship = (employee: any) => {
-  let employeeName = employee.name;
-  let citizenship = "Deutschland"; // Default
+  // Use the actual citizenship data from the database
+  const employeeName = employee.name;
+  const citizenship = employee.citizenship || "Deutschland";
   
-  if (employee.id === "employee-1") {
-    employeeName = "Hans Schmidt";
-    citizenship = "Deutschland";
-  } else if (employee.id === "employee-2") {
-    employeeName = "Maria Wagner";
-    citizenship = "Deutschland";
-  } else if (employee.id === "employee-3") {
-    employeeName = "Pierre Dubois";
-    citizenship = "Frankreich";
-  } else if (employee.id === "employee-4") {
-    employeeName = "Isabella Romano";
-    citizenship = "Italien";
-  } else if (employee.id === "employee-5") {
-    employeeName = "Miguel González";
-    citizenship = "Spanien";
-  } else if (employee.id === "employee-15") {
-    employeeName = "Jan Kowalski";
-    citizenship = "Polen";
-  } else if (employee.id === "employee-6") {
-    employeeName = "Sophia Müller";
-    citizenship = "Deutschland";
-  } else if (employee.id === "employee-7") {
-    employeeName = "Jan Kowalski";
-    citizenship = "Polen";
-  } else if (employee.id === "employee-8") {
-    employeeName = "Anna Hofer";
-    citizenship = "Österreich";
-  } else if (employee.id === "employee-9") {
-    employeeName = "Erik Johansson";
-    citizenship = "Schweden";
-  } else if (employee.id === "employee-10") {
-    employeeName = "Yuki Tanaka";
-    citizenship = "Japan";
-  }
-
   return { employeeName, citizenship };
 };
 
@@ -126,7 +93,16 @@ export const determineWorstStatus = (employeeDocuments: any[]) => {
   return hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
 };
 
-export const getRemindersCount = (employeeId: string, docTypeId: string) => {
+export const getRemindersCount = (employeeId: string, docTypeId: string, reminders?: any[]) => {
+  // If reminders data is available, use it to get actual count
+  if (reminders) {
+    const documentReminders = reminders.filter(r => 
+      r.employee_id === employeeId && 
+      r.document_id?.includes(docTypeId)
+    );
+    return documentReminders.length;
+  }
+  
   // Spezielle Behandlung für Jan Kowalski (employee-15) und A1-Bescheinigung
   if (employeeId === "employee-15" && docTypeId === "doc-type-11") {
     return 1; // Eine Erinnerung für Jan's abgelaufene A1-Bescheinigung
@@ -135,4 +111,3 @@ export const getRemindersCount = (employeeId: string, docTypeId: string) => {
   // Standard random count für andere Dokumente
   return Math.floor(Math.random() * 3);
 };
-

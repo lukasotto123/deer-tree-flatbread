@@ -52,7 +52,14 @@ export const useEmployees = () => {
         providerId: employee.provider_id,
         name: employee.name,
         position: employee.position || '',
-        documentsRequired: employee.documents_required || []
+        documentsRequired: employee.documents_required || [],
+        citizenship: employee.citizenship || 'Deutschland',
+        email: employee.email || '',
+        phone: employee.phone || '',
+        address: employee.address || '',
+        employmentStartDate: employee.employment_start_date || '',
+        employmentEndDate: employee.employment_end_date || '',
+        status: employee.status || 'active'
       }))
     }
   })
@@ -81,7 +88,6 @@ export const useDocuments = () => {
         employeeId: doc.employee_id || undefined,
         employeeName: doc.employee_name || undefined,
         fileUrl: doc.file_url || undefined,
-        // Map additional required properties from Document type
         lastChecked: doc.last_checked || null,
         nextCheckDue: doc.next_check_due || null,
         checkFrequency: doc.check_frequency || '',
@@ -95,7 +101,6 @@ export const useDocuments = () => {
         basicCheckFrequency: doc.basic_check_frequency || '',
         basicCheckRequirement: doc.basic_check_requirement || '',
         issuanceType: (doc.issuance_type || 'pro Unternehmen') as 'pro Unternehmen' | 'pro Mitarbeiter',
-        // Optional properties that may not be in database
         category: undefined,
         categoryLabel: undefined,
         remindersSent: undefined,
@@ -134,6 +139,70 @@ export const useDocumentTypes = () => {
           basic: docType.required_for_basic || ''
         }
       }))
+    }
+  })
+}
+
+export const useDocumentReminders = () => {
+  return useQuery({
+    queryKey: ['documentReminders'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('document_reminders')
+        .select('*')
+      
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export const useDocumentHistory = (documentId?: string) => {
+  return useQuery({
+    queryKey: ['documentHistory', documentId],
+    queryFn: async () => {
+      const query = supabase
+        .from('document_history')
+        .select('*')
+        .order('performed_at', { ascending: false })
+      
+      if (documentId) {
+        query.eq('document_id', documentId)
+      }
+      
+      const { data, error } = await query
+      
+      if (error) throw error
+      return data
+    },
+    enabled: !!documentId
+  })
+}
+
+export const useCompanyAssignments = () => {
+  return useQuery({
+    queryKey: ['companyAssignments'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('company_assignments')
+        .select('*')
+      
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export const useDocumentValidations = () => {
+  return useQuery({
+    queryKey: ['documentValidations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('document_validations')
+        .select('*')
+      
+      if (error) throw error
+      return data
     }
   })
 }

@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FileText, Eye, MoreHorizontal } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
+import { useDocumentReminders } from "@/hooks/useSupabaseData";
 import { shouldDocumentBeMissing, getDocumentStatus, getDocumentExpiryDate, getRemindersCount } from "./documentStatusUtils";
 
 interface DocumentsTableProps {
@@ -22,6 +23,7 @@ interface DocumentsTableProps {
 
 const DocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId, providerId, citizenship }: DocumentsTableProps) => {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const { data: reminders = [] } = useDocumentReminders();
 
   const handleShowDocumentHistory = (docId: string) => {
     setSelectedDocumentId(docId === selectedDocumentId ? null : docId);
@@ -50,22 +52,19 @@ const DocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId, provi
           </TableHeader>
           <TableBody>
             {relevantDocTypes.map((docType) => {
-              // Check if this document should be missing for this employee
               const forceMissing = shouldDocumentBeMissing(employeeId, docType.id);
               const doc = forceMissing ? null : employeeDocuments.find(d => d.type === docType.id);
               
               const documentStatus = getDocumentStatus(employeeId, docType.id);
               const expiryDate = getDocumentExpiryDate(employeeId, docType.id);
-              const remindersCount = getRemindersCount(employeeId, docType.id);
+              const remindersCount = getRemindersCount(employeeId, docType.id, reminders);
               
-              // Special case for A1-Bescheinigung - only relevant for non-Germans
               const isA1Doc = docType.id === "doc-type-11";
               const isRequired = isA1Doc ? citizenship !== "Deutschland" : true;
 
-              // Spezielle Relevanz-Anzeige für Jan Kowalski's A1-Bescheinigung
               const getRelevanceLabel = () => {
                 if (isA1Doc && employeeId === "employee-15") {
-                  return "Relevant"; // Für Jan's A1-Bescheinigung "Relevant" anzeigen
+                  return "Relevant";
                 }
                 if (isA1Doc && citizenship !== "Deutschland") {
                   return "Verpflichtend (A1)";
@@ -75,8 +74,6 @@ const DocumentsTable = ({ relevantDocTypes, employeeDocuments, employeeId, provi
 
               const hasHistory = doc && selectedDocumentId === doc.id;
               const isMissing = !doc;
-
-              // Special handling for Jan Kowalski's A1 certificate - don't show "Nächste" date
               const isJanA1Doc = employeeId === "employee-15" && docType.id === "doc-type-11";
 
               return (
