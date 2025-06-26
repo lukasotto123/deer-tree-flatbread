@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,18 +49,35 @@ const ProviderView = () => {
     return <div>Dienstleister nicht gefunden</div>;
   }
   
-  // Dokumente für diesen Dienstleister
-  const providerDocuments = documents.filter(doc => 
-    doc.providerId === id && !doc.employeeId
-  );
+  // Alle Dokumente für diesen Dienstleister (Unternehmen UND Mitarbeiter)
+  const allProviderDocuments = documents.filter(doc => doc.providerId === id);
+  
+  // Nur Unternehmensdokumente
+  const providerDocuments = allProviderDocuments.filter(doc => !doc.employeeId);
   
   // Mitarbeiter dieses Dienstleisters
   const providerEmployees = employees.filter(e => e.providerId === id);
 
+  // Berechne tatsächliche Dokumentenstatus-Counts basierend auf echten Daten
+  const actualDocumentCounts = useMemo(() => {
+    const valid = allProviderDocuments.filter(doc => doc.status === 'valid').length;
+    const expiring = allProviderDocuments.filter(doc => doc.status === 'expiring').length;
+    const expired = allProviderDocuments.filter(doc => doc.status === 'expired').length;
+    const missing = allProviderDocuments.filter(doc => doc.status === 'missing').length;
+    
+    return {
+      total: allProviderDocuments.length,
+      valid,
+      expiring,
+      expired,
+      missing
+    };
+  }, [allProviderDocuments]);
+
   // Function to determine if a document should be missing based on provider and document type
   const shouldDocumentBeMissing = (providerId: string, documentTypeId: string) => {
-    // For Nowak Construction Group (provider-3), no company documents should be missing
-    if (providerId === "provider-3") return false;
+    // For Malermeister Weber GmbH (provider-8), keine fehlenden Unternehmensdokumente
+    if (providerId === "provider-8") return false;
     
     // For specific providers, mark certain documents as missing
     if (providerId === "provider-1" && documentTypeId === "doc-type-1") return true;
@@ -69,7 +87,17 @@ const ProviderView = () => {
   };
 
   // Randomly distribute document statuses with 70% valid documents
-  const getRandomStatus = () => {
+  const getRandomStatus = (providerId: string, docTypeId: string) => {
+    // Für Malermeister Weber GmbH (provider-8) spezielle Logik
+    if (providerId === "provider-8") {
+      // Unbedenklichkeitsbescheinigung Finanzamt soll expiring sein
+      if (docTypeId === "doc-type-8") return "expiring";
+      // Betriebshaftpflichtversicherung soll expiring sein
+      if (docTypeId === "doc-type-3") return "expiring";
+      // Alle anderen sollen valid sein
+      return "valid";
+    }
+    
     const rand = Math.random();
     if (rand < 0.7) return "valid";
     else if (rand < 0.85) return "expiring";
@@ -151,7 +179,7 @@ const ProviderView = () => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold">{provider.name}</h1>
-          <StatusBadge status={provider.documentsCount.expired > 0 ? "expired" : "valid"} />
+          <StatusBadge status={actualDocumentCounts.expired > 0 ? "expired" : (actualDocumentCounts.expiring > 0 ? "expiring" : "valid")} />
         </div>
         <div className="flex gap-2">
           <Button 
@@ -231,25 +259,14 @@ const ProviderView = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {providerEmployees.map((employee) => {
-              // Special handling for Jan Kowalski
-              let validDocs, expiringDocs, expiredDocs, missingDocs;
+              // Get actual documents for this employee
+              const employeeDocuments = allProviderDocuments.filter(doc => doc.employeeId === employee.id);
               
-              if (employee.name === 'Jan Kowalski') {
-                // Jan Kowalski should have 2 valid and 1 expired document
-                validDocs = 2;
-                expiringDocs = 0;
-                expiredDocs = 1;
-                missingDocs = 0;
-              } else {
-                // Get documents for this employee
-                const employeeDocuments = documents.filter(doc => doc.employeeId === employee.id);
-                
-                // Calculate document status counts
-                validDocs = employeeDocuments.filter(d => d.status === 'valid').length;
-                expiringDocs = employeeDocuments.filter(d => d.status === 'expiring').length;
-                expiredDocs = employeeDocuments.filter(d => d.status === 'expired').length;
-                missingDocs = employeeDocuments.filter(d => d.status === 'missing').length;
-              }
+              // Calculate document status counts based on real data
+              const validDocs = employeeDocuments.filter(d => d.status === 'valid').length;
+              const expiringDocs = employeeDocuments.filter(d => d.status === 'expiring').length;
+              const expiredDocs = employeeDocuments.filter(d => d.status === 'expired').length;
+              const missingDocs = employeeDocuments.filter(d => d.status === 'missing').length;
               
               // Determine overall status
               const hasExpired = expiredDocs > 0;
@@ -326,8 +343,8 @@ const ProviderView = () => {
                     const forceMissing = shouldDocumentBeMissing(provider.id, docType.type);
                     const doc = forceMissing ? null : providerDocuments.find(d => d.type === docType.type);
                     
-                    // For Nowak Construction Group (provider-3), all company documents should be valid
-                    const randomStatus = provider.id === 'provider-3' ? 'valid' : getRandomStatus();
+                    // Use consistent status logic
+                    const documentStatus = getRandomStatus(provider.id, docType.type);
                     const isRelevant = true; // Default to true, would come from API
                     const isMissing = !doc && forceMissing;
                     const hasHistory = doc && selectedDocumentId === doc.id;
@@ -343,19 +360,19 @@ const ProviderView = () => {
                             {isMissing ? (
                               <StatusBadge status="missing" />
                             ) : (
-                              <StatusBadge status={randomStatus} />
+                              <StatusBadge status={documentStatus} />
                             )}
                           </TableCell>
                           <TableCell>
                             {!isMissing ? issueDate.toLocaleDateString('de-DE') : '-'}
                           </TableCell>
                           <TableCell>
-                            {!isMissing && (randomStatus === "expiring" || randomStatus === "expired")
-                              ? new Date(new Date().setMonth(new Date().getMonth() + (randomStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
+                            {!isMissing && (documentStatus === "expiring" || documentStatus === "expired")
+                              ? new Date(new Date().setMonth(new Date().getMonth() + (documentStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
                               : '-'}
                           </TableCell>
                           <TableCell>
-                            {(isMissing || randomStatus === "expired") && (
+                            {(isMissing || documentStatus === "expired" || documentStatus === "expiring") && (
                               <div className="text-sm">
                                 <div>{Math.floor(Math.random() * 3)} gesendet</div>
                                 <div className="text-xs text-muted-foreground">
@@ -401,7 +418,7 @@ const ProviderView = () => {
                               )}
                               
                               {/* Upload/Check button for non-valid or missing documents */}
-                              {(isMissing || (doc && randomStatus !== "valid")) && (
+                              {(isMissing || (doc && documentStatus !== "valid")) && (
                                 isMissing ? (
                                   <Button variant="outline" size="sm" disabled={!isActive}>
                                     Hochladen

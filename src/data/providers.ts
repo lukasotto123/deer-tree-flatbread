@@ -155,10 +155,10 @@ export const providers: Provider[] = [
     status: "active",
     documentsCount: {
       total: 14,
-      valid: 11,
-      expiring: 2,
+      valid: 12,
+      expiring: 2, // Korrigiert: 2 ablaufende Dokumente (nicht 3)
       expired: 0,
-      missing: 1
+      missing: 0 // Korrigiert: keine fehlenden Dokumente, der "Beitragsrückstand" war ein Fehler
     },
     lastUpdated: "2025-04-30"
   }
