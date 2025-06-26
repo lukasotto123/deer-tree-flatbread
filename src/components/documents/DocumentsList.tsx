@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Search, FileText, Download, Info, Shield, AlertTriangle, CheckCircle, Building, Users, Clock } from "lucide-react";
+import { Search, FileText, Download, Info, Shield, AlertTriangle, CheckCircle, Building, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentRequest from "./DocumentRequest";
@@ -24,7 +24,7 @@ const DocumentsList = ({ documents, activeTab = "all" }: DocumentsListProps) => 
   const [providerTypeFilter, setProviderTypeFilter] = useState<string>("all");
   const [branchFilter, setBranchFilter] = useState<string>("all");
   
-  const { data: validations = [] } = useDocumentValidations();
+  const { data: validations = [], isLoading: validationsLoading, error: validationsError } = useDocumentValidations();
 
   const filteredDocuments = documents.filter((doc) => {
     // Status Filter
@@ -59,6 +59,23 @@ const DocumentsList = ({ documents, activeTab = "all" }: DocumentsListProps) => 
       confidenceScore: validation?.confidence_score || 0
     };
   });
+
+  // Handle loading state
+  if (validationsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Laden...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (validationsError) {
+    console.error('Error loading document validations:', validationsError);
+  }
 
   return (
     <div className="space-y-4">

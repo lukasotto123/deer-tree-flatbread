@@ -8,12 +8,34 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-  const { data: documents = [], isLoading: documentsLoading } = useDocuments();
-  const { data: providers = [], isLoading: providersLoading } = useProviders();
-  const { data: locationSummary = [], isLoading: locationLoading } = useLocationDocumentSummary();
+  const { data: documents = [], isLoading: documentsLoading, error: documentsError } = useDocuments();
+  const { data: providers = [], isLoading: providersLoading, error: providersError } = useProviders();
+  const { data: locationSummary = [], isLoading: locationLoading, error: locationError } = useLocationDocumentSummary();
 
+  // Handle loading states
   if (documentsLoading || providersLoading || locationLoading) {
-    return <div>Laden...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Laden...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle error states
+  if (documentsError || providersError || locationError) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <p className="text-destructive mb-2">Fehler beim Laden der Daten</p>
+          <p className="text-muted-foreground text-sm">
+            {documentsError?.message || providersError?.message || locationError?.message}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // Calculate real document statistics from aggregated data

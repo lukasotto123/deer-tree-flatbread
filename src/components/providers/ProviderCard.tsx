@@ -7,6 +7,7 @@ import { Provider } from "@/types";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { CheckCircle, Clock, AlertTriangle, XCircle } from "lucide-react";
 import { useProviderDocumentCounts } from "@/hooks/useSupabaseData";
+import { Link } from "react-router-dom";
 
 interface ProviderCardProps {
   provider: Provider;
@@ -125,7 +126,9 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
           <p className="text-sm text-muted-foreground">
             Letzte Aktualisierung: {provider.lastUpdated}
           </p>
-          <Button size="sm">Details</Button>
+          <Button size="sm" asChild>
+            <Link to={`/providers/${provider.id}`}>Details</Link>
+          </Button>
         </div>
       </div>
     </div>
