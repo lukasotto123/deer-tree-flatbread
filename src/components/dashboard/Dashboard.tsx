@@ -3,18 +3,20 @@ import { FileText, CheckCircle, Clock } from "lucide-react";
 import StatCard from "./StatCard";
 import ExpiringDocumentsTable from "./ExpiringDocumentsTable";
 import DocumentsOverview from "./DocumentsOverview";
-import { useProviders, useDocuments } from "@/hooks/useSupabaseData";
+import { useProviders, useDocuments, useLocationDocumentSummary } from "@/hooks/useSupabaseData";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { data: documents = [], isLoading: documentsLoading } = useDocuments();
   const { data: providers = [], isLoading: providersLoading } = useProviders();
+  const { data: locationSummary = [], isLoading: locationLoading } = useLocationDocumentSummary();
 
-  if (documentsLoading || providersLoading) {
+  if (documentsLoading || providersLoading || locationLoading) {
     return <div>Laden...</div>;
   }
 
+  // Calculate real document statistics from aggregated data
   const documentStats = {
     total: documents.length,
     valid: documents.filter(doc => doc.status === 'valid').length,
@@ -22,7 +24,7 @@ const Dashboard = () => {
     expired: documents.filter(doc => doc.status === 'expired').length,
   };
 
-  // Calculate compliant and non-compliant Partners
+  // Calculate compliant and non-compliant Partners using real provider data with updated counts
   const nachunternehmer = providers.filter(p => p.type === 'nachunternehmer');
   const personaldienstleister = providers.filter(p => p.type === 'personaldienstleister');
   const allPartners = [...nachunternehmer, ...personaldienstleister];
@@ -69,6 +71,7 @@ const Dashboard = () => {
             </Button>
           </div>
         </div>
+        
         <StatCard
           title="Gesamt Dokumente"
           value={documentStats.total}

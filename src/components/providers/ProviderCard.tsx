@@ -6,14 +6,15 @@ import { cn } from "@/lib/utils";
 import { Provider } from "@/types";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { CheckCircle, Clock, AlertTriangle, XCircle } from "lucide-react";
-import { useDocuments } from "@/hooks/useSupabaseData";
+import { useProviderDocumentCounts } from "@/hooks/useSupabaseData";
 
 interface ProviderCardProps {
   provider: Provider;
 }
 
 const ProviderCard = ({ provider }: ProviderCardProps) => {
-  const { data: documents = [] } = useDocuments();
+  // Use the new hook to get real-time aggregated document counts
+  const { data: documentCounts } = useProviderDocumentCounts(provider.id);
   
   const providerTypeText = provider.type === 'personaldienstleister' 
     ? 'Personaldienstleister' 
@@ -25,26 +26,28 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
     pending: { color: 'bg-yellow-100 text-yellow-800', text: 'Ausstehend' },
   };
   
-  // Get actual documents for this provider from Supabase
-  const providerDocuments = documents.filter(doc => doc.providerId === provider.id);
-  
-  // Calculate actual document counts based on real Supabase data
-  const actualCounts = {
-    valid: providerDocuments.filter(doc => doc.status === 'valid').length,
-    expiring: providerDocuments.filter(doc => doc.status === 'expiring').length,
-    expired: providerDocuments.filter(doc => doc.status === 'expired').length,
-    missing: providerDocuments.filter(doc => doc.status === 'missing').length,
+  // Use the real-time aggregated counts from the database function
+  const displayCounts = {
+    valid: Number(documentCounts?.valid_documents || 0),
+    expiring: Number(documentCounts?.expiring_documents || 0),
+    expired: Number(documentCounts?.expired_documents || 0),
+    missing: Number(documentCounts?.missing_documents || 0),
   };
   
-  // Use actual counts from Supabase data instead of hardcoded values
-  const displayCounts = actualCounts;
+  // Check for Beitragsrückstände (specific expired document types)
+  const beitragsrueckstaende = Number(documentCounts?.beitragsrueckstaende || 0);
   
   // Determine worst document status based on actual counts
   const hasExpired = displayCounts.expired > 0;
   const hasMissing = displayCounts.missing > 0;
   const hasExpiring = displayCounts.expiring > 0;
+  const hasBeitragsrueckstaende = beitragsrueckstaende > 0;
   
-  const worstStatus = hasExpired ? "expired" : (hasMissing ? "missing" : (hasExpiring ? "expiring" : "valid"));
+  // Prioritize Beitragsrückstände as the worst status
+  const worstStatus = hasBeitragsrueckstaende ? "expired" : 
+                    (hasExpired ? "expired" : 
+                    (hasMissing ? "missing" : 
+                    (hasExpiring ? "expiring" : "valid")));
   
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden flex flex-col">
@@ -104,6 +107,16 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
               <span>{displayCounts.missing}</span>
             </div>
           </div>
+          
+          {/* Show Beitragsrückstände if any exist */}
+          {beitragsrueckstaende > 0 && (
+            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+              <div className="flex items-center text-red-700 text-sm">
+                <AlertTriangle className="h-4 w-4 mr-1" />
+                <span>{beitragsrueckstaende} Beitragsrückstand{beitragsrueckstaende > 1 ? 'e' : ''}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       

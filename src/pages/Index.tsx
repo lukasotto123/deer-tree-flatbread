@@ -17,15 +17,15 @@ const Index = () => {
     return <div>Laden...</div>;
   }
 
-  // Adjust the distribution to match 70% valid, 30% others
+  // Use real document statistics instead of adjusted distribution
   const documentStats = {
     total: documents.length,
-    valid: Math.round(documents.length * 0.7), // 70% valid documents
-    expiring: Math.round(documents.length * 0.15), // 15% expiring
-    expired: Math.round(documents.length * 0.15), // 15% expired
+    valid: documents.filter(doc => doc.status === 'valid').length,
+    expiring: documents.filter(doc => doc.status === 'expiring').length,
+    expired: documents.filter(doc => doc.status === 'expired').length,
   };
 
-  // Calculate compliant and non-compliant Partners
+  // Calculate compliant and non-compliant Partners using updated aggregated counts
   const nachunternehmer = providers.filter(p => p.type === 'nachunternehmer');
   const personaldienstleister = providers.filter(p => p.type === 'personaldienstleister');
   const allPartners = [...nachunternehmer, ...personaldienstleister];

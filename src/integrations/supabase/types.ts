@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      client_locations: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       company_assignments: {
         Row: {
           assignment_end_date: string | null
@@ -498,6 +522,7 @@ export type Database = {
         Row: {
           address: string | null
           billing_address: string | null
+          client_location_id: string | null
           contact_email: string | null
           contact_person: string | null
           contact_phone: string | null
@@ -518,6 +543,7 @@ export type Database = {
         Insert: {
           address?: string | null
           billing_address?: string | null
+          client_location_id?: string | null
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
@@ -538,6 +564,7 @@ export type Database = {
         Update: {
           address?: string | null
           billing_address?: string | null
+          client_location_id?: string | null
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
@@ -559,8 +586,22 @@ export type Database = {
       }
     }
     Views: {
+      location_document_summary: {
+        Row: {
+          beitragsrueckstaende: number | null
+          expired_documents: number | null
+          expiring_documents: number | null
+          location_id: string | null
+          location_name: string | null
+          missing_documents: number | null
+          total_documents: number | null
+          valid_documents: number | null
+        }
+        Relationships: []
+      }
       provider_document_summary: {
         Row: {
+          client_location_id: string | null
           expired_documents: number | null
           expiring_documents: number | null
           missing_documents: number | null
@@ -578,6 +619,29 @@ export type Database = {
       auto_create_document_reminders: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      calculate_employee_document_counts: {
+        Args: { employee_id_param: string }
+        Returns: {
+          employee_id: string
+          total_documents: number
+          valid_documents: number
+          expiring_documents: number
+          expired_documents: number
+          missing_documents: number
+        }[]
+      }
+      calculate_provider_document_counts: {
+        Args: { provider_id_param: string }
+        Returns: {
+          provider_id: string
+          total_documents: number
+          valid_documents: number
+          expiring_documents: number
+          expired_documents: number
+          missing_documents: number
+          beitragsrueckstaende: number
+        }[]
       }
     }
     Enums: {

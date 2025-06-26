@@ -208,7 +208,7 @@ export const useDocumentValidations = () => {
   })
 }
 
-// New hook to get provider document summary using the new view
+// New hook to get provider document summary using the updated view with client_location_id
 export const useProviderDocumentSummary = () => {
   return useQuery({
     queryKey: ['providerDocumentSummary'],
@@ -220,6 +220,66 @@ export const useProviderDocumentSummary = () => {
       if (error) throw error
       return data
     }
+  })
+}
+
+// New hook to get location document summary
+export const useLocationDocumentSummary = () => {
+  return useQuery({
+    queryKey: ['locationDocumentSummary'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('location_document_summary')
+        .select('*')
+      
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+// New hook to get employee document counts using the database function
+export const useEmployeeDocumentCounts = (employeeId: string) => {
+  return useQuery({
+    queryKey: ['employeeDocumentCounts', employeeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('calculate_employee_document_counts', { employee_id_param: employeeId })
+      
+      if (error) throw error
+      return data[0] || {
+        employee_id: employeeId,
+        total_documents: 0,
+        valid_documents: 0,
+        expiring_documents: 0,
+        expired_documents: 0,
+        missing_documents: 0
+      }
+    },
+    enabled: !!employeeId
+  })
+}
+
+// New hook to get provider document counts using the database function
+export const useProviderDocumentCounts = (providerId: string) => {
+  return useQuery({
+    queryKey: ['providerDocumentCounts', providerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('calculate_provider_document_counts', { provider_id_param: providerId })
+      
+      if (error) throw error
+      return data[0] || {
+        provider_id: providerId,
+        total_documents: 0,
+        valid_documents: 0,
+        expiring_documents: 0,
+        expired_documents: 0,
+        missing_documents: 0,
+        beitragsrueckstaende: 0
+      }
+    },
+    enabled: !!providerId
   })
 }
 
