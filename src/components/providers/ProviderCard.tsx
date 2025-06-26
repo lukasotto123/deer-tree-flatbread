@@ -28,7 +28,7 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
   // Get actual documents for this provider from Supabase
   const providerDocuments = documents.filter(doc => doc.providerId === provider.id);
   
-  // Calculate actual document counts
+  // Calculate actual document counts based on real Supabase data
   const actualCounts = {
     valid: providerDocuments.filter(doc => doc.status === 'valid').length,
     expiring: providerDocuments.filter(doc => doc.status === 'expiring').length,
@@ -36,17 +36,8 @@ const ProviderCard = ({ provider }: ProviderCardProps) => {
     missing: providerDocuments.filter(doc => doc.status === 'missing').length,
   };
   
-  // Spezielle Behandlung für Malermeister Weber GmbH (provider-8)
-  let displayCounts = actualCounts;
-  if (provider.id === "provider-8") {
-    // Für Malermeister Weber: 2 ablaufende Dokumente (Finanzamt + Betriebshaftpflicht)
-    displayCounts = {
-      valid: 12, // Andere Dokumente sind gültig
-      expiring: 2, // Unbedenklichkeitsbescheinigung Finanzamt + Betriebshaftpflichtversicherung
-      expired: 0,
-      missing: 0
-    };
-  }
+  // Use actual counts from Supabase data instead of hardcoded values
+  const displayCounts = actualCounts;
   
   // Determine worst document status based on actual counts
   const hasExpired = displayCounts.expired > 0;

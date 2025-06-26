@@ -150,6 +150,7 @@ export const useDocumentReminders = () => {
       const { data, error } = await supabase
         .from('document_reminders')
         .select('*')
+        .order('sent_at', { ascending: false })
       
       if (error) throw error
       return data
@@ -205,4 +206,38 @@ export const useDocumentValidations = () => {
       return data
     }
   })
+}
+
+// New hook to get provider document summary using the new view
+export const useProviderDocumentSummary = () => {
+  return useQuery({
+    queryKey: ['providerDocumentSummary'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('provider_document_summary')
+        .select('*')
+      
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+// Helper function to create document reminders
+export const createDocumentReminder = async (reminderData: {
+  provider_id: string;
+  employee_id?: string;
+  document_id: string;
+  reminder_type: string;
+  reminder_reason?: string;
+  document_status?: string;
+  days_until_expiry?: number;
+}) => {
+  const { data, error } = await supabase
+    .from('document_reminders')
+    .insert(reminderData)
+    .select()
+  
+  if (error) throw error
+  return data
 }

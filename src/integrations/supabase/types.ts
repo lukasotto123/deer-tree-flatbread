@@ -55,6 +55,13 @@ export type Database = {
             foreignKeyName: "company_assignments_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
+            referencedRelation: "provider_document_summary"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "company_assignments_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
             referencedRelation: "providers"
             referencedColumns: ["id"]
           },
@@ -109,6 +116,13 @@ export type Database = {
             foreignKeyName: "document_history_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
+            referencedRelation: "provider_document_summary"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "document_history_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
             referencedRelation: "providers"
             referencedColumns: ["id"]
           },
@@ -116,37 +130,49 @@ export type Database = {
       }
       document_reminders: {
         Row: {
+          auto_generated: boolean | null
           created_at: string | null
+          days_until_expiry: number | null
           document_id: string | null
+          document_status: string | null
           email_sent: boolean | null
           employee_id: string | null
           id: string
           next_reminder_due: string | null
           provider_id: string | null
+          reminder_reason: string | null
           reminder_type: string
           sent_at: string
           sms_sent: boolean | null
         }
         Insert: {
+          auto_generated?: boolean | null
           created_at?: string | null
+          days_until_expiry?: number | null
           document_id?: string | null
+          document_status?: string | null
           email_sent?: boolean | null
           employee_id?: string | null
           id?: string
           next_reminder_due?: string | null
           provider_id?: string | null
+          reminder_reason?: string | null
           reminder_type: string
           sent_at?: string
           sms_sent?: boolean | null
         }
         Update: {
+          auto_generated?: boolean | null
           created_at?: string | null
+          days_until_expiry?: number | null
           document_id?: string | null
+          document_status?: string | null
           email_sent?: boolean | null
           employee_id?: string | null
           id?: string
           next_reminder_due?: string | null
           provider_id?: string | null
+          reminder_reason?: string | null
           reminder_type?: string
           sent_at?: string
           sms_sent?: boolean | null
@@ -165,6 +191,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_reminders_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_document_summary"
+            referencedColumns: ["provider_id"]
           },
           {
             foreignKeyName: "document_reminders_provider_id_fkey"
@@ -373,6 +406,13 @@ export type Database = {
             foreignKeyName: "documents_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
+            referencedRelation: "provider_document_summary"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "documents_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
             referencedRelation: "providers"
             referencedColumns: ["id"]
           },
@@ -438,6 +478,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "employees_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_document_summary"
+            referencedColumns: ["provider_id"]
+          },
           {
             foreignKeyName: "employees_provider_id_fkey"
             columns: ["provider_id"]
@@ -512,10 +559,26 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      provider_document_summary: {
+        Row: {
+          expired_documents: number | null
+          expiring_documents: number | null
+          missing_documents: number | null
+          provider_id: string | null
+          provider_name: string | null
+          provider_type: Database["public"]["Enums"]["provider_type"] | null
+          reminders_sent: number | null
+          total_documents: number | null
+          valid_documents: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      auto_create_document_reminders: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       document_category:

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { User, FileText, Eye, AlertTriangle, Clock, CheckCircle, Euro, ToggleLeft, ToggleRight, X, Check, Users } from "lucide-react";
-import { useProviders, useEmployees, useDocuments } from "@/hooks/useSupabaseData";
+import { useProviders, useEmployees, useDocuments, useDocumentTypes } from "@/hooks/useSupabaseData";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 import { toast } from "sonner";
 import { DocumentCategory } from "@/types";
+import { triggerDocumentReminder } from "@/components/person/documentStatusUtils";
 
 const ProviderView = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +21,7 @@ const ProviderView = () => {
   const { data: providers = [], isLoading: providersLoading } = useProviders();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const { data: documents = [], isLoading: documentsLoading } = useDocuments();
+  const { data: documentTypes = [], isLoading: documentTypesLoading } = useDocumentTypes();
   
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [isActive, setIsActive] = useState<boolean>(true);
@@ -41,7 +42,7 @@ const ProviderView = () => {
   }, [provider]);
   
   // NOW we can do conditional returns after all hooks are called
-  if (providersLoading || employeesLoading || documentsLoading) {
+  if (providersLoading || employeesLoading || documentsLoading || documentTypesLoading) {
     return <div>Laden...</div>;
   }
   
@@ -52,13 +53,13 @@ const ProviderView = () => {
   // Alle Dokumente für diesen Dienstleister (Unternehmen UND Mitarbeiter)
   const allProviderDocuments = documents.filter(doc => doc.providerId === id);
   
-  // Nur Unternehmensdokumente
+  // Nur Unternehmensdokumente (ohne employee_id)
   const providerDocuments = allProviderDocuments.filter(doc => !doc.employeeId);
   
   // Mitarbeiter dieses Dienstleisters
   const providerEmployees = employees.filter(e => e.providerId === id);
 
-  // Berechne tatsächliche Dokumentenstatus-Counts basierend auf echten Daten
+  // Berechne tatsächliche Dokumentenstatus-Counts basierend auf echten Supabase-Daten
   const actualDocumentCounts = useMemo(() => {
     const valid = allProviderDocuments.filter(doc => doc.status === 'valid').length;
     const expiring = allProviderDocuments.filter(doc => doc.status === 'expiring').length;
@@ -73,44 +74,6 @@ const ProviderView = () => {
       missing
     };
   }, [allProviderDocuments]);
-
-  // Function to determine if a document should be missing based on provider and document type
-  const shouldDocumentBeMissing = (providerId: string, documentTypeId: string) => {
-    // For Malermeister Weber GmbH (provider-8), keine fehlenden Unternehmensdokumente
-    if (providerId === "provider-8") return false;
-    
-    // For specific providers, mark certain documents as missing
-    if (providerId === "provider-1" && documentTypeId === "doc-type-1") return true;
-    if (providerId === "provider-2" && documentTypeId === "doc-type-2") return true;
-    if (providerId === "provider-4" && documentTypeId === "doc-type-4") return true;
-    return false;
-  };
-
-  // Randomly distribute document statuses with 70% valid documents
-  const getRandomStatus = (providerId: string, docTypeId: string) => {
-    // Für Malermeister Weber GmbH (provider-8) spezielle Logik
-    if (providerId === "provider-8") {
-      // Unbedenklichkeitsbescheinigung Finanzamt soll expiring sein
-      if (docTypeId === "doc-type-8") return "expiring";
-      // Betriebshaftpflichtversicherung soll expiring sein
-      if (docTypeId === "doc-type-3") return "expiring";
-      // Alle anderen sollen valid sein
-      return "valid";
-    }
-    
-    const rand = Math.random();
-    if (rand < 0.7) return "valid";
-    else if (rand < 0.85) return "expiring";
-    else return "expired";
-  };
-
-  // Generate random issue date for documents
-  const getRandomIssueDate = () => {
-    const now = new Date();
-    const daysBack = Math.floor(Math.random() * 730) + 30; // Between 30 and 760 days ago
-    const issueDate = new Date(now.getTime() - (daysBack * 24 * 60 * 60 * 1000));
-    return issueDate;
-  };
 
   // Handle document selection for showing history
   const handleShowDocumentHistory = (docId: string) => {
@@ -127,52 +90,31 @@ const ProviderView = () => {
     );
   };
 
-  // Custom document categories with specific documents according to requirements
-  const customDocumentCategories = [
-    {
-      id: "cat-1",
-      category: "sozial_versicherungsnachweise",
-      label: "Sozial- & Versicherungsnachweise",
-      documents: [
-        { id: "doc-1", name: "Unbedenklichkeitsbescheinigung Berufsgenossenschaft", type: "doc-type-1" },
-        { id: "doc-2", name: "Unbedenklichkeitsbescheinigung der SOKA Bau", type: "doc-type-2" },
-        { id: "doc-3", name: "Betriebshaftpflichtversicherung", type: "doc-type-3" }
-      ]
-    },
-    {
-      id: "cat-2",
-      category: "arbeits_mindestlohn_compliance", 
-      label: "Arbeits- & Mindestlohn-Compliance",
-      documents: [
-        { id: "doc-4", name: "Bescheinigung für Tätigkeiten im Baugewerbe § 13b UStG", type: "doc-type-4" },
-        { id: "doc-5", name: "Mitteilung des Steuerberaters (Mitarbeiter u. Mindestlöhne)", type: "doc-type-5" },
-        { id: "doc-6", name: "Eidesstattliche Erklärung zur Zahlung von Mindestlöhnen", type: "doc-type-6" }
-      ]
-    },
-    {
-      id: "cat-3",
-      category: "behördliche_steuerliche_nachweise",
-      label: "Behördliche & steuerliche Nachweise", 
-      documents: [
-        { id: "doc-7", name: "Testergebnis Scheinselbstständigkeit", type: "doc-type-7" },
-        { id: "doc-8", name: "Freistellungsbescheinigung der Finanzverwaltung § 48b EStG", type: "doc-type-8" },
-        { id: "doc-9", name: "Gewerbeanmeldung", type: "doc-type-9" },
-        { id: "doc-10", name: "Unbedenklichkeitsbescheinigung Finanzamt", type: "doc-type-10" },
-        { id: "doc-11", name: "Handelsregisterauszug", type: "doc-type-11" },
-        { id: "doc-12", name: "Handwerkskarte bzw. Eintragung in die Handwerksrolle (IHK, wenn nicht Handwerk)", type: "doc-type-12" },
-        { id: "doc-13", name: "Unternehmerbescheinigung vom Finanzamt", type: "doc-type-13" },
-        { id: "doc-14", name: "Gewerbezentralregisterauszug", type: "doc-type-14" }
-      ]
-    },
-    {
-      id: "cat-4",
-      category: "bonitäts_risikoprüfung",
-      label: "Bonitäts- & Risikoprüfung",
-      documents: [
-        { id: "doc-15", name: "Creditreform-Selbstauskunft über Liquidität", type: "doc-type-15" }
-      ]
+  // Group document types by category for display
+  const documentTypesByCategory = useMemo(() => {
+    const grouped = documentTypes
+      .filter(dt => dt.providerType === provider.type)
+      .reduce((acc, docType) => {
+        if (!acc[docType.category]) {
+          acc[docType.category] = [];
+        }
+        acc[docType.category].push(docType);
+        return acc;
+      }, {} as Record<DocumentCategory, typeof documentTypes>);
+    
+    return grouped;
+  }, [documentTypes, provider.type]);
+
+  // Handle sending reminders for expiring/expired documents
+  const handleRequestDocument = async (documentId: string, status: string) => {
+    try {
+      await triggerDocumentReminder(documentId, provider.id, undefined, status);
+      toast.success(`Erinnerung für ${status === 'expired' ? 'abgelaufenes' : 'ablaufendes'} Dokument wurde gesendet`);
+    } catch (error) {
+      toast.error('Fehler beim Senden der Erinnerung');
+      console.error('Error sending reminder:', error);
     }
-  ];
+  };
 
   return (
     <div className="space-y-6">
@@ -259,10 +201,10 @@ const ProviderView = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {providerEmployees.map((employee) => {
-              // Get actual documents for this employee
+              // Get actual documents for this employee from Supabase
               const employeeDocuments = allProviderDocuments.filter(doc => doc.employeeId === employee.id);
               
-              // Calculate document status counts based on real data
+              // Calculate document status counts based on real Supabase data
               const validDocs = employeeDocuments.filter(d => d.status === 'valid').length;
               const expiringDocs = employeeDocuments.filter(d => d.status === 'expiring').length;
               const expiredDocs = employeeDocuments.filter(d => d.status === 'expired').length;
@@ -322,9 +264,9 @@ const ProviderView = () => {
           <CardTitle>Unternehmensdokumente</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
-          {customDocumentCategories.map((category) => (
-            <div key={category.id}>
-              <h3 className="text-lg font-semibold mb-4">{category.label}</h3>
+          {Object.entries(documentTypesByCategory).map(([category, docTypes]) => (
+            <div key={category}>
+              <h3 className="text-lg font-semibold mb-4">{docTypes[0]?.categoryLabel || category}</h3>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -338,43 +280,33 @@ const ProviderView = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {category.documents.map((docType) => {
-                    // Check if this document should be missing for this provider
-                    const forceMissing = shouldDocumentBeMissing(provider.id, docType.type);
-                    const doc = forceMissing ? null : providerDocuments.find(d => d.type === docType.type);
-                    
-                    // Use consistent status logic
-                    const documentStatus = getRandomStatus(provider.id, docType.type);
+                  {docTypes.map((docType) => {
+                    // Find actual document from Supabase data
+                    const doc = providerDocuments.find(d => d.type === docType.id);
                     const isRelevant = true; // Default to true, would come from API
-                    const isMissing = !doc && forceMissing;
                     const hasHistory = doc && selectedDocumentId === doc.id;
                     
-                    // Generate random issue date
-                    const issueDate = getRandomIssueDate();
-
                     return (
                       <React.Fragment key={docType.id}>
                         <TableRow className={!isActive ? 'opacity-60' : ''}>
                           <TableCell>{docType.name}</TableCell>
                           <TableCell>
-                            {isMissing ? (
-                              <StatusBadge status="missing" />
+                            {doc ? (
+                              <StatusBadge status={doc.status} />
                             ) : (
-                              <StatusBadge status={documentStatus} />
+                              <StatusBadge status="missing" />
                             )}
                           </TableCell>
                           <TableCell>
-                            {!isMissing ? issueDate.toLocaleDateString('de-DE') : '-'}
+                            {doc?.issuedDate ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
                           </TableCell>
                           <TableCell>
-                            {!isMissing && (documentStatus === "expiring" || documentStatus === "expired")
-                              ? new Date(new Date().setMonth(new Date().getMonth() + (documentStatus === "expiring" ? 1 : -1))).toLocaleDateString('de-DE')
-                              : '-'}
+                            {doc?.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
                           </TableCell>
                           <TableCell>
-                            {(isMissing || documentStatus === "expired" || documentStatus === "expiring") && (
+                            {(doc?.status === "expired" || doc?.status === "expiring" || !doc) && (
                               <div className="text-sm">
-                                <div>{Math.floor(Math.random() * 3)} gesendet</div>
+                                <div>Erinnerungen verfügbar</div>
                                 <div className="text-xs text-muted-foreground">
                                   Nächste: {new Date().toLocaleDateString('de-DE')}
                                 </div>
@@ -417,19 +349,16 @@ const ProviderView = () => {
                                 </Button>
                               )}
                               
-                              {/* Upload/Check button for non-valid or missing documents */}
-                              {(isMissing || (doc && documentStatus !== "valid")) && (
-                                isMissing ? (
-                                  <Button variant="outline" size="sm" disabled={!isActive}>
-                                    Hochladen
-                                  </Button>
-                                ) : (
-                                  <Link to={`/document-review/${id}/${doc.id}`}>
-                                    <Button variant="outline" size="sm" disabled={!isActive}>
-                                      Prüfen
-                                    </Button>
-                                  </Link>
-                                )
+                              {/* Request button for non-valid or missing documents */}
+                              {(!doc || (doc && doc.status !== "valid")) && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  disabled={!isActive}
+                                  onClick={() => handleRequestDocument(doc?.id || `missing-${docType.id}`, doc?.status || 'missing')}
+                                >
+                                  Anfordern
+                                </Button>
                               )}
                             </div>
                           </TableCell>
