@@ -27,8 +27,11 @@ const ProviderView = () => {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [isActive, setIsActive] = useState<boolean>(true);
   
-  // Find provider after hooks are called
-  const provider = useMemo(() => providers.find(p => p.id === id), [providers, id]);
+  // Find provider with stable dependencies
+  const provider = useMemo(() => {
+    if (!id || !providers.length) return null;
+    return providers.find(p => p.id === id) || null;
+  }, [providers, id]);
   
   // Scroll to top when component mounts or provider ID changes
   useEffect(() => {
@@ -41,6 +44,52 @@ const ProviderView = () => {
       setIsActive(provider.status === 'active');
     }
   }, [provider]);
+  
+  // Memoize filtered data with stable dependencies
+  const allProviderDocuments = useMemo(() => {
+    if (!id || !documents.length) return [];
+    return documents.filter(doc => doc.providerId === id);
+  }, [documents, id]);
+  
+  const providerDocuments = useMemo(() => {
+    return allProviderDocuments.filter(doc => !doc.employeeId);
+  }, [allProviderDocuments]);
+  
+  const providerEmployees = useMemo(() => {
+    if (!id || !employees.length) return [];
+    return employees.filter(e => e.providerId === id);
+  }, [employees, id]);
+  
+  // Calculate document counts with stable dependencies
+  const actualDocumentCounts = useMemo(() => {
+    const valid = allProviderDocuments.filter(doc => doc.status === 'valid').length;
+    const expiring = allProviderDocuments.filter(doc => doc.status === 'expiring').length;
+    const expired = allProviderDocuments.filter(doc => doc.status === 'expired').length;
+    const missing = allProviderDocuments.filter(doc => doc.status === 'missing').length;
+    
+    return {
+      total: allProviderDocuments.length,
+      valid,
+      expiring,
+      expired,
+      missing
+    };
+  }, [allProviderDocuments]);
+  
+  // Group document types by category with stable dependencies
+  const documentTypesByCategory = useMemo(() => {
+    if (!provider || !documentTypes.length) return {};
+    
+    return documentTypes
+      .filter(dt => dt.providerType === provider.type)
+      .reduce((acc, docType) => {
+        if (!acc[docType.category]) {
+          acc[docType.category] = [];
+        }
+        acc[docType.category].push(docType);
+        return acc;
+      }, {} as Record<DocumentCategory, typeof documentTypes>);
+  }, [documentTypes, provider]);
   
   // NOW we can do conditional returns after all hooks are called
   if (providersLoading || employeesLoading || documentsLoading || documentTypesLoading) {
@@ -83,31 +132,6 @@ const ProviderView = () => {
       </div>
     );
   }
-  
-  // Alle Dokumente für diesen Dienstleister (Unternehmen UND Mitarbeiter)
-  const allProviderDocuments = documents.filter(doc => doc.providerId === id);
-  
-  // Nur Unternehmensdokumente (ohne employee_id)
-  const providerDocuments = allProviderDocuments.filter(doc => !doc.employeeId);
-  
-  // Mitarbeiter dieses Dienstleisters
-  const providerEmployees = employees.filter(e => e.providerId === id);
-
-  // Berechne tatsächliche Dokumentenstatus-Counts basierend auf echten Supabase-Daten
-  const actualDocumentCounts = useMemo(() => {
-    const valid = allProviderDocuments.filter(doc => doc.status === 'valid').length;
-    const expiring = allProviderDocuments.filter(doc => doc.status === 'expiring').length;
-    const expired = allProviderDocuments.filter(doc => doc.status === 'expired').length;
-    const missing = allProviderDocuments.filter(doc => doc.status === 'missing').length;
-    
-    return {
-      total: allProviderDocuments.length,
-      valid,
-      expiring,
-      expired,
-      missing
-    };
-  }, [allProviderDocuments]);
 
   // Handle document selection for showing history
   const handleShowDocumentHistory = (docId: string) => {
@@ -123,21 +147,6 @@ const ProviderView = () => {
         : `${provider.name} wurde aktiviert`
     );
   };
-
-  // Group document types by category for display
-  const documentTypesByCategory = useMemo(() => {
-    const grouped = documentTypes
-      .filter(dt => dt.providerType === provider.type)
-      .reduce((acc, docType) => {
-        if (!acc[docType.category]) {
-          acc[docType.category] = [];
-        }
-        acc[docType.category].push(docType);
-        return acc;
-      }, {} as Record<DocumentCategory, typeof documentTypes>);
-    
-    return grouped;
-  }, [documentTypes, provider.type]);
 
   // Handle sending reminders for expiring/expired documents
   const handleRequestDocument = async (documentId: string, status: string) => {
