@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +10,7 @@ import { useProviders, useEmployees, useDocuments, useDocumentTypes } from "@/ho
 import StatusBadge from "@/components/ui/StatusBadge";
 import DocumentHistory from "@/components/ui/DocumentHistory";
 import { toast } from "sonner";
-import { DocumentCategory } from "@/types";
+import { DocumentCategory, DocumentType } from "@/types";
 import { triggerDocumentReminder } from "@/components/person/documentStatusUtils";
 
 const ProviderView = () => {
@@ -88,7 +87,7 @@ const ProviderView = () => {
         }
         acc[docType.category].push(docType);
         return acc;
-      }, {} as Record<DocumentCategory, typeof documentTypes>);
+      }, {} as Record<DocumentCategory, DocumentType[]>);
   }, [documentTypes, provider]);
   
   // NOW we can do conditional returns after all hooks are called
