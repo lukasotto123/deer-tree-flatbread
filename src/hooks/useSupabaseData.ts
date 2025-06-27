@@ -208,37 +208,7 @@ export const useDocumentValidations = () => {
   })
 }
 
-// New hook to get provider document summary using the updated view with client_location_id
-export const useProviderDocumentSummary = () => {
-  return useQuery({
-    queryKey: ['providerDocumentSummary'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('provider_document_summary')
-        .select('*')
-      
-      if (error) throw error
-      return data
-    }
-  })
-}
-
-// New hook to get location document summary
-export const useLocationDocumentSummary = () => {
-  return useQuery({
-    queryKey: ['locationDocumentSummary'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('location_document_summary')
-        .select('*')
-      
-      if (error) throw error
-      return data
-    }
-  })
-}
-
-// New hook to get employee document counts using the database function
+// Hook to get employee document counts using the database function
 export const useEmployeeDocumentCounts = (employeeId: string) => {
   return useQuery({
     queryKey: ['employeeDocumentCounts', employeeId],
@@ -260,7 +230,7 @@ export const useEmployeeDocumentCounts = (employeeId: string) => {
   })
 }
 
-// New hook to get provider document counts using the database function
+// Hook to get provider document counts using the database function
 export const useProviderDocumentCounts = (providerId: string) => {
   return useQuery({
     queryKey: ['providerDocumentCounts', providerId],

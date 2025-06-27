@@ -3,17 +3,16 @@ import { FileText, CheckCircle, Clock } from "lucide-react";
 import StatCard from "./StatCard";
 import ExpiringDocumentsTable from "./ExpiringDocumentsTable";
 import DocumentsOverview from "./DocumentsOverview";
-import { useProviders, useDocuments, useLocationDocumentSummary } from "@/hooks/useSupabaseData";
+import { useProviders, useDocuments } from "@/hooks/useSupabaseData";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { data: documents = [], isLoading: documentsLoading, error: documentsError } = useDocuments();
   const { data: providers = [], isLoading: providersLoading, error: providersError } = useProviders();
-  const { data: locationSummary = [], isLoading: locationLoading, error: locationError } = useLocationDocumentSummary();
 
   // Handle loading states
-  if (documentsLoading || providersLoading || locationLoading) {
+  if (documentsLoading || providersLoading) {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
@@ -25,13 +24,13 @@ const Dashboard = () => {
   }
 
   // Handle error states
-  if (documentsError || providersError || locationError) {
+  if (documentsError || providersError) {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
           <p className="text-destructive mb-2">Fehler beim Laden der Daten</p>
           <p className="text-muted-foreground text-sm">
-            {documentsError?.message || providersError?.message || locationError?.message}
+            {documentsError?.message || providersError?.message}
           </p>
         </div>
       </div>
