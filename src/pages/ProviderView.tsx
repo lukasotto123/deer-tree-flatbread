@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -306,121 +307,126 @@ const ProviderView = () => {
           <CardTitle>Unternehmensdokumente</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
-          {Object.entries(documentTypesByCategory).map(([category, docTypes]) => (
-            <div key={category}>
-              <h3 className="text-lg font-semibold mb-4">{docTypes[0]?.categoryLabel || category}</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Dokument</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Ausstellungsdatum</TableHead>
-                    <TableHead>Ablaufdatum</TableHead>
-                    <TableHead>Erinnerungen</TableHead>
-                    <TableHead>Relevanz</TableHead>
-                    <TableHead className="text-right">Aktionen</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {docTypes.map((docType) => {
-                    // Find actual document from Supabase data
-                    const doc = providerDocuments.find(d => d.type === docType.id);
-                    const isRelevant = true; // Default to true, would come from API
-                    const hasHistory = doc && selectedDocumentId === doc.id;
-                    
-                    return (
-                      <React.Fragment key={docType.id}>
-                        <TableRow className={!isActive ? 'opacity-60' : ''}>
-                          <TableCell>{docType.name}</TableCell>
-                          <TableCell>
-                            {doc ? (
-                              <StatusBadge status={doc.status} />
-                            ) : (
-                              <StatusBadge status="missing" />
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {doc?.issuedDate ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
-                          </TableCell>
-                          <TableCell>
-                            {doc?.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
-                          </TableCell>
-                          <TableCell>
-                            {(doc?.status === "expired" || doc?.status === "expiring" || !doc) && (
-                              <div className="text-sm">
-                                <div>Erinnerungen verfügbar</div>
-                                <div className="text-xs text-muted-foreground">
-                                  Nächste: {new Date().toLocaleDateString('de-DE')}
+          {Object.entries(documentTypesByCategory).map(([category, docTypes]) => {
+            // Type assertion to ensure docTypes is properly typed
+            const typedDocTypes = docTypes as DocumentType[];
+            
+            return (
+              <div key={category}>
+                <h3 className="text-lg font-semibold mb-4">{typedDocTypes[0]?.categoryLabel || category}</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Dokument</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Ausstellungsdatum</TableHead>
+                      <TableHead>Ablaufdatum</TableHead>
+                      <TableHead>Erinnerungen</TableHead>
+                      <TableHead>Relevanz</TableHead>
+                      <TableHead className="text-right">Aktionen</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {typedDocTypes.map((docType) => {
+                      // Find actual document from Supabase data
+                      const doc = providerDocuments.find(d => d.type === docType.id);
+                      const isRelevant = true; // Default to true, would come from API
+                      const hasHistory = doc && selectedDocumentId === doc.id;
+                      
+                      return (
+                        <React.Fragment key={docType.id}>
+                          <TableRow className={!isActive ? 'opacity-60' : ''}>
+                            <TableCell>{docType.name}</TableCell>
+                            <TableCell>
+                              {doc ? (
+                                <StatusBadge status={doc.status} />
+                              ) : (
+                                <StatusBadge status="missing" />
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {doc?.issuedDate ? new Date(doc.issuedDate).toLocaleDateString('de-DE') : '-'}
+                            </TableCell>
+                            <TableCell>
+                              {doc?.expiryDate ? new Date(doc.expiryDate).toLocaleDateString('de-DE') : '-'}
+                            </TableCell>
+                            <TableCell>
+                              {(doc?.status === "expired" || doc?.status === "expiring" || !doc) && (
+                                <div className="text-sm">
+                                  <div>Erinnerungen verfügbar</div>
+                                  <div className="text-xs text-muted-foreground">
+                                    Nächste: {new Date().toLocaleDateString('de-DE')}
+                                  </div>
                                 </div>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <Switch 
+                                  id={`relevance-${docType.id}`} 
+                                  checked={isRelevant} 
+                                  disabled={!isActive}
+                                />
+                                <Label htmlFor={`relevance-${docType.id}`}>
+                                  {isRelevant ? "Relevant" : "Nicht relevant"}
+                                </Label>
                               </div>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Switch 
-                                id={`relevance-${docType.id}`} 
-                                checked={isRelevant} 
-                                disabled={!isActive}
-                              />
-                              <Label htmlFor={`relevance-${docType.id}`}>
-                                {isRelevant ? "Relevant" : "Nicht relevant"}
-                              </Label>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
-                                disabled={!isActive}
-                              >
-                                <FileText className="h-4 w-4 mr-1" />
-                                Historie
-                              </Button>
-                              
-                              {/* Only show View button for existing documents */}
-                              {doc && (
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
                                 <Button 
                                   variant="outline" 
                                   size="sm"
+                                  onClick={() => handleShowDocumentHistory(doc ? doc.id : `missing-${docType.id}`)}
                                   disabled={!isActive}
                                 >
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  Anzeigen
+                                  <FileText className="h-4 w-4 mr-1" />
+                                  Historie
                                 </Button>
-                              )}
-                              
-                              {/* Request button for non-valid or missing documents */}
-                              {(!doc || (doc && doc.status !== "valid")) && (
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  disabled={!isActive}
-                                  onClick={() => handleRequestDocument(doc?.id || `missing-${docType.id}`, doc?.status || 'missing')}
-                                >
-                                  Anfordern
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                        {hasHistory && (
-                          <TableRow>
-                            <TableCell colSpan={7} className="p-0 border-b-0">
-                              <div className="py-3">
-                                <DocumentHistory documentId={doc.id} />
+                                
+                                {/* Only show View button for existing documents */}
+                                {doc && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    disabled={!isActive}
+                                  >
+                                    <Eye className="h-4 w-4 mr-1" />
+                                    Anzeigen
+                                  </Button>
+                                )}
+                                
+                                {/* Request button for non-valid or missing documents */}
+                                {(!doc || (doc && doc.status !== "valid")) && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    disabled={!isActive}
+                                    onClick={() => handleRequestDocument(doc?.id || `missing-${docType.id}`, doc?.status || 'missing')}
+                                  >
+                                    Anfordern
+                                  </Button>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          ))}
+                          {hasHistory && (
+                            <TableRow>
+                              <TableCell colSpan={7} className="p-0 border-b-0">
+                                <div className="py-3">
+                                  <DocumentHistory documentId={doc.id} />
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
     </div>
