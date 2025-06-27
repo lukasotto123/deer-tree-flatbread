@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,10 +19,10 @@ const ProviderView = () => {
   const navigate = useNavigate();
   
   // ALL HOOKS MUST BE CALLED FIRST, BEFORE ANY CONDITIONAL LOGIC
-  const { data: providers = [], isLoading: providersLoading } = useProviders();
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const { data: documents = [], isLoading: documentsLoading } = useDocuments();
-  const { data: documentTypes = [], isLoading: documentTypesLoading } = useDocumentTypes();
+  const { data: providers = [], isLoading: providersLoading, error: providersError } = useProviders();
+  const { data: employees = [], isLoading: employeesLoading, error: employeesError } = useEmployees();
+  const { data: documents = [], isLoading: documentsLoading, error: documentsError } = useDocuments();
+  const { data: documentTypes = [], isLoading: documentTypesLoading, error: documentTypesError } = useDocumentTypes();
   
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [isActive, setIsActive] = useState<boolean>(true);
@@ -43,11 +44,44 @@ const ProviderView = () => {
   
   // NOW we can do conditional returns after all hooks are called
   if (providersLoading || employeesLoading || documentsLoading || documentTypesLoading) {
-    return <div>Laden...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Laden...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Handle error states
+  if (providersError || employeesError || documentsError || documentTypesError) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <p className="text-destructive mb-2">Fehler beim Laden der Daten</p>
+          <p className="text-muted-foreground text-sm">
+            {providersError?.message || employeesError?.message || documentsError?.message || documentTypesError?.message}
+          </p>
+          <Button variant="outline" onClick={() => navigate("/")}>
+            Zurück zur Übersicht
+          </Button>
+        </div>
+      </div>
+    );
   }
   
   if (!provider) {
-    return <div>Dienstleister nicht gefunden</div>;
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <p className="text-destructive mb-2">Dienstleister nicht gefunden</p>
+          <Button variant="outline" onClick={() => navigate("/")}>
+            Zurück zur Übersicht
+          </Button>
+        </div>
+      </div>
+    );
   }
   
   // Alle Dokumente für diesen Dienstleister (Unternehmen UND Mitarbeiter)

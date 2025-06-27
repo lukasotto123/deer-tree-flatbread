@@ -79,13 +79,6 @@ export type Database = {
             foreignKeyName: "company_assignments_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
-            referencedRelation: "provider_document_summary"
-            referencedColumns: ["provider_id"]
-          },
-          {
-            foreignKeyName: "company_assignments_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
             referencedRelation: "providers"
             referencedColumns: ["id"]
           },
@@ -129,20 +122,6 @@ export type Database = {
           provider_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "document_history_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "document_history_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "provider_document_summary"
-            referencedColumns: ["provider_id"]
-          },
           {
             foreignKeyName: "document_history_provider_id_fkey"
             columns: ["provider_id"]
@@ -203,25 +182,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "document_reminders_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "document_reminders_employee_id_fkey"
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "document_reminders_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "provider_document_summary"
-            referencedColumns: ["provider_id"]
           },
           {
             foreignKeyName: "document_reminders_provider_id_fkey"
@@ -320,15 +285,7 @@ export type Database = {
           validation_details?: Json | null
           validation_type?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "document_validations_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       documents: {
         Row: {
@@ -385,7 +342,7 @@ export type Database = {
           provider_type: Database["public"]["Enums"]["provider_type"]
           secure_check_frequency?: string | null
           secure_check_requirement?: string | null
-          status: Database["public"]["Enums"]["document_status"]
+          status?: Database["public"]["Enums"]["document_status"]
           type: string
           updated_at?: string | null
         }
@@ -425,13 +382,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documents_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "provider_document_summary"
-            referencedColumns: ["provider_id"]
           },
           {
             foreignKeyName: "documents_provider_id_fkey"
@@ -502,13 +452,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "employees_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "provider_document_summary"
-            referencedColumns: ["provider_id"]
-          },
           {
             foreignKeyName: "employees_provider_id_fkey"
             columns: ["provider_id"]
@@ -586,34 +529,7 @@ export type Database = {
       }
     }
     Views: {
-      location_document_summary: {
-        Row: {
-          beitragsrueckstaende: number | null
-          expired_documents: number | null
-          expiring_documents: number | null
-          location_id: string | null
-          location_name: string | null
-          missing_documents: number | null
-          total_documents: number | null
-          valid_documents: number | null
-        }
-        Relationships: []
-      }
-      provider_document_summary: {
-        Row: {
-          client_location_id: string | null
-          expired_documents: number | null
-          expiring_documents: number | null
-          missing_documents: number | null
-          provider_id: string | null
-          provider_name: string | null
-          provider_type: Database["public"]["Enums"]["provider_type"] | null
-          reminders_sent: number | null
-          total_documents: number | null
-          valid_documents: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       auto_create_document_reminders: {
